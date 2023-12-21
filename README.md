@@ -240,6 +240,24 @@ upda_webhooks 2
 upda_events 146
 ```
 
+There's an example [Grafana](https://grafana.com) dashboard in the `_doc/` folder.
+
+[Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) could check for the following:
+
+```yaml
+- name: update_checks
+  rules:
+    - alert: UpdatesAvailable
+      expr: upda_updates == 0 and upda_updates_pending > 0
+      for: 4w
+      labels:
+        severity: high
+        class: update
+      annotations:
+        summary: "Updates available from upda for {{ $labels.job }}"
+        description: "Updates available from upda for {{ $labels.job }}"
+```
+
 ## Deployment
 
 ### Native
@@ -332,3 +350,4 @@ After the release has been created, ensure to change the following settings for 
 * Adapt `CHANGELOG.md` and add an _UNRELEASED_ section
 * Adapt `api.yaml`: `version` attribute must reflect the _next_ version number
 * Adapt `env: VERSION_*` in `.forgejo/workflows/release.yaml` to _next_ version number
+

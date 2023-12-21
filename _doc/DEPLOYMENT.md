@@ -111,7 +111,7 @@ services:
     image: git.myservermanager.com/varakh/upda:latest
     environment:
       - TZ=Europe/Berlin
-      - DB_FILE=/data/upda.db
+      - DB_SQLITE_FILE=/data/upda.db
       - ADMIN_USER=admin
       - ADMIN_PASSWORD=changeit
     restart: unless-stopped
@@ -152,6 +152,14 @@ server {
     
     # api
     location ~* ^/(api)/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    # metrics
+    location ~* ^/metrics {
         proxy_pass http://localhost:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
