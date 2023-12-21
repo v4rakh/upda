@@ -5,7 +5,7 @@ info:
   license:
     name: GPLv3
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
-  version: 1.0.0
+  version: 1.0.1
 externalDocs:
   description: Find out more about the project
   url: https://git.myservermanager.com/varakh/upda
