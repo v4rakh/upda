@@ -1,0 +1,77 @@
+on:
+  push:
+    tags:
+      - '*'
+env:
+  VERSION_MAJOR: 1
+  VERSION_MINOR: 0
+  VERSION_PATCH: 0
+  IMAGE_TAG: varakh/upda
+  IMAGE_TAG_PRIVATE: git.myservermanager.com/varakh/upda
+  FORGEJO_URL: https://git.myservermanager.com
+  FORGEJO_FQDN: git.myservermanager.com
+  FORGEJO_REPO: varakh/upda
+  REVISION: ${{ github.sha }}
+jobs:
+  release:
+    runs-on: docker
+    container:
+      image: node:20-bookworm
+    steps:
+      - name: Prepare requirements
+        run: |
+          apt-get update
+          apt-get install -y curl wget bash apt-transport-https ca-certificates gnupg zstd clang
+          curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update
+          apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '^1.21'
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test native build
+        run: |
+          make ci
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Forgejo
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.FORGEJO_FQDN }}
+          username: ${{ secrets.FORGEJO_USER }}
+          password: ${{ secrets.FORGEJO_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_KEY }}
+      - name: Build and push docker image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: |
+            ${{ env.IMAGE_TAG_PRIVATE }}:${{ env.VERSION_MAJOR }}
+            ${{ env.IMAGE_TAG_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
+            ${{ env.IMAGE_TAG_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+            ${{ env.IMAGE_TAG_PRIVATE }}:latest
+            ${{ env.IMAGE_TAG }}:${{ env.VERSION_MAJOR }}
+            ${{ env.IMAGE_TAG }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
+            ${{ env.IMAGE_TAG }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+            ${{ env.IMAGE_TAG }}:latest
+      - name: Upload artifacts
+        uses: actions/forgejo-release@v1
+        with:
+          url: ${{ env.FORGEJO_URL }}
+          repo: ${{ env.FORGEJO_REPO }}
+          token: ${{ secrets.FORGEJO_TOKEN }}
+          direction: upload
+          tag: ${{ github.ref_name }}
+          release-dir: bin
+          release-notes: "Release of version '${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}'. For a complete changelog, look into ${{ env.FORGEJO_URL }}/${{ env.FORGEJO_REPO }}/src/tag/${{ github.ref_name }}/CHANGELOG.md"

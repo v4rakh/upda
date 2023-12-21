@@ -1,0 +1,1308 @@
+openapi: 3.0.3
+info:
+  title: upda
+  description: API specification
+  license:
+    name: GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about the project
+  url: https://git.myservermanager.com/varakh/upda
+servers:
+  - url: http://localhost:8080/api/v1
+tags:
+  - name: updates
+    description: Updates endpoints
+  - name: webhooks
+    description: Webhooks endpoints
+  - name: events
+    description: Events endpoints
+  - name: application
+    description: Application related endpoints
+  - name: auth
+    description: Application authorization related endpoints
+paths:
+  '/info':
+    get:
+      tags:
+        - application
+      summary: Find application information
+      description: Find application information
+      operationId: findInfo
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfoResponse'
+  '/health':
+    get:
+      tags:
+        - application
+      summary: Find application health
+      description: Find application health
+      operationId: findHealth
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /updates:
+    get:
+      tags:
+        - updates
+      security:
+        - basicAuth: [ ]
+      summary: Finds updates
+      description: Finds updates
+      operationId: findUpdates
+      parameters:
+        - name: page
+          in: query
+          description: the page
+          required: false
+          schema:
+            type: number
+            default: 1
+        - name: pageSize
+          in: query
+          description: the page size
+          required: false
+          schema:
+            type: number
+            default: 5
+        - name: order
+          in: query
+          description: the order
+          required: false
+          schema:
+            type: string
+            default: desc
+            enum:
+              - asc
+              - desc
+        - name: orderBy
+          in: query
+          description: the order by
+          required: false
+          schema:
+            type: string
+            default: updated_at
+            enum:
+              - id
+              - application
+              - provider
+              - host
+              - created_at
+              - updated_at
+        - name: state
+          in: query
+          description: the state (list, added with &state=...&state=...
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - pending
+                - ignored
+                - approved
+        - name: searchTerm
+          in: query
+          description: the search term
+          required: false
+          schema:
+            type: string
+        - name: searchIn
+          in: query
+          description: the search in
+          required: false
+          schema:
+            type: string
+            default: application
+            enum:
+              - application
+              - provider
+              - host
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatePageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/updates/{id}':
+    get:
+      tags:
+        - updates
+      security:
+        - basicAuth: [ ]
+      summary: Finds update by ID
+      description: Finds update by ID
+      operationId: findUpdateById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - updates
+      security:
+        - basicAuth: [ ]
+      summary: Deletes an update by ID
+      description: 'Deletes an update by ID'
+      operationId: deleteUpdateById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/updates/{id}/state':
+    patch:
+      tags:
+        - updates
+      security:
+        - basicAuth: [ ]
+      summary: Modifies update's state by ID
+      description: Modifies update's state by ID
+      operationId: patchUpdateStateById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyUpdateStateRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/webhooks':
+    post:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Creates webhook
+      description: Creates webhook
+      operationId: createWebhook
+      requestBody:
+        description: Creates an announcement
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Finds webhooks
+      description: Finds webhooks
+      operationId: findWebhooks
+      parameters:
+        - name: page
+          in: query
+          description: the page
+          required: false
+          schema:
+            type: number
+            default: 1
+        - name: pageSize
+          in: query
+          description: the page size
+          required: false
+          schema:
+            type: number
+            default: 5
+        - name: order
+          in: query
+          description: the order
+          required: false
+          schema:
+            type: string
+            default: desc
+            enum:
+              - asc
+              - desc
+        - name: orderBy
+          in: query
+          description: the order by
+          required: false
+          schema:
+            type: string
+            default: updated_at
+            enum:
+              - id
+              - label
+              - created_at
+              - updated_at
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/webhooks/{id}':
+    post:
+      tags:
+        - webhooks
+      summary: Invokes a webhook by ID
+      description: 'Invokes a webhook by ID'
+      operationId: invokeWebhookById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+        - name: X-Webhook-Token
+          in: header
+          description: the token for the webhook id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/WebhookGenericRequest'
+                - $ref: '#/components/schemas/WebhookDiunRequest'
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Deletes a webhook by ID
+      description: 'Deletes a webhook by ID'
+      operationId: deleteWebhookById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/webhooks/{id}/label':
+    patch:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Modifies webhook's label by ID
+      description: Modifies webhook's label by ID
+      operationId: patchWebhookLabelById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies a webhook
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyWebhookLabelRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/webhooks/{id}/ignore-host':
+    patch:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Modifies webhook's ignoreHost by ID
+      description: Modifies webhook's ignoreHost by ID
+      operationId: patchWebhookIgnoreHostById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies a webhook
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyWebhookIgnoreHostRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /events:
+    get:
+      tags:
+        - events
+      security:
+        - basicAuth: [ ]
+      summary: Finds events
+      description: Finds events
+      operationId: findEvents
+      parameters:
+        - name: size
+          in: query
+          description: the size
+          required: false
+          schema:
+            type: number
+            default: 10
+        - name: skip
+          in: query
+          description: the skip
+          required: false
+          schema:
+            type: number
+            default: 0
+        - name: order
+          in: query
+          description: the order
+          required: false
+          schema:
+            type: string
+            default: desc
+            enum:
+              - asc
+              - desc
+        - name: orderBy
+          in: query
+          description: the order by
+          required: false
+          schema:
+            type: string
+            default: created_at
+            enum:
+              - id
+              - name
+              - created_at
+              - updated_at
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventWindowResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/events/{id}':
+    delete:
+      tags:
+        - events
+      security:
+        - basicAuth: [ ]
+      summary: Deletes a event by ID
+      description: 'Deletes a event by ID'
+      operationId: deleteEventById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /login:
+    get:
+      tags:
+        - auth
+      security:
+        - basicAuth: [ ]
+      summary: Probes login
+      description: Probes login
+      operationId: probeLogin
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    # response
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: string
+          enum:
+            - IllegalArgument
+            - Unauthorized
+            - Forbidden
+            - NotFound
+            - Conflict
+            - GeneralError
+    InfoResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+            timeZone:
+              type: string
+    HealthResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            healthy:
+              type: boolean
+    UpdateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        application:
+          type: string
+        provider:
+          type: string
+        host:
+          type: string
+        version:
+          type: string
+        state:
+          type: string
+          enum:
+            - pending
+            - approved
+            - ignored
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+    UpdateSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/UpdateResponse'
+    UpdatePageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateResponse'
+            page:
+              type: number
+            pageSize:
+              type: number
+            orderBy:
+              type: string
+              enum:
+                - id
+                - created_at
+                - updated_at
+                - provider
+                - host
+                - label
+            order:
+              type: string
+              enum:
+                - asc
+                - desc
+            totalElements:
+              type: number
+            totalPages:
+              type: number
+    WebhookSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/WebhookResponse'
+    WebhookResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - generic
+            - diun
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        token:
+          type: string
+          description: Only returned during creation
+          nullable: true
+        ignoreHost:
+          type: boolean
+    WebhookPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/WebhookResponse'
+            page:
+              type: number
+            pageSize:
+              type: number
+            orderBy:
+              type: string
+              enum:
+                - id
+                - label
+                - type
+                - created_at
+                - updated_at
+            order:
+              type: string
+              enum:
+                - asc
+                - desc
+            totalElements:
+              type: number
+            totalPages:
+              type: number
+    EventWindowResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/EventResponse'
+            size:
+              type: number
+            skip:
+              type: number
+            orderBy:
+              type: string
+              enum:
+                - id
+                - name
+                - created_at
+                - updated_at
+            order:
+              type: string
+              enum:
+                - asc
+                - desc
+            hasNext:
+              type: boolean
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          enum:
+            - update_created
+            - update_updated
+            - update_updated_state_pending
+            - update_updated_state_approved
+            - update_updated_state_ignored
+            - update_deleted
+            - webhook_created
+            - webhook_updated_label
+            - webhook_updated_ignore_host
+            - webhook_deleted
+        state:
+          type: string
+          enum:
+            - created
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        payload:
+          type: object
+          description: |
+            Depending on the event name, different payload can be returned
+          oneOf:
+            - $ref: '#/components/schemas/EventPayloadUpdateCreatedResponse'
+            - $ref: '#/components/schemas/EventPayloadUpdateUpdatedResponse'
+            - $ref: '#/components/schemas/EventPayloadUpdateDeletedResponse'
+            - $ref: '#/components/schemas/EventPayloadWebhookCreatedResponse'
+            - $ref: '#/components/schemas/EventPayloadWebhookUpdatedResponse'
+            - $ref: '#/components/schemas/EventPayloadWebhookDeletedResponse'
+    EventPayloadUpdateCreatedResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        application:
+          type: string
+        provider:
+          type: string
+        host:
+          type: string
+        version:
+          type: string
+        state:
+          type: string
+          enum:
+            - pending
+            - approved
+            - ignored
+    EventPayloadUpdateUpdatedResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        application:
+          type: string
+        provider:
+          type: string
+        host:
+          type: string
+        versionPrior:
+          type: string
+        version:
+          type: string
+        statePrior:
+          type: string
+          enum:
+            - pending
+            - approved
+            - ignored
+        state:
+          type: string
+          enum:
+            - pending
+            - approved
+            - ignored
+    EventPayloadUpdateDeletedResponse:
+      type: object
+      properties:
+        application:
+          type: string
+        provider:
+          type: string
+        host:
+          type: string
+        version:
+          type: string
+    EventPayloadWebhookCreatedResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - generic
+            - diun
+        ignoreHost:
+          type: boolean
+    EventPayloadWebhookUpdatedResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        labelPrior:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - generic
+            - diun
+        ignoreHostPrior:
+          type: boolean
+        ignoreHost:
+          type: boolean
+    EventPayloadWebhookDeletedResponse:
+      type: object
+      properties:
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - generic
+            - diun
+        ignoreHost:
+          type: boolean
+
+    # requests
+    ModifyUpdateStateRequest:
+      type: object
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          enum:
+            - pending
+            - approved
+            - ignored
+    ModifyWebhookLabelRequest:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+    ModifyWebhookIgnoreHostRequest:
+      type: object
+      required:
+        - ignoreHost
+      properties:
+        ignoreHost:
+          type: boolean
+    CreateWebhookRequest:
+      type: object
+      required:
+        - label
+        - type
+      properties:
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - generic
+            - diun
+        ignoreHost:
+          type: boolean
+    WebhookGenericRequest:
+      type: object
+      required:
+        - application
+        - host
+        - version
+      properties:
+        application:
+          type: string
+        provider:
+          type: string
+          description: The optional provider attribute. If left blank or not sent during webhook invocation, the issuing webhook's label is used.
+          nullable: true
+        host:
+          type: string
+        version:
+          type: string
+        metadata:
+          description: "Any JSON object"
+          type: object
+          additionalProperties:
+            type: object
+    WebhookDiunRequest:
+      type: object
+      required:
+        - diun_version
+        - hostname
+        - status
+        - provider
+        - image
+        - mime_type
+        - digest
+        - created
+        - platform
+        - metadata
+      properties:
+        diun_version:
+          type: string
+        hostname:
+          type: string
+        status:
+          type: string
+        provider:
+          type: string
+        image:
+          type: string
+        hub_link:
+          type: string
+        mime_type:
+          type: string
+        digest:
+          type: string
+        created:
+          type: string
+        platform:
+          type: string
+        metadata:
+          type: object
+          properties:
+            ctn_command:
+              type: string
+            ctn_createdat:
+              type: string
+            ctn_id:
+              type: string
+            ctn_names:
+              type: string
+            ctn_size:
+              type: string
+            ctn_state:
+              type: string
+            ctn_status:
+              type: string

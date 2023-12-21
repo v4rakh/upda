@@ -1,0 +1,952 @@
+{
+  "info": {
+    "_postman_id": "cf0931c9-d395-45f4-be89-a43c1b85b925",
+    "name": "updaserver",
+    "description": "API specification",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "updates",
+      "item": [
+        {
+          "name": "/updates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "",
+                  "if (jsonData.data && jsonData.data.content.length > 0) {",
+                  "    postman.setEnvironmentVariable(\"updateId\", jsonData.data.content[0].id);",
+                  "} else {",
+                  "    postman.setEnvironmentVariable(\"updateId\", null);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/updates?page=1&pageSize=10&order=desc&orderBy=updated_at&searchTerm=docker.io&searchIn=application",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "updates"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "the page"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "the page size"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "the order"
+                },
+                {
+                  "key": "orderBy",
+                  "value": "updated_at",
+                  "description": "the order by"
+                },
+                {
+                  "key": "state",
+                  "value": "ignored",
+                  "description": "the state",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "approved",
+                  "description": "the state",
+                  "disabled": true
+                },
+                {
+                  "key": "state",
+                  "value": "pending",
+                  "description": "the state",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "docker.io",
+                  "description": "the search term"
+                },
+                {
+                  "key": "searchIn",
+                  "value": "application",
+                  "description": "the search in"
+                }
+              ]
+            },
+            "description": "Finds updates"
+          },
+          "response": []
+        },
+        {
+          "name": "/updates/:id",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/updates/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "updates",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{updateId}}",
+                  "description": "(Required) the id"
+                }
+              ]
+            },
+            "description": "Deletes an update by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "/updates/:id/state",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"pending\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/updates/:id/state",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "updates",
+                ":id",
+                "state"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{webhookId}}"
+                }
+              ]
+            },
+            "description": "Creates webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "/updates/:id",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/updates/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "updates",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{updateId}}",
+                  "description": "(Required) the id"
+                }
+              ]
+            },
+            "description": "Deletes an update by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "events",
+      "item": [
+        {
+          "name": "/events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "",
+                  "if (jsonData.data && jsonData.data.content.length > 0) {",
+                  "    postman.setEnvironmentVariable(\"eventId\", jsonData.data.content[0].id);",
+                  "} else {",
+                  "    postman.setEnvironmentVariable(\"eventId\", null);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "2",
+                  "description": "the size",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "15",
+                  "description": "the skip",
+                  "disabled": true
+                },
+                {
+                  "key": "order",
+                  "value": "asc",
+                  "description": "the order",
+                  "disabled": true
+                },
+                {
+                  "key": "orderBy",
+                  "value": "updated_at",
+                  "description": "the order by",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Finds updates"
+          },
+          "response": []
+        },
+        {
+          "name": "/events/:id",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{eventId}}",
+                  "description": "(Required) the id"
+                }
+              ]
+            },
+            "description": "Deletes an update by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "webhooks",
+      "item": [
+        {
+          "name": "/webhooks",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = JSON.parse(responseBody);",
+                  "",
+                  "if (jsonData.data && jsonData.data.content.length > 0) {",
+                  "    postman.setEnvironmentVariable(\"webhookId\", jsonData.data.content[0].id);",
+                  "    postman.setEnvironmentVariable(\"webhookToken\", jsonData.data.content[0].token);",
+                  "} else {",
+                  "    postman.setEnvironmentVariable(\"webhookId\", null);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks?page=1&pageSize=10&order=desc&orderBy=created_at",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "the page"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "the page size"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "the order"
+                },
+                {
+                  "key": "orderBy",
+                  "value": "created_at",
+                  "description": "the order by"
+                }
+              ]
+            },
+            "description": "Finds webhooks"
+          },
+          "response": []
+        },
+        {
+          "name": "/webhooks (generic)",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"My test hook\",\n  \"type\": \"generic\",\n  \"ignoreHost\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks"
+              ]
+            },
+            "description": "Creates webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "/webhooks (diun)",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"My test hook\",\n  \"type\": \"diun\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks"
+              ]
+            },
+            "description": "Creates webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "/webhooks/:id/label",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"a new label\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/:id/label",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                ":id",
+                "label"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{webhookId}}"
+                }
+              ]
+            },
+            "description": "Creates webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "/webhooks/:id/ignore-host",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ignoreHost\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/:id/ignore-host",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                ":id",
+                "ignore-host"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{webhookId}}"
+                }
+              ]
+            },
+            "description": "Creates webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "/webhooks/:id",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "{{basicAuthPass}}",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "{{basicAuthUser}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{webhookId}}",
+                  "description": "(Required) the id"
+                }
+              ]
+            },
+            "description": "Deletes a webhook by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "/webhooks/:id (Invoke)",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{webhookToken}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "X-Webhook-Token",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "description": "(Required) the token for the webhook id",
+                "key": "X-Webhook-Token",
+                "value": "tempor labore amet"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"application\": \"2\",\n  \"provider\": \"cli\",\n  \"host\": \"myserver\",\n  \"version\": \"1.0.1\",\n  \"metadata\": {\n      \"key1\": \"val1\",\n      \"key2\": \"val2\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhooks/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhooks",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{webhookId}}",
+                  "description": "(Required) the id"
+                }
+              ]
+            },
+            "description": "Invokes a webhook by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "/info",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/info",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "info"
+          ]
+        },
+        "description": "Find application information"
+      },
+      "response": []
+    },
+    {
+      "name": "/health",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Find application health"
+      },
+      "response": []
+    },
+    {
+      "name": "/login",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            {
+              "key": "password",
+              "value": "{{basicAuthPass}}",
+              "type": "string"
+            },
+            {
+              "key": "username",
+              "value": "{{basicAuthUser}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        },
+        "description": "Probes login"
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "basicAuthUser",
+      "value": "admin",
+      "type": "default"
+    },
+    {
+      "key": "basicAuthPass",
+      "value": "changeit",
+      "type": "default"
+    },
+    {
+      "key": "webhookId",
+      "value": "no",
+      "type": "default"
+    },
+    {
+      "key": "updateId",
+      "value": "no",
+      "type": "default"
+    }
+  ]
+}

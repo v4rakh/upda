@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":rebaseStalePrs",
+    ":ignoreUnstable",
+    "group:monorepos",
+    "group:recommended"
+  ],
+  "prConcurrentLimit": 0,
+  // skip next alpine, see https://github.com/mattn/go-sqlite3/issues/1164
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "alpine"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "matchPackagePrefixes": [
+        "github.com/go-co-op/gocron"
+      ],
+      "groupName": "gocron"
+    },
+    {
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "groupName": "all minor dependencies",
+      "groupSlug": "all-minor-deps"
+    },
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "all patch dependencies",
+      "groupSlug": "all-patch-deps"
+    }
+  ]
+}

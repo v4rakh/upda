@@ -1,0 +1,44 @@
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  push:
+    branches:
+      - master
+env:
+  IMAGE_TAG: varakh/upda
+  REVISION: ${{ github.sha }}
+jobs:
+  build:
+    runs-on: docker
+    container:
+      image: node:20-bookworm
+    steps:
+      - name: Prepare requirements
+        run: |
+          apt-get update
+          apt-get install -y curl wget bash apt-transport-https ca-certificates gnupg zstd clang
+          curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update
+          apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+      - name: Set up node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '^1.21'
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test native build
+        run: |
+          make ci
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Test docker image build
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          tags: |
+            ${{ env.IMAGE_TAG }}:${{ github.sha }}
