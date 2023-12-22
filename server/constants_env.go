@@ -60,18 +60,18 @@ const (
 	envTaskUpdateCleanStaleEnabled      = "TASK_UPDATE_CLEAN_STALE_ENABLED"
 	envTaskUpdateCleanStaleInterval     = "TASK_UPDATE_CLEAN_STALE_INTERVAL"
 	envTaskUpdateCleanStaleMaxAge       = "TASK_UPDATE_CLEAN_STALE_MAX_AGE"
-	taskUpdateCleanStaleEnabledDefault  = "true"
+	taskUpdateCleanStaleEnabledDefault  = "false"
 	taskUpdateCleanStaleIntervalDefault = "1h"
 	taskUpdateCleanStaleMaxAgeDefault   = "168h"
 
 	envTaskEventCleanStaleEnabled      = "TASK_EVENT_CLEAN_STALE_ENABLED"
 	envTaskEventCleanStaleInterval     = "TASK_EVENT_CLEAN_STALE_INTERVAL"
 	envTaskEventCleanStaleMaxAge       = "TASK_EVENT_CLEAN_STALE_MAX_AGE"
-	taskEventCleanStaleEnabledDefault  = "true"
+	taskEventCleanStaleEnabledDefault  = "false"
 	taskEventCleanStaleIntervalDefault = "8h"
 	taskEventCleanStaleMaxAgeDefault   = "2190h"
 
-	envTaskLockRedisEnabled     = "TASK_LOCK_REDIS_ENABLED"
-	envTaskLockRedisUrl         = "TASK_LOCK_REDIS_URL"
-	taskLockRedisEnabledDefault = "false"
+	envLockRedisEnabled = "LOCK_REDIS_ENABLED"
+	envLockRedisUrl     = "LOCK_REDIS_URL"
+	redisEnabledDefault = "false"
 )

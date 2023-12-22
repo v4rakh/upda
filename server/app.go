@@ -46,12 +46,14 @@ func Start() {
 	webhookRepo := newWebhookDbRepo(env.db)
 	eventRepo := newEventDbRepo(env.db)
 
+	lockService := newLockMemService()
+
 	eventService := newEventService(eventRepo)
-	updateService := newUpdateService(updateRepo, eventService)
+	updateService := newUpdateService(updateRepo, eventService, prometheusService)
 	webhookService := newWebhookService(webhookRepo, env.webhookConfig, eventService)
 	webhookInvocationService := newWebhookInvocationService(webhookService, updateService, env.webhookConfig)
 
-	taskService := newTaskService(updateService, eventService, webhookService, prometheusService, env.appConfig, env.taskConfig, env.prometheusConfig)
+	taskService := newTaskService(updateService, eventService, webhookService, lockService, prometheusService, env.appConfig, env.taskConfig, env.lockConfig, env.prometheusConfig)
 	taskService.init()
 	taskService.start()
 

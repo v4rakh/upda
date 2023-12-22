@@ -44,8 +44,11 @@ type taskConfig struct {
 	eventCleanStaleInterval   string
 	eventCleanStaleMaxAge     time.Duration
 	prometheusRefreshInterval string
-	lockRedisEnabled          bool
-	lockRedisUrl              string
+}
+
+type lockConfig struct {
+	redisEnabled bool
+	redisUrl     string
 }
 
 type webhookConfig struct {
@@ -64,6 +67,7 @@ type Environment struct {
 	authConfig       *authConfig
 	serverConfig     *serverConfig
 	taskConfig       *taskConfig
+	lockConfig       *lockConfig
 	webhookConfig    *webhookConfig
 	prometheusConfig *prometheusConfig
 	db               *gorm.DB
@@ -159,8 +163,12 @@ func bootstrapEnvironment() *Environment {
 		eventCleanStaleInterval:   os.Getenv(envTaskEventCleanStaleInterval),
 		eventCleanStaleMaxAge:     eventCleanStaleMaxAge,
 		prometheusRefreshInterval: os.Getenv(envTaskPrometheusRefreshInterval),
-		lockRedisEnabled:          os.Getenv(envTaskLockRedisEnabled) == "true",
-		lockRedisUrl:              os.Getenv(envTaskLockRedisUrl),
+	}
+
+	var lc *lockConfig
+	lc = &lockConfig{
+		redisEnabled: os.Getenv(envLockRedisEnabled) == "true",
+		redisUrl:     os.Getenv(envLockRedisUrl),
 	}
 
 	webhookTokenLength := 32
@@ -244,6 +252,7 @@ func bootstrapEnvironment() *Environment {
 		authConfig:       authConfig,
 		serverConfig:     sc,
 		taskConfig:       tc,
+		lockConfig:       lc,
 		webhookConfig:    webhookConfig,
 		prometheusConfig: prometheusConfig,
 		db:               db}
@@ -270,6 +279,9 @@ func bootstrapFromEnvironmentAndValidate() {
 	// webhook
 	setEnvKeyDefault(envWebhooksTokenLength, webhooksTokenLengthDefault)
 
+	// lock
+	setEnvKeyDefault(envLockRedisEnabled, redisEnabledDefault)
+
 	// task
 	setEnvKeyDefault(envTaskUpdateCleanStaleEnabled, taskUpdateCleanStaleEnabledDefault)
 	setEnvKeyDefault(envTaskUpdateCleanStaleInterval, taskUpdateCleanStaleIntervalDefault)
@@ -280,7 +292,6 @@ func bootstrapFromEnvironmentAndValidate() {
 	setEnvKeyDefault(envTaskEventCleanStaleMaxAge, taskEventCleanStaleMaxAgeDefault)
 
 	setEnvKeyDefault(envTaskPrometheusRefreshInterval, taskPrometheusRefreshDefault)
-	setEnvKeyDefault(envTaskLockRedisEnabled, taskLockRedisEnabledDefault)
 
 	// prometheus
 	setEnvKeyDefault(envPrometheusEnabled, prometheusEnabledDefault)

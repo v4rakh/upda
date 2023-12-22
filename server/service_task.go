@@ -13,14 +13,22 @@ type taskService struct {
 	updateService     *updateService
 	eventService      *eventService
 	webhookService    *webhookService
+	lockService       lockService
 	prometheusService *prometheusService
 	appConfig         *appConfig
 	taskConfig        *taskConfig
+	lockConfig        *lockConfig
 	prometheusConfig  *prometheusConfig
 	scheduler         *gocron.Scheduler
 }
 
-func newTaskService(u *updateService, e *eventService, w *webhookService, p *prometheusService, ac *appConfig, tc *taskConfig, pc *prometheusConfig) *taskService {
+const (
+	taskLockNameUpdatesCleanStale = "updates_clean_stale"
+	taskLockNameEventsCleanStale  = "events_clean_stale"
+	taskLockNamePrometheusUpdate  = "prometheus_update"
+)
+
+func newTaskService(u *updateService, e *eventService, w *webhookService, l lockService, p *prometheusService, ac *appConfig, tc *taskConfig, lc *lockConfig, pc *prometheusConfig) *taskService {
 	location, err := time.LoadLocation(ac.timeZone)
 
 	if err != nil {
@@ -33,12 +41,12 @@ func newTaskService(u *updateService, e *eventService, w *webhookService, p *pro
 
 	scheduler := gocron.NewScheduler(location)
 
-	if tc.lockRedisEnabled {
+	if lc.redisEnabled {
 		var redisOptions *redis.Options
-		redisOptions, err = redis.ParseURL(tc.lockRedisUrl)
+		redisOptions, err = redis.ParseURL(lc.redisUrl)
 
 		if err != nil {
-			zap.L().Sugar().Fatalf("Cannot parse REDIS URL '%s' to set up locking. Reason: %s", tc.lockRedisUrl, err.Error())
+			zap.L().Sugar().Fatalf("Cannot parse REDIS URL '%s' to set up locking. Reason: %s", lc.redisUrl, err.Error())
 		}
 		redisClient := redis.NewClient(redisOptions)
 		locker, err := redislock.NewRedisLocker(redisClient, redislock.WithTries(1))
@@ -52,9 +60,11 @@ func newTaskService(u *updateService, e *eventService, w *webhookService, p *pro
 		updateService:     u,
 		eventService:      e,
 		webhookService:    w,
+		lockService:       l,
 		prometheusService: p,
 		appConfig:         ac,
 		taskConfig:        tc,
+		lockConfig:        lc,
 		prometheusConfig:  pc,
 		scheduler:         scheduler,
 	}
@@ -69,6 +79,7 @@ func (s *taskService) init() {
 func (s *taskService) stop() {
 	zap.L().Sugar().Infof("Stopping %d periodic tasks...", len(s.scheduler.Jobs()))
 	s.scheduler.Stop()
+	s.lockService.stop()
 	zap.L().Info("Stopped all periodic tasks")
 }
 
@@ -81,9 +92,27 @@ func (s *taskService) configureCleanupStaleUpdatesTask() {
 	if !s.taskConfig.updateCleanStaleEnabled {
 		return
 	}
-
+	initialDelay := time.Now().Add(10 * time.Second)
 	_, err := s.scheduler.Every(s.taskConfig.updateCleanStaleInterval).
+		StartAt(initialDelay).
 		Do(func() {
+			resource := taskLockNameUpdatesCleanStale
+			// distributed lock handled via gocron-redis-lock for tasks
+			if !s.lockConfig.redisEnabled {
+				// skip execution if lock already exists, wait otherwise
+				if lockExists := s.lockService.exists(resource); lockExists {
+					zap.L().Sugar().Debugf("Skipping task execution because task lock '%s' exists", resource)
+					return
+				}
+				_ = s.lockService.tryLock(resource)
+				defer func(lockService lockService, resource string) {
+					err := lockService.release(resource)
+					if err != nil {
+						zap.L().Sugar().Warnf("Could not release task lock '%s'", resource)
+					}
+				}(s.lockService, resource)
+			}
+
 			t := time.Now()
 			t = t.Add(-s.taskConfig.updateCleanStaleMaxAge)
 
@@ -112,8 +141,27 @@ func (s *taskService) configureCleanupStaleEventsTask() {
 		return
 	}
 
+	initialDelay := time.Now().Add(5 * time.Second)
 	_, err := s.scheduler.Every(s.taskConfig.eventCleanStaleInterval).
+		StartAt(initialDelay).
 		Do(func() {
+			resource := taskLockNameEventsCleanStale
+			// distributed lock handled via gocron-redis-lock for tasks
+			if !s.lockConfig.redisEnabled {
+				// skip execution if lock already exists, wait otherwise
+				if lockExists := s.lockService.exists(resource); lockExists {
+					zap.L().Sugar().Debugf("Skipping task execution because task lock '%s' exists", resource)
+					return
+				}
+				_ = s.lockService.tryLock(resource)
+				defer func(lockService lockService, resource string) {
+					err := lockService.release(resource)
+					if err != nil {
+						zap.L().Sugar().Warnf("Could not release task lock '%s'", resource)
+					}
+				}(s.lockService, resource)
+			}
+
 			t := time.Now()
 			t = t.Add(-s.taskConfig.eventCleanStaleMaxAge)
 
@@ -142,8 +190,27 @@ func (s *taskService) configurePrometheusRefreshTask() {
 		return
 	}
 
+	initialDelay := time.Now().Add(10 * time.Second)
 	_, err := s.scheduler.Every(s.taskConfig.prometheusRefreshInterval).
+		StartAt(initialDelay).
 		Do(func() {
+			resource := taskLockNamePrometheusUpdate
+			// distributed lock handled via gocron-redis-lock for tasks
+			if !s.lockConfig.redisEnabled {
+				// skip execution if lock already exists, wait otherwise
+				if lockExists := s.lockService.exists(resource); lockExists {
+					zap.L().Sugar().Debugf("Skipping task execution because task lock '%s' exists", resource)
+					return
+				}
+				_ = s.lockService.tryLock(resource)
+				defer func(lockService lockService, resource string) {
+					err := lockService.release(resource)
+					if err != nil {
+						zap.L().Sugar().Warnf("Could not release task lock '%s'", resource)
+					}
+				}(s.lockService, resource)
+			}
+
 			// updates with labels and collect stats about state
 			updates, updatesError := s.updateService.getAll()
 

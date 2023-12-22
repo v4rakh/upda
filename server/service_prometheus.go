@@ -22,6 +22,7 @@ func newPrometheusService(r *gin.Engine, c *prometheusConfig) *prometheusService
 				ginprom.Namespace(Name),
 				ginprom.Subsystem(""),
 				ginprom.Path(c.path),
+				ginprom.Ignore(c.path),
 				ginprom.Token(c.secureToken),
 			)
 		} else {
@@ -29,8 +30,8 @@ func newPrometheusService(r *gin.Engine, c *prometheusConfig) *prometheusService
 				ginprom.Engine(r),
 				ginprom.Namespace(Name),
 				ginprom.Subsystem(""),
+				ginprom.Ignore(c.path),
 				ginprom.Path(c.path),
-				ginprom.Token(c.secureToken),
 			)
 		}
 	}
