@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [1.0.3] - UNRELEASED
+
+* ...
+
 ## [1.0.2] - 2023/12/23
 
 * Fix wrong event type being created for update state change
