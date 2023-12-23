@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [1.0.2] - UNRELEASED
+
+* ...
+
 ## [1.0.1] - 2023/12/23
 
 * Disable cleaning up stale updates and events by default

@@ -5,7 +5,7 @@ on:
 env:
   VERSION_MAJOR: 1
   VERSION_MINOR: 0
-  VERSION_PATCH: 1
+  VERSION_PATCH: 2
   IMAGE_TAG: varakh/upda
   IMAGE_TAG_PRIVATE: git.myservermanager.com/varakh/upda
   FORGEJO_URL: https://git.myservermanager.com
