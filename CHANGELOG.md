@@ -2,9 +2,9 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [1.0.2] - UNRELEASED
+## [1.0.2] - 2023/12/23
 
-* ...
+* Fix wrong event type being created for update state change
 
 ## [1.0.1] - 2023/12/23
 
@@ -19,6 +19,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[1.0.2]: https://git.myservermanager.com/varakh/upda/releases/tag/1.0.2
 
 [1.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/1.0.1
 

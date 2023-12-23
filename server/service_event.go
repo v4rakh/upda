@@ -43,7 +43,7 @@ func (s *eventService) createUpdateUpdated(old *Update, new *Update) *Event {
 	if old.State == new.State {
 		eventName = api.EventNameUpdateUpdated
 	} else {
-		switch old.State {
+		switch new.State {
 		case api.UpdateStatePending.Value():
 			eventName = api.EventNameUpdateUpdatedPending
 			break
