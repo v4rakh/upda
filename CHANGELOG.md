@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [1.1.0] - UNRELEASED
+
+* ...
+
 ## [1.0.3] - 2024/01/21
 
 * Updated dependencies
