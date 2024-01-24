@@ -14,7 +14,7 @@ func newInfoHandler(a *appConfig) *infoHandler {
 	return &infoHandler{appConfig: *a}
 }
 
-func (h *infoHandler) showInfo(c *gin.Context) {
+func (h *infoHandler) show(c *gin.Context) {
 	c.JSON(http.StatusOK, api.DataResponse{Data: gin.H{
 		"name":     Name,
 		"version":  Version,

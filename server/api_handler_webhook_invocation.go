@@ -16,7 +16,7 @@ func newWebhookInvocationHandler(i *webhookInvocationService, w *webhookService)
 	return &webhookInvocationHandler{invocationService: *i, webhookService: *w}
 }
 
-func (h *webhookInvocationHandler) executeWebhookGeneric(c *gin.Context) {
+func (h *webhookInvocationHandler) execute(c *gin.Context) {
 	tokenHeader := c.GetHeader(HeaderWebhookToken)
 	webhookId := c.Param("id")
 

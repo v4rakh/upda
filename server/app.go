@@ -79,10 +79,10 @@ func Start() {
 	}))
 
 	apiPublicGroup := router.Group("/api/v1")
-	apiPublicGroup.GET("/health", healthHandler.showHealth)
-	apiPublicGroup.GET("/info", infoHandler.showInfo)
+	apiPublicGroup.GET("/health", healthHandler.show)
+	apiPublicGroup.GET("/info", infoHandler.show)
 
-	apiPublicGroup.POST("/webhooks/:id", webhookInvocationHandler.executeWebhookGeneric)
+	apiPublicGroup.POST("/webhooks/:id", webhookInvocationHandler.execute)
 
 	apiAuthGroup := router.Group("/api/v1", gin.BasicAuth(gin.Accounts{
 		env.authConfig.adminUser: env.authConfig.adminPassword,

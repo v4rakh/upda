@@ -13,7 +13,7 @@ func newHealthHandler() *healthHandler {
 	return &healthHandler{}
 }
 
-func (h *healthHandler) showHealth(c *gin.Context) {
+func (h *healthHandler) show(c *gin.Context) {
 	c.JSON(http.StatusOK, api.DataResponse{Data: gin.H{
 		"healthy": true,
 	}})
