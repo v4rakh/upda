@@ -23,8 +23,8 @@ func Start() {
 	// secure init
 	util.AssertAvailablePRNG()
 
-	// set gin mode derived from logging level
-	if zap.L().Level() == zap.DebugLevel {
+	// set gin mode derived
+	if env.appConfig.isDevelopment {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)

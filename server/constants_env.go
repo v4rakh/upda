@@ -1,13 +1,18 @@
 package server
 
 const (
+	envDevelopment = "DEVELOPMENT"
+
+	envLoggingLevel        = "LOGGING_LEVEL"
+	loggingLevelDefault    = "info"
+	envLoggingEncoding     = "LOGGING_ENCODING"
+	loggingEncodingDefault = "json"
+
 	envTZ     = "TZ"
 	tzDefault = "Europe/Berlin"
 
 	envAdminUser     = "ADMIN_USER"
 	envAdminPassword = "ADMIN_PASSWORD"
-
-	envLoggingLevel = "LOGGING_LEVEL"
 
 	envServerPort           = "SERVER_PORT"
 	envServerListen         = "SERVER_LISTEN"

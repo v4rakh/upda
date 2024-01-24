@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"github.com/adrg/xdg"
 	"go.uber.org/zap"
@@ -8,6 +9,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
 	"moul.io/zapgorm2"
 	"os"
@@ -16,7 +18,9 @@ import (
 )
 
 type appConfig struct {
-	timeZone string
+	timeZone      string
+	isDevelopment bool
+	isDebug       bool
 }
 
 type serverConfig struct {
@@ -74,34 +78,77 @@ type Environment struct {
 }
 
 func bootstrapEnvironment() *Environment {
-	// logging (configured independently)
-	var logger *zap.Logger
 	var err error
-	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)
 
-	envLoggingLevel := os.Getenv(envLoggingLevel)
-	if envLoggingLevel != "" {
-		if level, err = zap.ParseAtomicLevel(envLoggingLevel); err != nil {
-			log.Fatalf("Cannot parse logging level: %v", err)
+	// bootstrap logging (configured independently and required before any other action)
+	loggingLevel := os.Getenv(envLoggingLevel)
+	if loggingLevel == "" {
+		if err = os.Setenv(envLoggingLevel, loggingLevelDefault); err != nil {
+			log.Fatalf("Cannot set logging level: %v", err)
+		}
+		loggingLevel = os.Getenv(envLoggingLevel)
+	}
+	var level zap.AtomicLevel
+	if level, err = zap.ParseAtomicLevel(loggingLevel); err != nil {
+		log.Fatalf("Cannot parse logging level: %v", err)
+	}
+	loggingEncoding := os.Getenv(envLoggingEncoding)
+	if loggingEncoding == "" {
+		if err = os.Setenv(envLoggingEncoding, loggingEncodingDefault); err != nil {
+			log.Fatalf("Cannot set logging encoding: %v", err)
+		}
+		loggingEncoding = os.Getenv(envLoggingEncoding)
+	}
+	if loggingEncoding != "json" && loggingEncoding != "console" {
+		log.Fatalf("Cannot parse logging level: %v", errors.New("only 'json' and 'console' are allowed logging encodings"))
+	}
+	isDebug := level.Level() == zap.DebugLevel
+	isDevelopment := os.Getenv(envDevelopment) == "true"
+	var loggingEncoderConfig zapcore.EncoderConfig
+	if loggingEncoding == "json" {
+		loggingEncoderConfig = zap.NewProductionEncoderConfig()
+	} else {
+		loggingEncoderConfig = zap.NewDevelopmentEncoderConfig()
+	}
+
+	var zapConfig *zap.Config
+	if isDebug {
+		zapConfig = &zap.Config{
+			Level:            level,
+			Development:      isDevelopment,
+			Encoding:         loggingEncoding,
+			EncoderConfig:    loggingEncoderConfig,
+			OutputPaths:      []string{"stderr"},
+			ErrorOutputPaths: []string{"stderr"},
+		}
+	} else {
+		zapConfig = &zap.Config{
+			Level:       level,
+			Development: isDevelopment,
+			Sampling: &zap.SamplingConfig{
+				Initial:    100,
+				Thereafter: 100,
+			},
+			Encoding:         loggingEncoding,
+			EncoderConfig:    loggingEncoderConfig,
+			OutputPaths:      []string{"stderr"},
+			ErrorOutputPaths: []string{"stderr"},
 		}
 	}
 
-	logger, err = zap.NewDevelopment(zap.IncreaseLevel(level))
-	if err != nil {
-		log.Fatalf("Can't initialize logger: %v", err)
-	}
-	// flushes buffer, if any
-	defer logger.Sync()
-
-	zap.ReplaceGlobals(logger)
+	zapLogger := zap.Must(zapConfig.Build())
+	defer zapLogger.Sync()
+	zap.ReplaceGlobals(zapLogger)
 
 	// assign defaults from given environment variables and validate
 	bootstrapFromEnvironmentAndValidate()
 
 	// parse environment variables in actual configuration structs
 	// app config
-	appConfig := &appConfig{
-		timeZone: os.Getenv(envTZ),
+	ac := &appConfig{
+		timeZone:      os.Getenv(envTZ),
+		isDebug:       isDebug,
+		isDevelopment: isDevelopment,
 	}
 
 	// server config
@@ -137,7 +184,7 @@ func bootstrapEnvironment() *Environment {
 		corsAllowHeaders: []string{os.Getenv(envCorsAllowHeaders)},
 	}
 
-	authConfig := &authConfig{
+	authC := &authConfig{
 		adminUser:     os.Getenv(envAdminUser),
 		adminPassword: os.Getenv(envAdminPassword),
 	}
@@ -179,24 +226,29 @@ func bootstrapEnvironment() *Environment {
 		zap.L().Sugar().Fatalln("Invalid webhook token length. Reason: must be a positive number")
 	}
 
-	webhookConfig := &webhookConfig{
+	wc := &webhookConfig{
 		tokenLength: webhookTokenLength,
 	}
 
-	prometheusConfig := &prometheusConfig{
+	pc := &prometheusConfig{
 		enabled:            os.Getenv(envPrometheusEnabled) == "true",
 		path:               os.Getenv(envPrometheusMetricsPath),
 		secureTokenEnabled: os.Getenv(envPrometheusSecureTokenEnabled) == "true",
 		secureToken:        os.Getenv(envPrometheusSecureToken),
 	}
 
-	if prometheusConfig.enabled && prometheusConfig.secureTokenEnabled {
+	if pc.enabled && pc.secureTokenEnabled {
 		failIfEnvKeyNotPresent(envPrometheusSecureToken)
 	}
 
 	// database setup
-	gormLogger := zapgorm2.New(logger)
-	gormLogger.SetAsDefault()
+	gormConfig := &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)}
+	if isDebug && isDevelopment {
+		gormZapLogger := zap.Must(zapConfig.Build())
+		defer gormZapLogger.Sync()
+		gormLogger := zapgorm2.New(gormZapLogger)
+		gormConfig = &gorm.Config{Logger: gormLogger}
+	}
 
 	var db *gorm.DB
 	zap.L().Sugar().Infof("Using database type '%s'", os.Getenv(envDbType))
@@ -213,7 +265,7 @@ func bootstrapEnvironment() *Environment {
 		dbFile := os.Getenv(envDbSqliteFile)
 		zap.L().Sugar().Infof("Using database file '%s'", dbFile)
 
-		if db, err = gorm.Open(sqlite.Open(dbFile), &gorm.Config{Logger: gormLogger}); err != nil {
+		if db, err = gorm.Open(sqlite.Open(dbFile), gormConfig); err != nil {
 			zap.L().Sugar().Fatalf("Could not setup database: %v", err)
 		}
 
@@ -237,7 +289,7 @@ func bootstrapEnvironment() *Environment {
 		}
 
 		dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable TimeZone=%v", host, dbUser, dbPass, dbName, port, dbTZ)
-		if db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: gormLogger}); err != nil {
+		if db, err = gorm.Open(postgres.Open(dsn), gormConfig); err != nil {
 			zap.L().Sugar().Fatalf("Could not setup database: %v", err)
 		}
 	} else {
@@ -248,13 +300,13 @@ func bootstrapEnvironment() *Environment {
 		zap.L().Sugar().Fatalf("Could not setup database")
 	}
 
-	env := &Environment{appConfig: appConfig,
-		authConfig:       authConfig,
+	env := &Environment{appConfig: ac,
+		authConfig:       authC,
 		serverConfig:     sc,
 		taskConfig:       tc,
 		lockConfig:       lc,
-		webhookConfig:    webhookConfig,
-		prometheusConfig: prometheusConfig,
+		webhookConfig:    wc,
+		prometheusConfig: pc,
 		db:               db}
 
 	if err = env.db.AutoMigrate(&Update{}, &Webhook{}, &Event{}); err != nil {

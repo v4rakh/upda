@@ -4,6 +4,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 
 ## [1.1.0] - UNRELEASED
 
+* Adapted logging which defaults to JSON encoding
 * ...
 
 ## [1.0.3] - 2024/01/21
