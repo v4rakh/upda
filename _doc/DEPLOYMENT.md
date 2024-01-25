@@ -1,5 +1,13 @@
 # Deployment
 
+## Native
+
+Download the binary for your operating system. Next, use the binary or execute it locally.
+
+See the provided systemd service example [upda.service](./contrib/upda.service) to deploy on a UNIX/Linux machine.
+
+## Container
+
 Use one of the provided `docker-compose` examples, edit to your needs. Then issue `docker compose up` command.
 
 All applications should be up and running.
@@ -10,7 +18,7 @@ Default image user is `appuser` (`uid=2033`) and group is `appgroup` (`gid=2033`
 
 The following examples are available
 
-## Postgres
+### Postgres
 
 ```yaml
 version: '3.9'
@@ -78,7 +86,7 @@ volumes:
     external: false
 ```
 
-## SQLite
+### SQLite
 
 ```yaml
 version: '3.9'
@@ -111,14 +119,13 @@ services:
     image: git.myservermanager.com/varakh/upda:latest
     environment:
       - TZ=Europe/Berlin
-      - DB_SQLITE_FILE=/data/upda.db
       - ADMIN_USER=admin
       - ADMIN_PASSWORD=changeit
     restart: unless-stopped
     networks:
       - internal
     volumes:
-      - upda-app-vol:/data
+      - upda-app-vol:/home/appuser
     ports:
       - "127.0.0.1:8080:8080"
 
@@ -127,7 +134,7 @@ volumes:
     external: false
 ```
 
-### Reverse proxy
+## Reverse proxy
 
 You may want to use a proxy in front of them on your host, e.g., nginx. Here's a configuration snippet which should do
 the work.

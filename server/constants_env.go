@@ -8,6 +8,9 @@ const (
 	envLoggingEncoding     = "LOGGING_ENCODING"
 	loggingEncodingDefault = "json"
 
+	envLoggingDirectory    = "LOGGING_DIRECTORY"
+	loggingFileNameDefault = "upda.log"
+
 	envTZ     = "TZ"
 	tzDefault = "Europe/Berlin"
 

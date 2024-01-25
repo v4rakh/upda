@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"git.myservermanager.com/varakh/upda/util"
 	"github.com/adrg/xdg"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -13,6 +14,7 @@ import (
 	"log"
 	"moul.io/zapgorm2"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -111,6 +113,19 @@ func bootstrapEnvironment() *Environment {
 		loggingEncoderConfig = zap.NewDevelopmentEncoderConfig()
 	}
 
+	logPaths := []string{"stderr"}
+	loggingDirectory := os.Getenv(envLoggingDirectory)
+
+	if loggingDirectory != "" {
+		logFile := filepath.Join(loggingDirectory, loggingFileNameDefault)
+
+		if err = util.CreateFileWithParent(logFile); err != nil {
+			log.Fatalf("Log file '%s' cannot be created: %v", loggingDirectory, err)
+		}
+
+		logPaths = append(logPaths, logFile)
+	}
+
 	var zapConfig *zap.Config
 	if isDebug {
 		zapConfig = &zap.Config{
@@ -118,8 +133,8 @@ func bootstrapEnvironment() *Environment {
 			Development:      isDevelopment,
 			Encoding:         loggingEncoding,
 			EncoderConfig:    loggingEncoderConfig,
-			OutputPaths:      []string{"stderr"},
-			ErrorOutputPaths: []string{"stderr"},
+			OutputPaths:      logPaths,
+			ErrorOutputPaths: logPaths,
 		}
 	} else {
 		zapConfig = &zap.Config{
@@ -131,8 +146,8 @@ func bootstrapEnvironment() *Environment {
 			},
 			Encoding:         loggingEncoding,
 			EncoderConfig:    loggingEncoderConfig,
-			OutputPaths:      []string{"stderr"},
-			ErrorOutputPaths: []string{"stderr"},
+			OutputPaths:      logPaths,
+			ErrorOutputPaths: logPaths,
 		}
 	}
 
@@ -264,6 +279,10 @@ func bootstrapEnvironment() *Environment {
 
 		dbFile := os.Getenv(envDbSqliteFile)
 		zap.L().Sugar().Infof("Using database file '%s'", dbFile)
+
+		if err = util.CreateFileWithParent(dbFile); err != nil {
+			zap.L().Sugar().Fatalf("Database file '%s' cannot be created: %v", dbFile, err)
+		}
 
 		if db, err = gorm.Open(sqlite.Open(dbFile), gormConfig); err != nil {
 			zap.L().Sugar().Fatalf("Could not setup database: %v", err)
