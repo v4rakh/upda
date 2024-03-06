@@ -8,6 +8,9 @@
     "group:recommended"
   ],
   "prConcurrentLimit": 0,
+  "schedule": [
+    "monthly"
+  ],
   // skip next alpine, see https://github.com/mattn/go-sqlite3/issues/1164
   "packageRules": [
     {
