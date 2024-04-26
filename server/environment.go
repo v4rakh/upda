@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -38,8 +39,10 @@ type serverConfig struct {
 }
 
 type authConfig struct {
-	adminUser     string
-	adminPassword string
+	authMethod           string
+	basicAuthUser        string
+	basicAuthPassword    string
+	basicAuthCredentials map[string]string
 }
 
 type taskConfig struct {
@@ -209,9 +212,25 @@ func bootstrapEnvironment() *Environment {
 		corsAllowHeaders: []string{os.Getenv(envCorsAllowHeaders)},
 	}
 
+	authMode := os.Getenv(envAuthMode)
+
+	if authMode != authModeBasicSingle && authMode != authModeBasicCredentials {
+		zap.L().Sugar().Fatalln("Invalid auth mode. Reason: must be one of ['basic_single','basic_credentials'")
+	}
+
 	authC := &authConfig{
-		adminUser:     os.Getenv(envAdminUser),
-		adminPassword: os.Getenv(envAdminPassword),
+		authMethod: authMode,
+	}
+
+	if authModeBasicSingle == authMode {
+		failIfEnvKeyNotPresent(envBasicAuthUser)
+		failIfEnvKeyNotPresent(envBasicAuthPassword)
+		authC.basicAuthUser = os.Getenv(envBasicAuthUser)
+		authC.basicAuthPassword = os.Getenv(envBasicAuthPassword)
+	}
+	if authModeBasicCredentials == authMode {
+		failIfEnvKeyNotPresent(envBasicAuthCredentials)
+		authC.basicAuthCredentials = parseBasicAuthCredentials(envBasicAuthCredentials)
 	}
 
 	// task config
@@ -390,12 +409,13 @@ func bootstrapEnvironment() *Environment {
 }
 
 func bootstrapFromEnvironmentAndValidate() {
+	failIfEnvKeyNotPresent(envSecret)
+
+	// auth mode
+	setEnvKeyDefault(envAuthMode, authModeDefault)
+
 	// app
 	setEnvKeyDefault(envTZ, tzDefault)
-
-	failIfEnvKeyNotPresent(envSecret)
-	failIfEnvKeyNotPresent(envAdminUser)
-	failIfEnvKeyNotPresent(envAdminPassword)
 
 	// webhook
 	setEnvKeyDefault(envWebhooksTokenLength, webhooksTokenLengthDefault)
@@ -466,4 +486,36 @@ func setEnvKeyDefault(key string, defaultValue string) {
 
 		zap.L().Sugar().Infof("Set '%s' to '%s'", key, defaultValue)
 	}
+}
+
+func parseBasicAuthCredentials(envProperty string) map[string]string {
+	if envProperty == "" {
+		zap.L().Sugar().Fatalln("Invalid env for parsing basic auth credentials")
+	}
+	credentialsFromEnv := os.Getenv(envProperty)
+
+	var credentials []string
+	credentials = strings.Split(credentialsFromEnv, ",")
+
+	basicAuthCredentials := make(map[string]string)
+
+	for _, c := range credentials {
+		pair := strings.Split(c, "=")
+
+		if len(pair) != 2 {
+			zap.L().Sugar().Fatalln("Invalid basic auth credentials. Reason: credentials must be specified with the = separator per credential entry")
+		}
+
+		if pair[0] == "" {
+			zap.L().Sugar().Fatalln("Invalid basic auth credentials. Reason: username must not be blank")
+		}
+
+		if pair[1] == "" {
+			zap.L().Sugar().Fatalln("Invalid basic auth credentials. Reason: password must not be blank")
+		}
+
+		basicAuthCredentials[pair[0]] = pair[1]
+	}
+
+	return basicAuthCredentials
 }

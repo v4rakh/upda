@@ -58,8 +58,8 @@ services:
       - DB_POSTGRES_NAME=upda
       - DB_POSTGRES_USER=upda
       - DB_POSTGRES_PASSWORD=upda
-      - ADMIN_USER=admin
-      - ADMIN_PASSWORD=changeit
+      - BASIC_AUTH_USER=admin
+      - BASIC_AUTH_PASSWORD=changeit
       # generate 32 character long secret, e.g., with "openssl rand -hex 16"
       - SECRET=generated-secure-secret-32-chars
     restart: unless-stopped
@@ -121,8 +121,8 @@ services:
     image: git.myservermanager.com/varakh/upda:latest
     environment:
       - TZ=Europe/Berlin
-      - ADMIN_USER=admin
-      - ADMIN_PASSWORD=changeit
+      - BASIC_AUTH_USER=admin
+      - BASIC_AUTH_PASSWORD=changeit
       # generate 32 character long secret, e.g., with "openssl rand -hex 16"
       - SECRET=generated-secure-secret-32-chars
     restart: unless-stopped

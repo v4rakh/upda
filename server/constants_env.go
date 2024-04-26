@@ -16,8 +16,13 @@ const (
 	envTZ     = "TZ"
 	tzDefault = "Europe/Berlin"
 
-	envAdminUser     = "ADMIN_USER"
-	envAdminPassword = "ADMIN_PASSWORD"
+	envAuthMode              = "AUTH_MODE"
+	authModeDefault          = authModeBasicSingle
+	authModeBasicSingle      = "basic_single"
+	authModeBasicCredentials = "basic_credentials"
+	envBasicAuthUser         = "BASIC_AUTH_USER"
+	envBasicAuthPassword     = "BASIC_AUTH_PASSWORD"
+	envBasicAuthCredentials  = "BASIC_AUTH_CREDENTIALS"
 
 	envServerPort           = "SERVER_PORT"
 	envServerListen         = "SERVER_LISTEN"

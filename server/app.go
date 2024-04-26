@@ -95,9 +95,19 @@ func Start() {
 
 	apiPublicGroup.POST("/webhooks/:id", webhookInvocationHandler.execute)
 
-	apiAuthGroup := router.Group("/api/v1", gin.BasicAuth(gin.Accounts{
-		env.authConfig.adminUser: env.authConfig.adminPassword,
-	}))
+	var authMethodHandler gin.HandlerFunc
+
+	if authModeBasicSingle == env.authConfig.authMethod {
+		authMethodHandler = gin.BasicAuth(gin.Accounts{
+			env.authConfig.basicAuthUser: env.authConfig.basicAuthPassword,
+		})
+	} else if authModeBasicCredentials == env.authConfig.authMethod {
+		authMethodHandler = gin.BasicAuth(env.authConfig.basicAuthCredentials)
+	} else {
+		zap.L().Fatal("No valid auth mode found")
+	}
+
+	apiAuthGroup := router.Group("/api/v1", authMethodHandler)
 
 	apiAuthGroup.GET("/login", authHandler.login)
 
