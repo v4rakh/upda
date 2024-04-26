@@ -258,6 +258,7 @@ occurrence is replaced before invocation as well.
 | `<VAR>PROVIDER</VAR>`    | The update's provider name invoking the action    |
 | `<VAR>HOST</VAR>`        | The update's host invoking the action             |
 | `<VAR>VERSION</VAR>`     | The update's version (latest) invoking the action |
+| `<VAR>STATE</VAR>`       | The update's state invoking the action            |
 
 #### shoutrrr
 

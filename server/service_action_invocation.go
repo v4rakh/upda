@@ -256,6 +256,7 @@ func (s *actionInvocationService) replaceVars(str string, eventPayloadInfo *even
 	str = strings.ReplaceAll(str, "<VAR>PROVIDER</VAR>", eventPayloadInfo.Provider)
 	str = strings.ReplaceAll(str, "<VAR>HOST</VAR>", eventPayloadInfo.Host)
 	str = strings.ReplaceAll(str, "<VAR>VERSION</VAR>", eventPayloadInfo.Version)
+	str = strings.ReplaceAll(str, "<VAR>STATE</VAR>", eventPayloadInfo.State)
 
 	return str
 }

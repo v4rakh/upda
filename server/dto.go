@@ -12,4 +12,5 @@ type eventPayloadInformationDto struct {
 	Application string
 	Provider    string
 	Version     string
+	State       string
 }

@@ -339,6 +339,7 @@ type EventPayloadUpdateDeletedDto struct {
 	Provider    string `json:"provider,omitempty"`
 	Host        string `json:"host,omitempty"`
 	Version     string `json:"version,omitempty"`
+	State       string `json:"state,omitempty"`
 }
 
 func NewEventWindowResponse(content []*EventResponse, size int, skip int, orderBy string, order string, hasNext bool) *EventWindowResponse {
