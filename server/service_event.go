@@ -45,17 +45,7 @@ func (s *eventService) createUpdateUpdated(old *Update, new *Update) *Event {
 	if old.State == new.State {
 		eventName = api.EventNameUpdateUpdated
 	} else {
-		switch new.State {
-		case api.UpdateStatePending.Value():
-			eventName = api.EventNameUpdateUpdatedPending
-			break
-		case api.UpdateStateApproved.Value():
-			eventName = api.EventNameUpdateUpdatedApproved
-			break
-		case api.UpdateStateIgnored.Value():
-			eventName = api.EventNameUpdateUpdatedIgnored
-			break
-		}
+		eventName = api.EventNameUpdateUpdatedState
 	}
 
 	s.createWithWarnOnly(eventName, &api.EventPayloadUpdateUpdatedDto{
@@ -218,19 +208,7 @@ func (s *eventService) extractPayloadInfo(event *Event) (*eventPayloadInformatio
 			return nil, newServiceError(General, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateUpdatedApproved.Value():
-		var p api.EventPayloadUpdateUpdatedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
-		}
-		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateUpdatedPending.Value():
-		var p api.EventPayloadUpdateUpdatedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
-		}
-		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateUpdatedIgnored.Value():
+	case api.EventNameUpdateUpdatedState.Value():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, newServiceError(General, err)

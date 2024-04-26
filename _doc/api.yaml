@@ -2330,9 +2330,7 @@ components:
           enum:
             - update_created
             - update_updated
-            - update_updated_state_pending
-            - update_updated_state_approved
-            - update_updated_state_ignored
+            - update_updated_state
             - update_deleted
         createdAt:
           type: string

@@ -239,14 +239,12 @@ action type, which can send notifications to a variety of services like Gotify, 
 
 Supported events are the following:
 
-| Event name                      | Description                                                         |
-|:--------------------------------|:--------------------------------------------------------------------|
-| `update_created`                | An update has been created                                          |
-| `update_updated`                | An update has been updated (not necessarily its version attribute!) |
-| `update_updated_state_pending`  | An update's state changed to pending                                |
-| `update_updated_state_approved` | An update's state changed to approved                               |
-| `update_updated_state_ignored`  | An update's state changed to ignored                                |
-| `update_deleted`                | An update has been removed                                          |
+| Event name             | Description                                                         |
+|:-----------------------|:--------------------------------------------------------------------|
+| `update_created`       | An update has been created                                          |
+| `update_updated`       | An update has been updated (not necessarily its version attribute!) |
+| `update_updated_state` | An update's state changed                                           |
+| `update_deleted`       | An update has been removed                                          |
 
 For privacy, an action's configuration supports upda's **secrets** vault, which means that before an action is
 triggered, any occurrence of `<SECRET>SECRET_KEY</SECRET>` is properly replaced by the value of the `SECRET_KEY` defined
