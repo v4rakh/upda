@@ -10,14 +10,12 @@ import (
 type webhookService struct {
 	repo          WebhookRepository
 	webhookConfig *webhookConfig
-	eventService  *eventService
 }
 
-func newWebhookService(r WebhookRepository, c *webhookConfig, e *eventService) *webhookService {
+func newWebhookService(r WebhookRepository, c *webhookConfig) *webhookService {
 	return &webhookService{
 		repo:          r,
 		webhookConfig: c,
-		eventService:  e,
 	}
 }
 
@@ -42,16 +40,15 @@ func (s *webhookService) create(label string, t api.WebhookType, ignoreHost bool
 
 	var err error
 	var token string
-	var e *Webhook
 
 	if token, err = util.GenerateSecureRandomString(s.webhookConfig.tokenLength); err != nil {
 		return nil, newServiceError(General, fmt.Errorf("token generation failed: %w", err))
 	}
 
+	var e *Webhook
 	if e, err = s.repo.create(label, t, token, ignoreHost); err != nil {
 		return nil, err
 	} else {
-		s.eventService.createWebhookCreated(e)
 		zap.L().Sugar().Info("Created webhook")
 		return e, nil
 	}
@@ -69,12 +66,10 @@ func (s *webhookService) updateLabel(id string, label string) (*Webhook, error) 
 		return nil, err
 	}
 
-	old := e
 	if e, err = s.repo.updateLabel(id, label); err != nil {
 		return nil, err
 	}
 
-	s.eventService.createWebhookUpdated(old, e)
 	zap.L().Sugar().Infof("Modified webhook '%v'", id)
 	return e, nil
 }
@@ -91,12 +86,10 @@ func (s *webhookService) updateIgnoreHost(id string, ignoreHost bool) (*Webhook,
 		return nil, err
 	}
 
-	old := e
 	if e, err = s.repo.updateIgnoreHost(id, ignoreHost); err != nil {
 		return nil, err
 	}
 
-	s.eventService.createWebhookUpdated(old, e)
 	zap.L().Sugar().Infof("Modified webhook '%v'", id)
 	return e, nil
 }
@@ -115,7 +108,6 @@ func (s *webhookService) delete(id string) error {
 		return err
 	}
 
-	s.eventService.createWebhookDeleted(e)
 	zap.L().Sugar().Infof("Deleted webhook '%v'", id)
 
 	return nil

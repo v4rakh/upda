@@ -49,6 +49,16 @@ type taskConfig struct {
 	eventCleanStaleEnabled    bool
 	eventCleanStaleInterval   string
 	eventCleanStaleMaxAge     time.Duration
+	actionsEnqueueEnabled     bool
+	actionsEnqueueInterval    string
+	actionsEnqueueBatchSize   int
+	actionsInvokeEnabled      bool
+	actionsInvokeInterval     string
+	actionsInvokeBatchSize    int
+	actionsInvokeMaxRetries   int
+	actionsCleanStaleEnabled  bool
+	actionsCleanStaleInterval string
+	actionsCleanStaleMaxAge   time.Duration
 	prometheusRefreshInterval string
 }
 
@@ -217,6 +227,35 @@ func bootstrapEnvironment() *Environment {
 		zap.L().Sugar().Fatalf("Could not parse max age for cleaning stale events. Reason: %s", errParse.Error())
 	}
 
+	var actionsEnqueueBatchSize int
+	if actionsEnqueueBatchSize, err = strconv.Atoi(os.Getenv(envTaskActionsEnqueueBatchSize)); err != nil {
+		zap.L().Sugar().Fatalf("Invalid actions enqueue batch size. Reason: %v", err)
+	}
+	if actionsEnqueueBatchSize <= 0 {
+		zap.L().Sugar().Fatalf("Invalid actions enqueue batch size, must be a positive number.")
+	}
+
+	var actionsInvokeBatchSize int
+	if actionsInvokeBatchSize, err = strconv.Atoi(os.Getenv(envTaskActionsInvokeBatchSize)); err != nil {
+		zap.L().Sugar().Fatalf("Invalid actions invoke batch size. Reason: %v", err)
+	}
+	if actionsInvokeBatchSize <= 0 {
+		zap.L().Sugar().Fatalf("Invalid actions invoke batch size, must be a positive number.")
+	}
+
+	var actionsInvokeMaxRetries int
+	if actionsInvokeMaxRetries, err = strconv.Atoi(os.Getenv(envTaskActionsInvokeMaxRetries)); err != nil {
+		zap.L().Sugar().Fatalf("Invalid actions invoke max retries. Reason: %v", err)
+	}
+	if actionsInvokeMaxRetries <= 0 {
+		zap.L().Sugar().Fatalf("Invalid actions invoke max retries, must be a positive number.")
+	}
+
+	var actionsCleanStaleMaxAge time.Duration
+	if actionsCleanStaleMaxAge, errParse = time.ParseDuration(os.Getenv(envTaskActionsCleanStaleMaxAge)); errParse != nil {
+		zap.L().Sugar().Fatalf("Could not parse max age for cleaning stale actions. Reason: %s", errParse.Error())
+	}
+
 	tc = &taskConfig{
 		updateCleanStaleEnabled:   os.Getenv(envTaskUpdateCleanStaleEnabled) == "true",
 		updateCleanStaleInterval:  os.Getenv(envTaskUpdateCleanStaleInterval),
@@ -224,6 +263,16 @@ func bootstrapEnvironment() *Environment {
 		eventCleanStaleEnabled:    os.Getenv(envTaskEventCleanStaleEnabled) == "true",
 		eventCleanStaleInterval:   os.Getenv(envTaskEventCleanStaleInterval),
 		eventCleanStaleMaxAge:     eventCleanStaleMaxAge,
+		actionsEnqueueEnabled:     os.Getenv(envTaskActionsEnqueueEnabled) == "true",
+		actionsEnqueueInterval:    os.Getenv(envTaskActionsEnqueueInterval),
+		actionsEnqueueBatchSize:   actionsEnqueueBatchSize,
+		actionsInvokeEnabled:      os.Getenv(envTaskActionsInvokeEnabled) == "true",
+		actionsInvokeInterval:     os.Getenv(envTaskActionsInvokeInterval),
+		actionsInvokeBatchSize:    actionsInvokeBatchSize,
+		actionsInvokeMaxRetries:   actionsInvokeMaxRetries,
+		actionsCleanStaleEnabled:  os.Getenv(envTaskActionsCleanStaleEnabled) == "true",
+		actionsCleanStaleInterval: os.Getenv(envTaskActionsCleanStaleInterval),
+		actionsCleanStaleMaxAge:   actionsCleanStaleMaxAge,
 		prometheusRefreshInterval: os.Getenv(envTaskPrometheusRefreshInterval),
 	}
 
@@ -289,7 +338,7 @@ func bootstrapEnvironment() *Environment {
 		}
 
 		if res := db.Exec("PRAGMA foreign_keys = ON"); res.Error != nil {
-			zap.L().Sugar().Fatalf("Could not invoke foreign key for SQLite: %v", res.Error)
+			zap.L().Sugar().Fatalf("Could not execute foreign key for SQLite: %v", res.Error)
 		}
 
 		sqlDb, _ := db.DB()
@@ -328,7 +377,7 @@ func bootstrapEnvironment() *Environment {
 		prometheusConfig: pc,
 		db:               db}
 
-	if err = env.db.AutoMigrate(&Update{}, &Webhook{}, &Event{}); err != nil {
+	if err = env.db.AutoMigrate(&Update{}, &Webhook{}, &Event{}, &Secret{}, &Action{}, &ActionInvocation{}); err != nil {
 		zap.L().Sugar().Fatalf("Could not migrate database schema: %s", err)
 	}
 
@@ -344,6 +393,7 @@ func bootstrapFromEnvironmentAndValidate() {
 	// app
 	setEnvKeyDefault(envTZ, tzDefault)
 
+	failIfEnvKeyNotPresent(envSecret)
 	failIfEnvKeyNotPresent(envAdminUser)
 	failIfEnvKeyNotPresent(envAdminPassword)
 
@@ -361,6 +411,19 @@ func bootstrapFromEnvironmentAndValidate() {
 	setEnvKeyDefault(envTaskEventCleanStaleEnabled, taskEventCleanStaleEnabledDefault)
 	setEnvKeyDefault(envTaskEventCleanStaleInterval, taskEventCleanStaleIntervalDefault)
 	setEnvKeyDefault(envTaskEventCleanStaleMaxAge, taskEventCleanStaleMaxAgeDefault)
+
+	setEnvKeyDefault(envTaskActionsEnqueueEnabled, taskActionsEnqueueEnabledDefault)
+	setEnvKeyDefault(envTaskActionsEnqueueInterval, taskActionsEnqueueIntervalDefault)
+	setEnvKeyDefault(envTaskActionsEnqueueBatchSize, taskActionsEnqueueBatchSizeDefault)
+
+	setEnvKeyDefault(envTaskActionsInvokeEnabled, taskActionsInvokeEnabledDefault)
+	setEnvKeyDefault(envTaskActionsInvokeInterval, taskActionsInvokeIntervalDefault)
+	setEnvKeyDefault(envTaskActionsInvokeBatchSize, taskActionsInvokeBatchSizeDefault)
+	setEnvKeyDefault(envTaskActionsInvokeMaxRetries, taskActionsInvokeMaxRetriesDefault)
+
+	setEnvKeyDefault(envTaskActionsCleanStaleEnabled, taskActionsCleanStaleEnabledDefault)
+	setEnvKeyDefault(envTaskActionsCleanStaleInterval, taskActionsCleanStaleIntervalDefault)
+	setEnvKeyDefault(envTaskActionsCleanStaleMaxAge, taskActionsCleanStaleMaxAgeDefault)
 
 	setEnvKeyDefault(envTaskPrometheusRefreshInterval, taskPrometheusRefreshDefault)
 

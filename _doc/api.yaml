@@ -5,7 +5,7 @@ info:
   license:
     name: GPLv3
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
-  version: 1.1.0
+  version: 2.0.0
 externalDocs:
   description: Find out more about the project
   url: https://git.myservermanager.com/varakh/upda
@@ -18,6 +18,12 @@ tags:
     description: Webhooks endpoints
   - name: events
     description: Events endpoints
+  - name: secrets
+    description: Secrets endpoints
+  - name: actions
+    description: Actions endpoints
+  - name: action-invocations
+    description: Action invocations endpoints
   - name: application
     description: Application related endpoints
   - name: auth
@@ -335,7 +341,7 @@ paths:
       description: Creates webhook
       operationId: createWebhook
       requestBody:
-        description: Creates an announcement
+        description: Creates a webhook
         content:
           application/json:
             schema:
@@ -406,7 +412,7 @@ paths:
           required: false
           schema:
             type: string
-            default: desc
+            default: asc
             enum:
               - asc
               - desc
@@ -416,7 +422,7 @@ paths:
           required: false
           schema:
             type: string
-            default: updated_at
+            default: label
             enum:
               - id
               - label
@@ -489,6 +495,58 @@ paths:
       responses:
         '204':
           description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Finds a webhook by ID
+      description: Finds webhook by ID
+      operationId: findWebhookById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSingleResponse'
         '400':
           description: Bad request
           content:
@@ -769,12 +827,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   '/events/{id}':
+    get:
+      tags:
+        - events
+      security:
+        - basicAuth: [ ]
+      summary: Finds an event by ID
+      description: Finds event by ID
+      operationId: findEventById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
         - events
       security:
         - basicAuth: [ ]
-      summary: Deletes a event by ID
+      summary: Deletes an event by ID
       description: 'Deletes a event by ID'
       operationId: deleteEventById
       parameters:
@@ -787,6 +897,1156 @@ paths:
       responses:
         '204':
           description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /actions:
+    post:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Creates action
+      description: Creates action
+      operationId: createAction
+      requestBody:
+        description: Creates an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Finds actions
+      description: Finds actions
+      operationId: findActions
+      parameters:
+        - name: page
+          in: query
+          description: the page
+          required: false
+          schema:
+            type: number
+            default: 1
+        - name: pageSize
+          in: query
+          description: the page size
+          required: false
+          schema:
+            type: number
+            default: 5
+        - name: order
+          in: query
+          description: the order
+          required: false
+          schema:
+            type: string
+            default: asc
+            enum:
+              - asc
+              - desc
+        - name: orderBy
+          in: query
+          description: the order by
+          required: false
+          schema:
+            type: string
+            default: label
+            enum:
+              - id
+              - label
+              - type
+              - created_at
+              - updated_at
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/label':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's label by ID
+      description: Modifies action's label by ID
+      operationId: patchActionLabelById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionLabelRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/match-event':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's matchEvent by ID
+      description: Modifies action's matchEvent by ID
+      operationId: patchActionMatchEventById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionMatchEventRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/match-host':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's matchHost by ID
+      description: Modifies action's matchHost by ID
+      operationId: patchActionMatchHostById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionMatchHostRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/match-application':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's matchApplication by ID
+      description: Modifies action's matchApplication by ID
+      operationId: patchActionMatchApplicationById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionMatchApplicationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/match-provider':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's matchProvider by ID
+      description: Modifies action's matchProvider by ID
+      operationId: patchActionMatchProviderById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionMatchProviderRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/payload':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's payload by ID
+      description: Modifies action's payload by ID
+      operationId: patchActionPayloadById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionPayloadRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/enabled':
+    patch:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Modifies action's enabled flag by ID
+      description: Modifies action's enabled flag by ID
+      operationId: patchActionEnabledById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyActionEnabledRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}/test':
+    post:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Tests action by ID
+      description: Tests action by ID
+      operationId: postActionTestById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Tests an action
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestActionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionTestSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/actions/{id}':
+    get:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Finds an action by ID
+      description: Finds action by ID
+      operationId: findActionById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - actions
+      security:
+        - basicAuth: [ ]
+      summary: Deletes an action by ID
+      description: 'Deletes an action by ID'
+      operationId: deleteActionById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /action-invocations:
+    get:
+      tags:
+        - action-invocations
+      security:
+        - basicAuth: [ ]
+      summary: Finds action invocations
+      description: Finds action invocations
+      operationId: findActionInvocations
+      parameters:
+        - name: page
+          in: query
+          description: the page
+          required: false
+          schema:
+            type: number
+            default: 1
+        - name: pageSize
+          in: query
+          description: the page size
+          required: false
+          schema:
+            type: number
+            default: 5
+        - name: order
+          in: query
+          description: the order
+          required: false
+          schema:
+            type: string
+            default: desc
+            enum:
+              - asc
+              - desc
+        - name: orderBy
+          in: query
+          description: the order by
+          required: false
+          schema:
+            type: string
+            default: created_at
+            enum:
+              - id
+              - state
+              - retry_count
+              - created_at
+              - updated_at
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionInvocationPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/action-invocations/{id}':
+    get:
+      tags:
+        - action-invocations
+      security:
+        - basicAuth: [ ]
+      summary: Finds an action invocation by ID
+      description: Finds action invocation by ID
+      operationId: findActionInvocationById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionInvocationSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - action-invocations
+      security:
+        - basicAuth: [ ]
+      summary: Deletes an action invocation by ID
+      description: 'Deletes an action invocation by ID'
+      operationId: deleteActionInvocationById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /secrets:
+    post:
+      tags:
+        - secrets
+      security:
+        - basicAuth: [ ]
+      summary: Creates secret
+      description: Creates secret
+      operationId: createSecret
+      requestBody:
+        description: Creates a secret
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSecretRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - secrets
+      security:
+        - basicAuth: [ ]
+      summary: Finds secrets
+      description: Finds secrets
+      operationId: findSecrets
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/secrets/{id}':
+    get:
+      tags:
+        - secrets
+      security:
+        - basicAuth: [ ]
+      summary: Finds a secret by ID
+      description: Finds secret by ID
+      operationId: findSecretById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - secrets
+      security:
+        - basicAuth: [ ]
+      summary: Deletes a secret by ID
+      description: 'Deletes a secret by ID'
+      operationId: deleteSecretById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/secrets/{id}/value':
+    patch:
+      tags:
+        - secrets
+      security:
+        - basicAuth: [ ]
+      summary: Modifies secret's value by ID
+      description: Modifies secret's value by ID
+      operationId: patchSecretValueById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies a secret
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifySecretValueRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretSingleResponse'
         '400':
           description: Bad request
           content:
@@ -1053,6 +2313,13 @@ components:
                 - desc
             hasNext:
               type: boolean
+    EventSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/EventResponse'
     EventResponse:
       type: object
       properties:
@@ -1067,14 +2334,6 @@ components:
             - update_updated_state_approved
             - update_updated_state_ignored
             - update_deleted
-            - webhook_created
-            - webhook_updated_label
-            - webhook_updated_ignore_host
-            - webhook_deleted
-        state:
-          type: string
-          enum:
-            - created
         createdAt:
           type: string
         updatedAt:
@@ -1087,9 +2346,6 @@ components:
             - $ref: '#/components/schemas/EventPayloadUpdateCreatedResponse'
             - $ref: '#/components/schemas/EventPayloadUpdateUpdatedResponse'
             - $ref: '#/components/schemas/EventPayloadUpdateDeletedResponse'
-            - $ref: '#/components/schemas/EventPayloadWebhookCreatedResponse'
-            - $ref: '#/components/schemas/EventPayloadWebhookUpdatedResponse'
-            - $ref: '#/components/schemas/EventPayloadWebhookDeletedResponse'
     EventPayloadUpdateCreatedResponse:
       type: object
       properties:
@@ -1147,7 +2403,7 @@ components:
           type: string
         version:
           type: string
-    EventPayloadWebhookCreatedResponse:
+    ActionResponse:
       type: object
       properties:
         id:
@@ -1157,40 +2413,175 @@ components:
         type:
           type: string
           enum:
-            - generic
-            - diun
-        ignoreHost:
+            - shoutrrr
+        matchEvent:
+          type: string
+          nullable: true
+        matchHost:
+          type: string
+          nullable: true
+        matchApplication:
+          type: string
+          nullable: true
+        matchProvider:
+          type: string
+          nullable: true
+        payload:
+          type: object
+        enabled:
           type: boolean
-    EventPayloadWebhookUpdatedResponse:
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ActionSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/ActionResponse'
+    ActionPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActionResponse'
+            page:
+              type: number
+            pageSize:
+              type: number
+            orderBy:
+              type: string
+              enum:
+                - id
+                - created_at
+                - updated_at
+                - label
+                - type
+            order:
+              type: string
+              enum:
+                - asc
+                - desc
+            totalElements:
+              type: number
+            totalPages:
+              type: number
+    ActionTestResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          description: Blank in case of success
+    ActionTestSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/ActionTestResponse'
+    ActionInvocationResponse:
       type: object
       properties:
         id:
           type: string
-        labelPrior:
-          type: string
-        label:
-          type: string
-        type:
+        retryCount:
+          type: number
+        state:
           type: string
           enum:
-            - generic
-            - diun
-        ignoreHostPrior:
-          type: boolean
-        ignoreHost:
-          type: boolean
-    EventPayloadWebhookDeletedResponse:
+            - created
+            - running
+            - retrying
+            - error
+            - success
+        message:
+          type: string
+          nullable: true
+        actionId:
+          type: string
+        eventId:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ActionInvocationSingleResponse:
       type: object
       properties:
-        label:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/ActionInvocationResponse'
+    ActionInvocationPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ActionInvocationResponse'
+            page:
+              type: number
+            pageSize:
+              type: number
+            orderBy:
+              type: string
+              enum:
+                - id
+                - created_at
+                - updated_at
+                - state
+                - retry_count
+            order:
+              type: string
+              enum:
+                - asc
+                - desc
+            totalElements:
+              type: number
+            totalPages:
+              type: number
+    SecretResponse:
+      type: object
+      properties:
+        id:
           type: string
-        type:
+        key:
           type: string
-          enum:
-            - generic
-            - diun
-        ignoreHost:
-          type: boolean
+        value:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    SecretSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/SecretResponse'
+    SecretPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/SecretResponse'
 
     # requests
     ModifyUpdateStateRequest:
@@ -1306,3 +2697,135 @@ components:
               type: string
             ctn_status:
               type: string
+    CreateActionRequest:
+      type: object
+      required:
+        - label
+        - type
+        - payload
+        - enabled
+      properties:
+        label:
+          type: string
+        type:
+          type: string
+          enum:
+            - shoutrrr
+        matchEvent:
+          type: string
+        matchHost:
+          type: string
+        matchApplication:
+          type: string
+        matchProvider:
+          type: string
+        enabled:
+          type: boolean
+        payload:
+          type: object
+          anyOf:
+            - $ref: '#/components/schemas/CreateActionPayloadRequestShoutrrr'
+    CreateActionPayloadRequestShoutrrr:
+      type: object
+      required:
+        - urls
+        - body
+      properties:
+        urls:
+          type: array
+          items:
+            type: string
+        body:
+          type: string
+    TestActionRequest:
+      type: object
+      required:
+        - application
+        - provider
+        - host
+        - version
+      properties:
+        application:
+          type: string
+        provider:
+          type: string
+        host:
+          type: string
+        version:
+          type: string
+    CreateSecretRequest:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    ModifySecretValueRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+    ModifyActionLabelRequest:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+    ModifyActionTypeRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - shoutrrr
+    ModifyActionMatchEventRequest:
+      type: object
+      properties:
+        matchEvent:
+          type: string
+          nullable: true
+    ModifyActionMatchHostRequest:
+      type: object
+      properties:
+        matchHost:
+          type: string
+          nullable: true
+    ModifyActionMatchApplicationRequest:
+      type: object
+      properties:
+        matchApplication:
+          type: string
+          nullable: true
+    ModifyActionMatchProviderRequest:
+      type: object
+      properties:
+        matchProvider:
+          type: string
+          nullable: true
+    ModifyActionPayloadRequest:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum:
+            - shoutrrr
+        payload:
+          type: object
+    ModifyActionEnabledRequest:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean

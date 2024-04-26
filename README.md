@@ -23,6 +23,7 @@ Contributions are very welcome!
 * [Configuration](#configuration)
 * [3rd party integrations](#3rd-party-integrations)
     * [Webhooks](#webhooks)
+    * [Actions](#actions)
     * [Prometheus Metrics](#prometheus-metrics)
 * [Deployment](#deployment)
     * [Native](#native)
@@ -59,21 +60,23 @@ via [alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/).
 
 In addition, you can use _upda_'s UI to manage updates, e.g. _approve_ them when they have been rolled out to a host.
 
-Important to note:
-
-* _upda_ is **NOT a scraper** to watch docker registries or GitHub releases, it simply collects and consolidates updates
-  from different sources via _webhooks_. If you like to watch GitHub releases, write a scraper and use `upda-cli` to
-  report back to _upda_.
-* _upda_ uses basic auth for administrative tasks like viewing available updates or setting up the initial webhooks.
+> _upda_ is **NOT** a scraper to watch docker registries or GitHub releases, it simply tracks and consolidates updates
+> from different sources provided via _webhooks_. If you like to watch GitHub releases, write a scraper and
+> use `upda-cli` to report back to _upda_.
 
 ## Concepts
 
-_upda_ retrieves new updates when webhooks of upda are invoked, e.g., [duin](https://crazymax.dev/diun/) invokes it
-or any other application which can reach the instance.
-Tracked updates are unique for the attributes `(application,provider,host)` which means that subsequent updates for an
-identical _application_, _provider_ and _host_ simply updates the `version` and `metadata` attributes for that tracked
-_update_ (regardless if the version or metadata payload _actually_ changed - reasoning behind this is to get reflected
-metadata updates independent if version attribute has changed).
+1. Create a webhook in upda.
+2. Use the webhook's URL in a 3rd party application to start tracking an update or use `upda-cli` to report an update.
+3. Enjoy visualization and state management of tracked updates in one place.
+4. Optionally, define [actions](#actions) for tracked updates as they arrive
+
+_upda_ retrieves new updates when webhooks of upda are invoked, e.g., [duin](https://crazymax.dev/diun/) invokes it or
+any other application which can reach the instance. Tracked updates are unique for the
+attributes `(application,provider,host)` which means that subsequent updates for an identical _application_, _provider_
+and _host_ simply updates the `version` and `metadata` attributes for that tracked _update_ (regardless if the version
+or metadata payload _actually_ changed - reasoning behind this is to get reflected metadata updates independent if
+version attribute has changed).
 
 State management of tracked updates:
 
@@ -127,52 +130,68 @@ via web interface or API.
 
 The following environment variables can be used to modify application behavior.
 
-| Variable                           | Purpose                                                                                                                                                                                                       | Default/Description                                                                                                                  |
-|:-----------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
-| `TZ`                               | The time zone (**recommended** to set it properly, background tasks depend on it)                                                                                                                             | Defaults to `Europe/Berlin`, can be any time zone according to _tz database_                                                         |
-| `ADMIN_USER`                       | Admin user name for login                                                                                                                                                                                     | Not set by default, you need to explicitly set it to user name                                                                       |
-| `ADMIN_PASSWORD`                   | Admin password for login                                                                                                                                                                                      | Not set by default, you need to explicitly set it to a secure random                                                                 |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `DB_TYPE`                          | The database type (Postgres is **recommended**)                                                                                                                                                               | Defaults to `sqlite`, possible values are `sqlite` or `postgres`                                                                     |
-| `DB_SQLITE_FILE`                   | Path to the SQLITE file                                                                                                                                                                                       | Defaults to `<XDG_DATA_DIR>/upda/upda.db`, e.g. `~/.local/share/upda/upda.db`                                                        |
-| `DB_POSTGRES_HOST`                 | The postgres host                                                                                                                                                                                             | Postgres host address, defaults to `localhost`                                                                                       |
-| `DB_POSTGRES_PORT`                 | The postgres port                                                                                                                                                                                             | Postgres port, defaults to `5432`                                                                                                    |
-| `DB_POSTGRES_NAME`                 | The postgres database name                                                                                                                                                                                    | Postgres database name, needs to be set                                                                                              |
-| `DB_POSTGRES_TZ`                   | The postgres time zone                                                                                                                                                                                        | Postgres time zone settings, defaults to `Europe/Berlin`                                                                             |
-| `DB_POSTGRES_USER`                 | The postgres user                                                                                                                                                                                             | Postgres user name, needs to be set                                                                                                  |
-| `DB_POSTGRES_PASSWORD`             | The postgres password                                                                                                                                                                                         | Postgres user password, needs to be set                                                                                              |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `SERVER_PORT`                      | Port                                                                                                                                                                                                          | Defaults to `8080`                                                                                                                   |
-| `SERVER_LISTEN`                    | Server's listen address                                                                                                                                                                                       | Defaults to empty which equals `0.0.0.0`                                                                                             |
-| `SERVER_TLS_ENABLED`               | If server uses TLS                                                                                                                                                                                            | Defaults `false`                                                                                                                     |
-| `SERVER_TLS_CERT_PATH`             | When TLS enabled, provide the certificate path                                                                                                                                                                |                                                                                                                                      |
-| `SERVER_TLS_KEY_PATH`              | When TLS enabled, provide the key path                                                                                                                                                                        |                                                                                                                                      |
-| `SERVER_TIMEOUT`                   | Timeout the server waits before shutting down to end any pending tasks                                                                                                                                        | Defaults to `1s` (1 second), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                 |
-| `CORS_ALLOW_ORIGIN`                | CORS configuration                                                                                                                                                                                            | Defaults to `*`                                                                                                                      |
-| `CORS_ALLOW_METHODS`               | CORS configuration                                                                                                                                                                                            | Defaults to `GET, POST, PUT, PATCH, DELETE, OPTIONS`                                                                                 |
-| `CORS_ALLOW_HEADERS`               | CORS configuration                                                                                                                                                                                            | Defaults to `Authorization, Content-Type`                                                                                            |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `LOGGING_LEVEL`                    | Logging level. Possible are `debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal`. Setting to `debug` enables high verbosity output.                                                                   | Defaults to `info`                                                                                                                   |
-| `LOGGING_ENCODING`                 | Logging encoding. Possible are `console` and `json`                                                                                                                                                           | Defaults to `json`                                                                                                                   |
-| `LOGGING_DIRECTORY`                | Logging directory. When set, logs will be added to a file called `upda.log` in addition to the standard output. Ensure that upda has access permissions. Use an external program for log rotation if desired. |                                                                                                                                      |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `WEBHOOKS_TOKEN_LENGTH`            | The length of the token                                                                                                                                                                                       | Defaults to `16`, positive number                                                                                                    |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `TASK_UPDATE_CLEAN_STALE_ENABLED`  | If background task should run to do housekeeping of stale (ignored/approved) updates from the database                                                                                                        | Defaults to `false`                                                                                                                  | 
-| `TASK_UPDATE_CLEAN_STALE_INTERVAL` | Interval at which a background task does housekeeping by deleting stale (ignored/approved) updates from the database                                                                                          | Defaults to `1h` (1 hour), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                   | 
-| `TASK_UPDATE_CLEAN_STALE_MAX_AGE`  | Number defining at which age stale (ignored/approved) updates are deleted by the background task (_updatedAt_ attribute decides)                                                                              | Defaults to `168h` (168 hours = 1 week), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number     |
-| `TASK_EVENT_CLEAN_STALE_ENABLED`   | If background task should run to do housekeeping of stale (old) events from the database                                                                                                                      | Defaults to `false`                                                                                                                  |
-| `TASK_EVENT_CLEAN_STALE_INTERVAL`  | Interval at which a background task does housekeeping by deleting stale (old) events from the database                                                                                                        | Defaults to `8h` (8 hours), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                  |
-| `TASK_EVENT_CLEAN_STALE_MAX_AGE`   | Number defining at which age stale (old) events are deleted by the background task (_updatedAt_ attribute decides)                                                                                            | Defaults to `2190h` (2190 hours = 3 months), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number |
-| `TASK_PROMETHEUS_REFRESH_INTERVAL` | Interval at which a background task updates custom metrics                                                                                                                                                    | Defaults to `60s` (60 seconds), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number              |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `LOCK_REDIS_ENABLED`               | If locking via REDIS (multiple instances) is enabled. Requires REDIS. Otherwise uses in-memory locks.                                                                                                         | Defaults to `false`                                                                                                                  |
-| `LOCK_REDIS_URL`                   | If locking via REDIS is enabled, this should point to a resolvable REDIS instance, e.g. `redis://<user>:<pass>@localhost:6379/<db>`.                                                                          |                                                                                                                                      |
-|                                    |                                                                                                                                                                                                               |                                                                                                                                      |
-| `PROMETHEUS_ENABLED`               | If Prometheus metrics are exposed                                                                                                                                                                             | Defaults to `false`                                                                                                                  |
-| `PROMETHEUS_METRICS_PATH`          | Defines the metrics endpoint path                                                                                                                                                                             | Defaults to `/metrics`                                                                                                               |
-| `PROMETHEUS_SECURE_TOKEN_ENABLED`  | If Prometheus metrics endpoint is protected by a token when enabled (**recommended**)                                                                                                                         | Defaults to `true`                                                                                                                   |
-| `PROMETHEUS_SECURE_TOKEN`          | The token securing the metrics endpoint when enabled (**recommended**)                                                                                                                                        | Not set by default, you need to explicitly set it to a secure random                                                                 |
+| Variable                            | Purpose                                                                                                                                                                                                       | Default/Description                                                                                                                  |
+|:------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| `SECRET`                            | A 32 character long secure random secret used for encrypting some data inside the database. When data has been created inside the database, the secret cannot be changed anymore, otherwise decryption fails. | Not set by default, you need to explicitly set it, e.g., generate via `openssl rand -hex 16`                                         |
+| `TZ`                                | The time zone (**recommended** to set it properly, background tasks depend on it)                                                                                                                             | Defaults to `Europe/Berlin`, can be any time zone according to _tz database_                                                         |
+| `ADMIN_USER`                        | Admin user name for login                                                                                                                                                                                     | Not set by default, you need to explicitly set it to user name                                                                       |
+| `ADMIN_PASSWORD`                    | Admin password for login                                                                                                                                                                                      | Not set by default, you need to explicitly set it to a secure random                                                                 |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `DB_TYPE`                           | The database type (Postgres is **recommended**)                                                                                                                                                               | Defaults to `sqlite`, possible values are `sqlite` or `postgres`                                                                     |
+| `DB_SQLITE_FILE`                    | Path to the SQLITE file                                                                                                                                                                                       | Defaults to `<XDG_DATA_DIR>/upda/upda.db`, e.g. `~/.local/share/upda/upda.db`                                                        |
+| `DB_POSTGRES_HOST`                  | The postgres host                                                                                                                                                                                             | Postgres host address, defaults to `localhost`                                                                                       |
+| `DB_POSTGRES_PORT`                  | The postgres port                                                                                                                                                                                             | Postgres port, defaults to `5432`                                                                                                    |
+| `DB_POSTGRES_NAME`                  | The postgres database name                                                                                                                                                                                    | Postgres database name, needs to be set                                                                                              |
+| `DB_POSTGRES_TZ`                    | The postgres time zone                                                                                                                                                                                        | Postgres time zone settings, defaults to `Europe/Berlin`                                                                             |
+| `DB_POSTGRES_USER`                  | The postgres user                                                                                                                                                                                             | Postgres user name, needs to be set                                                                                                  |
+| `DB_POSTGRES_PASSWORD`              | The postgres password                                                                                                                                                                                         | Postgres user password, needs to be set                                                                                              |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `SERVER_PORT`                       | Port                                                                                                                                                                                                          | Defaults to `8080`                                                                                                                   |
+| `SERVER_LISTEN`                     | Server's listen address                                                                                                                                                                                       | Defaults to empty which equals `0.0.0.0`                                                                                             |
+| `SERVER_TLS_ENABLED`                | If server uses TLS                                                                                                                                                                                            | Defaults `false`                                                                                                                     |
+| `SERVER_TLS_CERT_PATH`              | When TLS enabled, provide the certificate path                                                                                                                                                                |                                                                                                                                      |
+| `SERVER_TLS_KEY_PATH`               | When TLS enabled, provide the key path                                                                                                                                                                        |                                                                                                                                      |
+| `SERVER_TIMEOUT`                    | Timeout the server waits before shutting down to end any pending tasks                                                                                                                                        | Defaults to `1s` (1 second), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                 |
+| `CORS_ALLOW_ORIGIN`                 | CORS configuration                                                                                                                                                                                            | Defaults to `*`                                                                                                                      |
+| `CORS_ALLOW_METHODS`                | CORS configuration                                                                                                                                                                                            | Defaults to `GET, POST, PUT, PATCH, DELETE, OPTIONS`                                                                                 |
+| `CORS_ALLOW_HEADERS`                | CORS configuration                                                                                                                                                                                            | Defaults to `Authorization, Content-Type`                                                                                            |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `LOGGING_LEVEL`                     | Logging level. Possible are `debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal`. Setting to `debug` enables high verbosity output.                                                                   | Defaults to `info`                                                                                                                   |
+| `LOGGING_ENCODING`                  | Logging encoding. Possible are `console` and `json`                                                                                                                                                           | Defaults to `json`                                                                                                                   |
+| `LOGGING_DIRECTORY`                 | Logging directory. When set, logs will be added to a file called `upda.log` in addition to the standard output. Ensure that upda has access permissions. Use an external program for log rotation if desired. |                                                                                                                                      |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `WEBHOOKS_TOKEN_LENGTH`             | The length of the token                                                                                                                                                                                       | Defaults to `16`, positive number                                                                                                    |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `TASK_UPDATE_CLEAN_STALE_ENABLED`   | If background task should run to do housekeeping of stale (ignored/approved) updates from the database                                                                                                        | Defaults to `false`                                                                                                                  | 
+| `TASK_UPDATE_CLEAN_STALE_INTERVAL`  | Interval at which a background task does housekeeping by deleting stale (ignored/approved) updates from the database                                                                                          | Defaults to `1h` (1 hour), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                   | 
+| `TASK_UPDATE_CLEAN_STALE_MAX_AGE`   | Number defining at which age stale (ignored/approved) updates are deleted by the background task (_updatedAt_ attribute decides)                                                                              | Defaults to `720h` (168 hours = 1 week), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number     |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `TASK_EVENT_CLEAN_STALE_ENABLED`    | If background task should run to do housekeeping of stale (old) events from the database                                                                                                                      | Defaults to `false`                                                                                                                  |
+| `TASK_EVENT_CLEAN_STALE_INTERVAL`   | Interval at which a background task does housekeeping by deleting stale (old) events from the database                                                                                                        | Defaults to `8h` (8 hours), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                  |
+| `TASK_EVENT_CLEAN_STALE_MAX_AGE`    | Number defining at which age stale (old) events are deleted by the background task (_updatedAt_ attribute decides)                                                                                            | Defaults to `2190h` (2190 hours = 3 months), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `TASK_ACTIONS_ENQUEUE_ENABLED`      | If background task should run to enqueue matching actions derived from events (actions are invocation separately after being enqueued)                                                                        | Defaults to `true`                                                                                                                   |
+| `TASK_ACTIONS_ENQUEUE_INTERVAL`     | Interval at which a background task does check to enqueue actions                                                                                                                                             | Defaults to `10s` (10 seconds), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number              |
+| `TASK_ACTIONS_ENQUEUE_BATCH_SIZE`   | Number defining how many unhandled events are processed in a batch by the background task                                                                                                                     | Defaults to `1`, must be positive number                                                                                             |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `TASK_ACTIONS_INVOKE_ENABLED`       | If background task should run to invoke enqueued actions derived                                                                                                                                              | Defaults to `true`                                                                                                                   |
+| `TASK_ACTIONS_INVOKE_INTERVAL`      | Interval at which a background task does check to invoke enqueued actions                                                                                                                                     | Defaults to `10s` (10 seconds), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number              |
+| `TASK_ACTIONS_INVOKE_BATCH_SIZE`    | Number defining how many enqueued actions are processed in a batch by the background task                                                                                                                     | Defaults to `1`, must be positive number                                                                                             |
+| `TASK_ACTIONS_INVOKE_MAX_RETRIES`   | Number defining how often actions are invoked in case of an error, if exceeded, those actions are not retried again                                                                                           | Defaults to `3`, must be positive number                                                                                             |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `TASK_ACTIONS_CLEAN_STALE_ENABLED`  | If background task should run to do housekeeping of stale (handled, meaning success or error state) actions from the database                                                                                 | Defaults to `true`                                                                                                                   |
+| `TASK_ACTIONS_CLEAN_STALE_INTERVAL` | Interval at which a background task does housekeeping by deleting stale (handled) actions from the database                                                                                                   | Defaults to `12h` (12 hours), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number                |
+| `TASK_ACTIONS_CLEAN_STALE_MAX_AGE`  | Number defining at which age stale (handled) actions are deleted by the background task (_updatedAt_ attribute decides)                                                                                       | Defaults to `720h` (720 hours = 30 days), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number    |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `TASK_PROMETHEUS_REFRESH_INTERVAL`  | Interval at which a background task updates custom metrics                                                                                                                                                    | Defaults to `60s` (60 seconds), qualifier can be `s = second`, `m = minute`, `h = hour` prefixed with a positive number              |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `LOCK_REDIS_ENABLED`                | If locking via REDIS (multiple instances) is enabled. Requires REDIS. Otherwise uses in-memory locks.                                                                                                         | Defaults to `false`                                                                                                                  |
+| `LOCK_REDIS_URL`                    | If locking via REDIS is enabled, this should point to a resolvable REDIS instance, e.g. `redis://<user>:<pass>@localhost:6379/<db>`.                                                                          |                                                                                                                                      |
+|                                     |                                                                                                                                                                                                               |                                                                                                                                      |
+| `PROMETHEUS_ENABLED`                | If Prometheus metrics are exposed                                                                                                                                                                             | Defaults to `false`                                                                                                                  |
+| `PROMETHEUS_METRICS_PATH`           | Defines the metrics endpoint path                                                                                                                                                                             | Defaults to `/metrics`                                                                                                               |
+| `PROMETHEUS_SECURE_TOKEN_ENABLED`   | If Prometheus metrics endpoint is protected by a token when enabled (**recommended**)                                                                                                                         | Defaults to `true`                                                                                                                   |
+| `PROMETHEUS_SECURE_TOKEN`           | The token securing the metrics endpoint when enabled (**recommended**)                                                                                                                                        | Not set by default, you need to explicitly set it to a secure random                                                                 |
 
 ## 3rd party integrations
 
@@ -182,8 +201,10 @@ This is the core mechanism of _upda_ and why it exists. Webhooks are the central
 updates.
 
 In order to configure a 3rd party application like [duin](https://crazymax.dev/diun/) to send updates to _upda_ with
-the [duin webhook notification configuration](https://crazymax.dev/diun/notif/webhook/), **create** a new _upda_ webhook
-token via _upda_'s web interface or via API call. This gives you
+the [duin webhook notification configuration](https://crazymax.dev/diun/notif/webhook/), create a new _upda_ webhook via
+web interface or via API call.
+
+This gives you
 
 * a unique _upda_ URL to configure in the notification part of [duin](https://crazymax.dev/diun/),
   e.g., `/api/v1/webhooks/<a unique identifier>`
@@ -202,6 +223,64 @@ notif:
             content-type: application/json
             X-Webhook-Token: <the token from webhook creation in upda>
         timeout: 10s
+```
+
+### Actions
+
+Actions can be used to invoke arbitrary third party tools when an _event_ occurs, e.g., an update has been created or
+modified. An action is triggered when its condition meet the action's definition (event name, host, application,
+provider).
+
+Actions have types. Different types require different payload to set them up. [shoutrrr](#shoutrrr) is supported as
+action type, which can send notifications to a variety of services like Gotify, Ntfy, Teams, OpsGenie and many more.
+
+Supported events are the following:
+
+| Event name                      | Description                                                         |
+|:--------------------------------|:--------------------------------------------------------------------|
+| `update_created`                | An update has been created                                          |
+| `update_updated`                | An update has been updated (not necessarily its version attribute!) |
+| `update_updated_state_pending`  | An update's state changed to pending                                |
+| `update_updated_state_approved` | An update's state changed to approved                               |
+| `update_updated_state_ignored`  | An update's state changed to ignored                                |
+| `update_deleted`                | An update has been removed                                          |
+
+For privacy, an action's configuration supports upda's **secrets** vault, which means that before an action is
+triggered, any occurrence of `<SECRET>SECRET_KEY</SECRET>` is properly replaced by the value of the `SECRET_KEY` defined
+inside the vault.
+
+In addition to secrets, upda provides **variables** which can be used with the `<VAR>VARIABLE_NAME</VAR>` syntax and any
+occurrence is replaced before invocation as well.
+
+| Variable name            | Description                                       |
+|:-------------------------|:--------------------------------------------------|
+| `<VAR>APPLICATION</VAR>` | The update's application name invoking the action |
+| `<VAR>PROVIDER</VAR>`    | The update's provider name invoking the action    |
+| `<VAR>HOST</VAR>`        | The update's host invoking the action             |
+| `<VAR>VERSION</VAR>`     | The update's version (latest) invoking the action |
+
+#### shoutrrr
+
+[shoutrrr](https://github.com/containrrr/shoutrrr?tab=readme-ov-file#documentation) supports multiple services directly
+which can be provided as simple URL, e.g., `gotify://gotify.example.com:443/<token>`, where `<token>`
+can also be provided as secret: `gotify://gotify.example.com:443/<SECRET>GOTIFY_TOKEN</SECRET>`.
+
+A full payload for defining an upda shoutrrr action looks like the following. No worries, there's
+a [web interface](https://git.myservermanager.com/varakh/upda-ui) for configuring actions:
+
+```json5
+{
+    // ...
+    "type": "shoutrrr",
+    "matchEvent": "update_created",
+    // payload 'urls' and 'body' are specific to the shoutrrr action type
+    "payload": {
+        "urls": [
+            "gotify://myurl/<SECRET>GOTIFY_TOKEN</SECRET>/?title=Great+News+On+Upda"
+        ],
+        "body": "A new update arrived on <VAR>HOST</VAR> for <VAR>APPLICATION</VAR>. Its version is <VAR>VERSION</VAR>."
+    }
+}
 ```
 
 ### Prometheus Metrics
@@ -224,11 +303,6 @@ Custom exposed metrics are exposed under the `upda_` namespace.
 Examples:
 
 ```shell
-# HELP upda_updates details for all updates, -1=deleted (deleted next restart), 0=pending, 1=approved, 2=ignored
-upda_updates{application="codeberg.org/forgejo/forgejo",host="myserver",provider="oci"} 0
-upda_updates{application="docker.io/library/mysql",host="myserver",provider="oci"} 2
-upda_updates{application="quay.io/navidys/prometheus-podman-exporter",host="myserver",provider="oci"} 1
-upda_updates{application="quay.io/navidys/prometheus-podman-exporter",host="myserver2",provider="oci"} 1
 # HELP upda_updates_all amount of all updates
 upda_updates_all 4
 # HELP upda_updates_approved amount of all updates in approved state
@@ -241,6 +315,8 @@ upda_updates_pending 1
 upda_webhooks 2
 # HELP upda_events amount of all events
 upda_events 146
+# HELP upda_actions amount of all actions
+upda_actions 0
 ```
 
 There's an example [Grafana](https://grafana.com) dashboard in the `_doc/` folder.
@@ -248,17 +324,17 @@ There's an example [Grafana](https://grafana.com) dashboard in the `_doc/` folde
 [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) could check for the following:
 
 ```yaml
-- name: update_checks
-  rules:
-    - alert: UpdatesAvailable
-      expr: upda_updates == 0 and upda_updates_pending > 0
-      for: 4w
-      labels:
-        severity: high
-        class: update
-      annotations:
-        summary: "Updates available from upda for {{ $labels.job }}"
-        description: "Updates available from upda for {{ $labels.job }}"
+-   name: update_checks
+    rules:
+        -   alert: UpdatesAvailable
+            expr: upda_updates == 0 and upda_updates_pending > 0
+            for: 4w
+            labels:
+                severity: high
+                class: update
+            annotations:
+                summary: "Updates available from upda for {{ $labels.job }}"
+                description: "Updates available from upda for {{ $labels.job }}"
 ```
 
 ## Deployment

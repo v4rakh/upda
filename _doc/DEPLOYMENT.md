@@ -60,6 +60,8 @@ services:
       - DB_POSTGRES_PASSWORD=upda
       - ADMIN_USER=admin
       - ADMIN_PASSWORD=changeit
+      # generate 32 character long secret, e.g., with "openssl rand -hex 16"
+      - SECRET=generated-secure-secret-32-chars
     restart: unless-stopped
     networks:
       - internal
@@ -121,6 +123,8 @@ services:
       - TZ=Europe/Berlin
       - ADMIN_USER=admin
       - ADMIN_PASSWORD=changeit
+      # generate 32 character long secret, e.g., with "openssl rand -hex 16"
+      - SECRET=generated-secure-secret-32-chars
     restart: unless-stopped
     networks:
       - internal

@@ -39,16 +39,12 @@ func (e WebhookType) Value() string {
 type EventName string
 
 const (
-	EventNameUpdateCreated            EventName = "update_created"
-	EventNameUpdateUpdated            EventName = "update_updated"
-	EventNameUpdateUpdatedPending     EventName = "update_updated_state_pending"
-	EventNameUpdateUpdatedApproved    EventName = "update_updated_state_approved"
-	EventNameUpdateUpdatedIgnored     EventName = "update_updated_state_ignored"
-	EventNameUpdateDeleted            EventName = "update_deleted"
-	EventNameWebhookCreated           EventName = "webhook_created"
-	EventNameWebhookUpdatedLabel      EventName = "webhook_updated_label"
-	EventNameWebhookUpdatedIgnoreHost EventName = "webhook_updated_ignore_host"
-	EventNameWebhookDeleted           EventName = "webhook_deleted"
+	EventNameUpdateCreated         EventName = "update_created"
+	EventNameUpdateUpdated         EventName = "update_updated"
+	EventNameUpdateUpdatedPending  EventName = "update_updated_state_pending"
+	EventNameUpdateUpdatedApproved EventName = "update_updated_state_approved"
+	EventNameUpdateUpdatedIgnored  EventName = "update_updated_state_ignored"
+	EventNameUpdateDeleted         EventName = "update_deleted"
 )
 
 func (e *EventName) Scan(value interface{}) error {
@@ -64,7 +60,8 @@ func (e EventName) Value() string {
 type EventState string
 
 const (
-	EventStateCreated EventState = "created"
+	EventStateCreated  EventState = "created"
+	EventStateEnqueued EventState = "enqueued"
 )
 
 func (e *EventState) Scan(value interface{}) error {
@@ -73,5 +70,41 @@ func (e *EventState) Scan(value interface{}) error {
 }
 
 func (e EventState) Value() string {
+	return string(e)
+}
+
+// ActionType state of an update
+type ActionType string
+
+const (
+	ActionTypeShoutrrr ActionType = "shoutrrr"
+)
+
+func (e *ActionType) Scan(value interface{}) error {
+	*e = ActionType(value.([]byte))
+	return nil
+}
+
+func (e ActionType) Value() string {
+	return string(e)
+}
+
+// ActionInvocationState state of an action invocation
+type ActionInvocationState string
+
+const (
+	ActionInvocationStateCreated  ActionInvocationState = "created"
+	ActionInvocationStateRunning  ActionInvocationState = "running"
+	ActionInvocationStateRetrying ActionInvocationState = "retrying"
+	ActionInvocationStateSuccess  ActionInvocationState = "success"
+	ActionInvocationStateError    ActionInvocationState = "error"
+)
+
+func (e *ActionInvocationState) Scan(value interface{}) error {
+	*e = ActionInvocationState(value.([]byte))
+	return nil
+}
+
+func (e ActionInvocationState) Value() string {
 	return string(e)
 }

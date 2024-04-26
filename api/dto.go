@@ -25,6 +25,62 @@ type CreateWebhookRequest struct {
 	IgnoreHost bool   `json:"ignoreHost"`
 }
 
+type CreateSecretRequest struct {
+	Key   string `json:"key" binding:"required,min=1"`
+	Value string `json:"value" binding:"required,min=1"`
+}
+
+type CreateActionRequest struct {
+	Label            string      `json:"label" binding:"required,min=1,max=255"`
+	Type             string      `json:"type" binding:"required,oneof=shoutrrr"`
+	MatchEvent       *string     `json:"matchEvent"`
+	MatchHost        *string     `json:"matchHost"`
+	MatchApplication *string     `json:"matchApplication"`
+	MatchProvider    *string     `json:"matchProvider"`
+	Payload          interface{} `json:"payload"`
+	Enabled          bool        `json:"enabled"`
+}
+
+type ModifySecretValueRequest struct {
+	Value string `json:"value" binding:"required,min=1"`
+}
+
+type ModifyActionLabelRequest struct {
+	Label string `json:"label" binding:"required,min=1,max=255"`
+}
+
+type ModifyActionMatchEventRequest struct {
+	MatchEvent *string `json:"matchEvent"`
+}
+
+type ModifyActionMatchHostRequest struct {
+	MatchHost *string `json:"matchHost"`
+}
+
+type ModifyActionMatchApplicationRequest struct {
+	MatchApplication *string `json:"matchApplication"`
+}
+
+type ModifyActionMatchProviderRequest struct {
+	MatchProvider *string `json:"matchProvider"`
+}
+
+type ModifyActionTypeAndPayloadRequest struct {
+	Type    ActionType  `json:"type" binding:"required,oneof=shoutrrr"`
+	Payload interface{} `json:"payload" binding:"required"`
+}
+
+type ModifyActionEnabledRequest struct {
+	Enabled bool `json:"enabled"`
+}
+
+type TestActionRequest struct {
+	Application string `json:"application" binding:"required,min=1"`
+	Provider    string `json:"provider" binding:"required,min=1"`
+	Host        string `json:"host" binding:"required,min=1"`
+	Version     string `json:"version" binding:"required,min=1"`
+}
+
 type PaginateUpdateRequest struct {
 	PageSize   int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
 	Page       int    `form:"page,default=1" binding:"numeric,gte=1"`
@@ -37,8 +93,22 @@ type PaginateUpdateRequest struct {
 type PaginateWebhookRequest struct {
 	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
 	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
+	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
+	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
+}
+
+type PaginateActionRequest struct {
+	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
+	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
+	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
+}
+
+type PaginateActionInvocationRequest struct {
+	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
 	Order    string `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=updated_at" binding:"oneof=id label type created_at updated_at"`
+	OrderBy  string `form:"orderBy,default=created_at" binding:"oneof=id state retry_count created_at updated_at"`
 }
 
 type WebhookGenericRequest struct {
@@ -216,10 +286,23 @@ func NewWebhookPageResponse(content []*WebhookResponse, page int, pageSize int, 
 type EventResponse struct {
 	ID        uuid.UUID   `json:"id"`
 	Name      string      `json:"name"`
-	State     string      `json:"state"`
 	CreatedAt time.Time   `json:"createdAt"`
 	UpdatedAt time.Time   `json:"updatedAt"`
 	Payload   interface{} `json:"payload,omitempty"`
+}
+
+type EventSingleResponse struct {
+	Data EventResponse `json:"data"`
+}
+
+func NewEventSingleResponse(id uuid.UUID, name string, createdAt time.Time, updatedAt time.Time, payload interface{}) *EventSingleResponse {
+	e := new(EventSingleResponse)
+	e.Data.ID = id
+	e.Data.Name = name
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	e.Data.Payload = payload
+	return e
 }
 
 type EventWindowResponse struct {
@@ -269,24 +352,160 @@ func NewEventWindowResponse(content []*EventResponse, size int, skip int, orderB
 	return e
 }
 
-type EventPayloadWebhookCreatedDto struct {
-	ID         uuid.UUID `json:"id,omitempty"`
-	Label      string    `json:"label,omitempty"`
-	Type       string    `json:"type,omitempty"`
-	IgnoreHost bool      `json:"ignoreHost"`
+type SecretResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Key       string    `json:"key"`
+	Value     string    `json:"value,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-type EventPayloadWebhookUpdatedDto struct {
-	ID              uuid.UUID `json:"id,omitempty"`
-	LabelPrior      string    `json:"labelPrior,omitempty"`
-	Label           string    `json:"label,omitempty"`
-	IgnoreHostPrior bool      `json:"ignoreHostPrior"`
-	IgnoreHost      bool      `json:"ignoreHost"`
-	Type            string    `json:"type,omitempty"`
+type SecretSingleResponse struct {
+	Data SecretResponse `json:"data"`
 }
 
-type EventPayloadWebhookDeletedDto struct {
-	Label      string `json:"label,omitempty"`
-	Type       string `json:"type,omitempty"`
-	IgnoreHost bool   `json:"ignoreHost"`
+func NewSecretSingleResponse(id uuid.UUID, key string, value string, createdAt time.Time, updatedAt time.Time) *SecretSingleResponse {
+	e := new(SecretSingleResponse)
+	e.Data.ID = id
+	e.Data.Key = key
+	e.Data.Value = value
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type SecretPageResponse struct {
+	Content []*SecretResponse `json:"content"`
+}
+
+type SecretDataPageResponse struct {
+	Data *SecretPageResponse `json:"data"`
+}
+
+func NewSecretPageResponse(content []*SecretResponse) *SecretPageResponse {
+	e := new(SecretPageResponse)
+	e.Content = content
+	return e
+}
+
+type ActionResponse struct {
+	ID               uuid.UUID   `json:"id"`
+	Label            string      `json:"label"`
+	Type             string      `json:"type"`
+	MatchEvent       *string     `json:"matchEvent,omitempty"`
+	MatchHost        *string     `json:"matchHost,omitempty"`
+	MatchApplication *string     `json:"matchApplication,omitempty"`
+	MatchProvider    *string     `json:"matchProvider,omitempty"`
+	Payload          interface{} `json:"payload,omitempty"`
+	Enabled          bool        `json:"enabled"`
+	CreatedAt        time.Time   `json:"createdAt"`
+	UpdatedAt        time.Time   `json:"updatedAt"`
+}
+
+type ActionSingleResponse struct {
+	Data ActionResponse `json:"data"`
+}
+
+func NewActionSingleResponse(id uuid.UUID, label string, t string, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool, createdAt time.Time, updatedAt time.Time) *ActionSingleResponse {
+	e := new(ActionSingleResponse)
+	e.Data.ID = id
+	e.Data.Label = label
+	e.Data.Type = t
+	e.Data.MatchEvent = matchEvent
+	e.Data.MatchHost = matchHost
+	e.Data.MatchApplication = matchApplication
+	e.Data.MatchProvider = matchProvider
+	e.Data.Payload = payload
+	e.Data.Enabled = enabled
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type ActionPageResponse struct {
+	Content       []*ActionResponse `json:"content"`
+	Page          int               `json:"page"`
+	PageSize      int               `json:"pageSize"`
+	OrderBy       string            `json:"orderBy"`
+	Order         string            `json:"order"`
+	TotalElements int64             `json:"totalElements"`
+	TotalPages    int64             `json:"totalPages"`
+}
+
+func NewActionPageResponse(content []*ActionResponse, page int, pageSize int, orderBy string, order string, totalElements int64, totalPages int64) *ActionPageResponse {
+	e := new(ActionPageResponse)
+	e.Content = content
+	e.Page = page
+	e.PageSize = pageSize
+	e.OrderBy = orderBy
+	e.Order = order
+	e.TotalElements = totalElements
+	e.TotalPages = totalPages
+	return e
+}
+
+type ActionTestResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type ActionTestSingleResponse struct {
+	Data ActionTestResponse `json:"data"`
+}
+
+func NewActionTestSingleResponse(success bool, message string) *ActionTestSingleResponse {
+	e := new(ActionTestSingleResponse)
+	e.Data.Success = success
+	e.Data.Message = message
+	return e
+}
+
+type ActionInvocationResponse struct {
+	ID         uuid.UUID `json:"id"`
+	RetryCount int       `json:"retryCount"`
+	State      string    `json:"state"`
+	Message    *string   `json:"message,omitempty"`
+	ActionID   string    `json:"actionId"`
+	EventID    string    `json:"eventId"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+}
+
+type ActionInvocationSingleResponse struct {
+	Data ActionInvocationResponse `json:"data"`
+}
+
+func NewActionInvocationSingleResponse(id uuid.UUID, retryCount int, state string, message *string, actionId string, eventId string, createdAt time.Time, updatedAt time.Time) *ActionInvocationSingleResponse {
+	e := new(ActionInvocationSingleResponse)
+	e.Data.ID = id
+	e.Data.RetryCount = retryCount
+	e.Data.State = state
+	e.Data.Message = message
+	e.Data.ActionID = actionId
+	e.Data.EventID = eventId
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type ActionInvocationPageResponse struct {
+	Content       []*ActionInvocationResponse `json:"content"`
+	Page          int                         `json:"page"`
+	PageSize      int                         `json:"pageSize"`
+	OrderBy       string                      `json:"orderBy"`
+	Order         string                      `json:"order"`
+	TotalElements int64                       `json:"totalElements"`
+	TotalPages    int64                       `json:"totalPages"`
+}
+
+func NewActionInvocationPageResponse(content []*ActionInvocationResponse, page int, pageSize int, orderBy string, order string, totalElements int64, totalPages int64) *ActionInvocationPageResponse {
+	e := new(ActionInvocationPageResponse)
+	e.Content = content
+	e.Page = page
+	e.PageSize = pageSize
+	e.OrderBy = orderBy
+	e.Order = order
+	e.TotalElements = totalElements
+	e.TotalPages = totalPages
+	return e
 }

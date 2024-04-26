@@ -213,7 +213,7 @@ func (r *updateDbRepo) deleteByUpdatedAtBeforeAndStates(time time.Time, state ..
 }
 
 func (r *updateDbRepo) paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...api.UpdateState) ([]*Update, error) {
-	if page == 0 || pageSize <= 0 {
+	if page == 0 {
 		return nil, errorValidationPageGreaterZero
 	}
 	if pageSize <= 0 {

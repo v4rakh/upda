@@ -12,7 +12,9 @@ type eventRepository interface {
 	window(size int, skip int, orderBy string, order string) ([]*Event, error)
 	windowHasNext(size int, skip int, orderBy string, order string) (bool, error)
 	count(state ...api.EventState) (int64, error)
+	findAllByState(limit int, state ...api.EventState) ([]*Event, error)
 	create(name api.EventName, state api.EventState, payload interface{}) (*Event, error)
+	updateState(id string, state api.EventState) (*Event, error)
 	delete(id string) (int64, error)
 	deleteByUpdatedAtBeforeAndStates(time time.Time, state ...api.EventState) (int64, error)
 }
@@ -81,6 +83,31 @@ func (r *eventDbRepo) create(name api.EventName, state api.EventState, payload i
 	return e, nil
 }
 
+func (r *eventDbRepo) updateState(id string, state api.EventState) (*Event, error) {
+	if id == "" || state == "" {
+		return nil, errorValidationNotBlank
+	}
+
+	var err error
+	var e *Event
+
+	if e, err = r.find(id); err != nil {
+		return nil, err
+	}
+
+	e.State = state.Value()
+
+	var res *gorm.DB
+	if res = r.db.Save(&e); res.Error != nil {
+		return nil, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return e, errorDatabaseRowsExpected
+	}
+
+	return e, nil
+}
+
 func (r *eventDbRepo) delete(id string) (int64, error) {
 	if id == "" {
 		return 0, errorValidationNotBlank
@@ -112,8 +139,9 @@ func (r *eventDbRepo) deleteByUpdatedAtBeforeAndStates(time time.Time, state ...
 }
 
 func (r *eventDbRepo) window(size int, skip int, orderBy string, order string) ([]*Event, error) {
-	var e []*Event
-
+	if size <= 0 {
+		return nil, errorValidationSizeGreaterZero
+	}
 	if orderBy == "" {
 		orderBy = "created_at"
 	}
@@ -121,6 +149,7 @@ func (r *eventDbRepo) window(size int, skip int, orderBy string, order string) (
 		order = "asc"
 	}
 
+	var e []*Event
 	if res := r.db.Order(orderBy + " " + order).Offset(skip).Limit(size).Find(&e); res.Error != nil {
 		return nil, newServiceDatabaseError(res.Error)
 	}
@@ -145,9 +174,37 @@ func (r *eventDbRepo) windowHasNext(size int, skip int, orderBy string, order st
 	return len(e) > 0, nil
 }
 
+func (r *eventDbRepo) findAllByState(limit int, state ...api.EventState) ([]*Event, error) {
+	if len(state) == 0 {
+		return nil, errorValidationNotEmpty
+	}
+	if limit <= 0 {
+		return nil, errorValidationLimitGreaterZero
+	}
+
+	var e []*Event
+
+	states := translateEventState(state...)
+
+	if res := r.db.Model(&Event{}).Scopes(allGetEventCriterion(states)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
+		return nil, newServiceDatabaseError(res.Error)
+	}
+
+	return e, nil
+}
+
 func (r *eventDbRepo) count(state ...api.EventState) (int64, error) {
 	var c int64
 
+	states := translateEventState(state...)
+	if res := r.db.Model(&Event{}).Scopes(allGetEventCriterion(states)).Count(&c); res.Error != nil {
+		return 0, newServiceDatabaseError(res.Error)
+	}
+
+	return c, nil
+}
+
+func translateEventState(state ...api.EventState) []string {
 	states := make([]string, 0)
 	if len(state) > 0 {
 		for _, s := range state {
@@ -155,11 +212,7 @@ func (r *eventDbRepo) count(state ...api.EventState) (int64, error) {
 		}
 	}
 
-	if res := r.db.Model(&Event{}).Scopes(allGetEventCriterion(states)).Count(&c); res.Error != nil {
-		return 0, newServiceDatabaseError(res.Error)
-	}
-
-	return c, nil
+	return states
 }
 
 func criterionEventState(states []string) func(db *gorm.DB) *gorm.DB {

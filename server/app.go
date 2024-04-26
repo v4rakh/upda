@@ -45,15 +45,22 @@ func Start() {
 	updateRepo := newUpdateDbRepo(env.db)
 	webhookRepo := newWebhookDbRepo(env.db)
 	eventRepo := newEventDbRepo(env.db)
+	secretRepo := newSecretDbRepo(env.db)
+	actionRepo := newActionDbRepo(env.db)
+	actionInvocationRepo := newActionInvocationDbRepo(env.db)
 
 	lockService := newLockMemService()
 
 	eventService := newEventService(eventRepo)
-	updateService := newUpdateService(updateRepo, eventService, prometheusService)
-	webhookService := newWebhookService(webhookRepo, env.webhookConfig, eventService)
+	updateService := newUpdateService(updateRepo, eventService)
+	webhookService := newWebhookService(webhookRepo, env.webhookConfig)
 	webhookInvocationService := newWebhookInvocationService(webhookService, updateService, env.webhookConfig)
 
-	taskService := newTaskService(updateService, eventService, webhookService, lockService, prometheusService, env.appConfig, env.taskConfig, env.lockConfig, env.prometheusConfig)
+	secretService := newSecretService(secretRepo)
+	actionService := newActionService(actionRepo, eventService)
+	actionInvocationService := newActionInvocationService(actionInvocationRepo, actionService, eventService, secretService)
+
+	taskService := newTaskService(updateService, eventService, webhookService, actionService, actionInvocationService, lockService, prometheusService, env.appConfig, env.taskConfig, env.lockConfig, env.prometheusConfig)
 	taskService.init()
 	taskService.start()
 
@@ -61,6 +68,10 @@ func Start() {
 	webhookHandler := newWebhookHandler(webhookService)
 	webhookInvocationHandler := newWebhookInvocationHandler(webhookInvocationService, webhookService)
 	eventHandler := newEventHandler(eventService)
+	secretHandler := newSecretHandler(secretService)
+	actionHandler := newActionHandler(actionService)
+	actionInvocationHandler := newActionInvocationHandler(actionService, actionInvocationService)
+
 	infoHandler := newInfoHandler(env.appConfig)
 	healthHandler := newHealthHandler()
 	authHandler := newAuthHandler()
@@ -97,12 +108,37 @@ func Start() {
 
 	apiAuthGroup.GET("/webhooks", webhookHandler.paginate)
 	apiAuthGroup.POST("/webhooks", webhookHandler.create)
+	apiAuthGroup.GET("/webhooks/:id", webhookHandler.get)
 	apiAuthGroup.PATCH("/webhooks/:id/label", webhookHandler.updateLabel)
 	apiAuthGroup.PATCH("/webhooks/:id/ignore-host", webhookHandler.updateIgnoreHost)
 	apiAuthGroup.DELETE("/webhooks/:id", webhookHandler.delete)
 
 	apiAuthGroup.GET("/events", eventHandler.window)
+	apiAuthGroup.GET("/events/:id", eventHandler.get)
 	apiAuthGroup.DELETE("/events/:id", eventHandler.delete)
+
+	apiAuthGroup.GET("/secrets", secretHandler.getAll)
+	apiAuthGroup.GET("/secrets/:id", secretHandler.get)
+	apiAuthGroup.POST("/secrets", secretHandler.create)
+	apiAuthGroup.PATCH("/secrets/:id/value", secretHandler.updateValue)
+	apiAuthGroup.DELETE("/secrets/:id", secretHandler.delete)
+
+	apiAuthGroup.GET("/actions", actionHandler.paginate)
+	apiAuthGroup.POST("/actions", actionHandler.create)
+	apiAuthGroup.GET("/actions/:id", actionHandler.get)
+	apiAuthGroup.PATCH("/actions/:id/label", actionHandler.updateLabel)
+	apiAuthGroup.PATCH("/actions/:id/match-event", actionHandler.updateMatchEvent)
+	apiAuthGroup.PATCH("/actions/:id/match-host", actionHandler.updateMatchHost)
+	apiAuthGroup.PATCH("/actions/:id/match-application", actionHandler.updateMatchApplication)
+	apiAuthGroup.PATCH("/actions/:id/match-provider", actionHandler.updateMatchProvider)
+	apiAuthGroup.PATCH("/actions/:id/payload", actionHandler.updatePayload)
+	apiAuthGroup.PATCH("/actions/:id/enabled", actionHandler.updateEnabled)
+	apiAuthGroup.DELETE("/actions/:id", actionHandler.delete)
+	apiAuthGroup.POST("/actions/:id/test", actionInvocationHandler.test)
+
+	apiAuthGroup.GET("/action-invocations", actionInvocationHandler.paginate)
+	apiAuthGroup.GET("/action-invocations/:id", actionInvocationHandler.get)
+	apiAuthGroup.DELETE("/action-invocations/:id", actionInvocationHandler.delete)
 
 	// start server
 	serverAddress := fmt.Sprintf("%s:%d", env.serverConfig.listen, env.serverConfig.port)

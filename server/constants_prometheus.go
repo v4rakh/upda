@@ -13,12 +13,12 @@ const (
 	metricUpdatesApproved     = "updates_approved"
 	metricUpdatesApprovedHelp = "amount of all updates in approved state"
 
-	metricUpdates     = "updates"
-	metricUpdatesHelp = "details for all updates, 0=pending, 1=approved, 2=ignored"
-
 	metricWebhooks     = "webhooks"
 	metricWebhooksHelp = "amount of all webhooks"
 
 	metricEvents     = "events"
 	metricEventsHelp = "amount of all events"
+
+	metricActions     = "actions"
+	metricActionsHelp = "amount of all actions"
 )

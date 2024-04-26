@@ -129,7 +129,7 @@ func (r *webhookDbRepo) delete(id string) (int64, error) {
 }
 
 func (r *webhookDbRepo) paginate(page int, pageSize int, orderBy string, order string) ([]*Webhook, error) {
-	if page == 0 || pageSize <= 0 {
+	if page == 0 {
 		return nil, errorValidationPageGreaterZero
 	}
 	if pageSize <= 0 {

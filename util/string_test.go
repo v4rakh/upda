@@ -35,3 +35,26 @@ func TestExtractValuesFromString(t *testing.T) {
 	a.Contains(valuesString, "val1")
 	a.Contains(valuesString, "val2")
 }
+
+func TestExtractBetweenEmpty(t *testing.T) {
+	a := assert.New(t)
+	a.Equal(0, len(ExtractBetween("", "", "")))
+	a.Equal(0, len(ExtractBetween("test", "", "")))
+	a.Equal(0, len(ExtractBetween("test", "test", "")))
+}
+
+func TestExtractBetweenVars(t *testing.T) {
+	a := assert.New(t)
+
+	left := "<VAR>"
+	right := "</VAR>"
+
+	//str := "A new update arrived on <VAR>HOST</VAR> for <VAR>APPLICATION</VAR>. Its version is <VAR>VERSION</VAR>"
+	str := "<VAR>MY_VAR</VAR> A new update arrived on <VA>HOST</VAR> for for <VAR>APPLICATION</VAR> (<VAR>MY_SECOND_VAR</VAR>) ... some random other tag <SECRET>MY_SECRET</SECRET>"
+	matches := ExtractBetween(str, left, right)
+
+	a.Equal(true, len(matches) > 0)
+	a.Equal("MY_VAR", matches[0][1])
+	a.Equal("APPLICATION", matches[1][1])
+	a.Equal("MY_SECOND_VAR", matches[2][1])
+}

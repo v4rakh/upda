@@ -53,10 +53,10 @@ func (s *prometheusService) init() {
 	err = s.registerGaugeNoLabels(metricUpdatesPending, metricUpdatesPendingHelp)
 	err = s.registerGaugeNoLabels(metricUpdatesIgnored, metricUpdatesIgnoredHelp)
 	err = s.registerGaugeNoLabels(metricUpdatesApproved, metricUpdatesApprovedHelp)
-	err = s.registerGauge(metricUpdates, metricUpdatesHelp, []string{"application", "provider", "host"})
 
 	err = s.registerGaugeNoLabels(metricWebhooks, metricWebhooksHelp)
 	err = s.registerGaugeNoLabels(metricEvents, metricEventsHelp)
+	err = s.registerGaugeNoLabels(metricActions, metricActionsHelp)
 
 	if err != nil {
 		zap.L().Sugar().Fatalf("Cannot initialize service. Reason: %v", err)

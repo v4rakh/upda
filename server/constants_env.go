@@ -11,6 +11,8 @@ const (
 	envLoggingDirectory    = "LOGGING_DIRECTORY"
 	loggingFileNameDefault = "upda.log"
 
+	envSecret = "SECRET"
+
 	envTZ     = "TZ"
 	tzDefault = "Europe/Berlin"
 
@@ -70,7 +72,7 @@ const (
 	envTaskUpdateCleanStaleMaxAge       = "TASK_UPDATE_CLEAN_STALE_MAX_AGE"
 	taskUpdateCleanStaleEnabledDefault  = "false"
 	taskUpdateCleanStaleIntervalDefault = "1h"
-	taskUpdateCleanStaleMaxAgeDefault   = "168h"
+	taskUpdateCleanStaleMaxAgeDefault   = "720h"
 
 	envTaskEventCleanStaleEnabled      = "TASK_EVENT_CLEAN_STALE_ENABLED"
 	envTaskEventCleanStaleInterval     = "TASK_EVENT_CLEAN_STALE_INTERVAL"
@@ -78,6 +80,29 @@ const (
 	taskEventCleanStaleEnabledDefault  = "false"
 	taskEventCleanStaleIntervalDefault = "8h"
 	taskEventCleanStaleMaxAgeDefault   = "2190h"
+
+	envTaskActionsEnqueueEnabled       = "TASK_ACTIONS_ENQUEUE_ENABLED"
+	envTaskActionsEnqueueInterval      = "TASK_ACTIONS_ENQUEUE_INTERVAL"
+	envTaskActionsEnqueueBatchSize     = "TASK_ACTIONS_ENQUEUE_BATCH_SIZE"
+	taskActionsEnqueueEnabledDefault   = "true"
+	taskActionsEnqueueIntervalDefault  = "10s"
+	taskActionsEnqueueBatchSizeDefault = "1"
+
+	envTaskActionsInvokeEnabled        = "TASK_ACTIONS_INVOKE_ENABLED"
+	envTaskActionsInvokeInterval       = "TASK_ACTIONS_INVOKE_INTERVAL"
+	envTaskActionsInvokeBatchSize      = "TASK_ACTIONS_INVOKE_BATCH_SIZE"
+	envTaskActionsInvokeMaxRetries     = "TASK_ACTIONS_INVOKE_MAX_RETRIES"
+	taskActionsInvokeEnabledDefault    = "true"
+	taskActionsInvokeIntervalDefault   = "10s"
+	taskActionsInvokeBatchSizeDefault  = "1"
+	taskActionsInvokeMaxRetriesDefault = "3"
+
+	envTaskActionsCleanStaleEnabled      = "TASK_ACTIONS_CLEAN_STALE_ENABLED"
+	envTaskActionsCleanStaleInterval     = "TASK_ACTIONS_CLEAN_STALE_INTERVAL"
+	envTaskActionsCleanStaleMaxAge       = "TASK_ACTIONS_CLEAN_STALE_MAX_AGE"
+	taskActionsCleanStaleEnabledDefault  = "true"
+	taskActionsCleanStaleIntervalDefault = "12h"
+	taskActionsCleanStaleMaxAgeDefault   = "720h"
 
 	envLockRedisEnabled = "LOCK_REDIS_ENABLED"
 	envLockRedisUrl     = "LOCK_REDIS_URL"

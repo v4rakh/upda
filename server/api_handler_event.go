@@ -35,7 +35,6 @@ func (h *eventHandler) window(c *gin.Context) {
 		data = append(data, &api.EventResponse{
 			ID:        e.ID,
 			Name:      e.Name,
-			State:     e.State,
 			CreatedAt: e.CreatedAt,
 			UpdatedAt: e.UpdatedAt,
 			Payload:   e.Payload,
@@ -49,6 +48,16 @@ func (h *eventHandler) window(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewEventWindowResponse(data, queryParams.Size, queryParams.Skip, queryParams.OrderBy, queryParams.Order, hasNext)))
+}
+
+func (h *eventHandler) get(c *gin.Context) {
+	e, err := h.service.get(c.Param("id"))
+	if err != nil {
+		_ = c.AbortWithError(errToHttpStatus(err), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, api.NewEventSingleResponse(e.ID, e.Name, e.CreatedAt, e.UpdatedAt, e.Payload))
 }
 
 func (h *eventHandler) delete(c *gin.Context) {

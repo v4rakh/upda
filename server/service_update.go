@@ -8,16 +8,14 @@ import (
 )
 
 type updateService struct {
-	repo              updateRepository
-	eventService      *eventService
-	prometheusService *prometheusService
+	repo         updateRepository
+	eventService *eventService
 }
 
-func newUpdateService(r updateRepository, e *eventService, p *prometheusService) *updateService {
+func newUpdateService(r updateRepository, e *eventService) *updateService {
 	return &updateService{
-		repo:              r,
-		eventService:      e,
-		prometheusService: p,
+		repo:         r,
+		eventService: e,
 	}
 }
 
@@ -117,10 +115,6 @@ func (s *updateService) delete(id string) error {
 	}
 
 	s.eventService.createUpdateDeleted(e)
-
-	if err = s.prometheusService.setGauge(metricUpdates, []string{e.Application, e.Provider, e.Host}, -1); err != nil {
-		zap.L().Sugar().Errorf("Could not refresh updates prometheus metric for deleted update '%v'. Reason: %v", e.ID, err)
-	}
 
 	zap.L().Sugar().Infof("Deleted update '%v'", id)
 	return nil

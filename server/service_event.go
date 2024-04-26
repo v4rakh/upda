@@ -1,7 +1,9 @@
 package server
 
 import (
+	"errors"
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/util"
 	"go.uber.org/zap"
 	"time"
 )
@@ -85,60 +87,6 @@ func (s *eventService) createUpdateDeleted(e *Update) *Event {
 	return nil
 }
 
-func (s *eventService) createWebhookCreated(e *Webhook) *Event {
-	if e == nil {
-		return nil
-	}
-
-	s.createWithWarnOnly(api.EventNameWebhookCreated, &api.EventPayloadWebhookCreatedDto{
-		ID:         e.ID,
-		Label:      e.Label,
-		Type:       e.Type,
-		IgnoreHost: e.IgnoreHost,
-	})
-
-	return nil
-}
-
-func (s *eventService) createWebhookUpdated(old *Webhook, new *Webhook) *Event {
-	if old == nil || new == nil {
-		return nil
-	}
-
-	var eventName api.EventName
-
-	if old.Label == new.Label {
-		eventName = api.EventNameWebhookUpdatedIgnoreHost
-	} else {
-		eventName = api.EventNameWebhookUpdatedLabel
-	}
-
-	s.createWithWarnOnly(eventName, &api.EventPayloadWebhookUpdatedDto{
-		ID:              new.ID,
-		LabelPrior:      old.Label,
-		Label:           new.Label,
-		IgnoreHostPrior: old.IgnoreHost,
-		IgnoreHost:      new.IgnoreHost,
-		Type:            new.Type,
-	})
-
-	return nil
-}
-
-func (s *eventService) createWebhookDeleted(e *Webhook) *Event {
-	if e == nil {
-		return nil
-	}
-
-	s.createWithWarnOnly(api.EventNameWebhookDeleted, &api.EventPayloadWebhookDeletedDto{
-		Label:      e.Label,
-		Type:       e.Type,
-		IgnoreHost: e.IgnoreHost,
-	})
-
-	return nil
-}
-
 func (s *eventService) createWithWarnOnly(name api.EventName, payload interface{}) *Event {
 	var e *Event
 	var err error
@@ -211,4 +159,89 @@ func (s *eventService) windowHasNext(size int, skip int, orderBy string, order s
 
 func (s *eventService) count(state ...api.EventState) (int64, error) {
 	return s.repo.count(state...)
+}
+
+func (s *eventService) getByState(limit int, state ...api.EventState) ([]*Event, error) {
+	if len(state) == 0 {
+		return nil, errorValidationNotEmpty
+	}
+	if limit <= 0 {
+		return nil, errorValidationLimitGreaterZero
+	}
+
+	return s.repo.findAllByState(limit, state...)
+}
+
+func (s *eventService) updateState(id string, state api.EventState) (*Event, error) {
+	if id == "" || state == "" {
+		return nil, errorValidationNotBlank
+	}
+
+	var e *Event
+	var err error
+
+	if e, err = s.get(id); err != nil {
+		return nil, err
+	}
+
+	if e, err = s.repo.updateState(id, state); err != nil {
+		return nil, err
+	}
+
+	zap.L().Sugar().Infof("Modified event '%v'", id)
+	return e, nil
+}
+
+func (s *eventService) extractPayloadInfo(event *Event) (*eventPayloadInformationDto, error) {
+	if event == nil {
+		return nil, errorValidationNotEmpty
+	}
+
+	var err error
+	var bytes []byte
+
+	if bytes, err = event.Payload.MarshalJSON(); err != nil {
+		return nil, newServiceError(General, err)
+	}
+
+	switch event.Name {
+	case api.EventNameUpdateCreated.Value():
+		var p api.EventPayloadUpdateCreatedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateCreatedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version}, nil
+	case api.EventNameUpdateDeleted.Value():
+		var p api.EventPayloadUpdateDeletedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateDeletedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version}, nil
+	case api.EventNameUpdateUpdatedApproved.Value():
+		var p api.EventPayloadUpdateUpdatedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version}, nil
+	case api.EventNameUpdateUpdatedPending.Value():
+		var p api.EventPayloadUpdateUpdatedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version}, nil
+	case api.EventNameUpdateUpdatedIgnored.Value():
+		var p api.EventPayloadUpdateUpdatedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version}, nil
+	case api.EventNameUpdateUpdated.Value():
+		var p api.EventPayloadUpdateUpdatedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version}, nil
+	}
+
+	return nil, newServiceError(General, errors.New("no matching event found"))
 }

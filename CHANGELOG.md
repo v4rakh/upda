@@ -2,10 +2,16 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [1.1.0] - UNRELEASED
+## [2.0.0] - UNRELEASED
 
+> This is a major version upgrade. Other versions are incompatible with this release.
+
+* Added mandatory `SECRET` environment variable to encrypt some data inside the database
+* Switched to encrypting webhook tokens in database
+* Added _Actions_, a simple way to trigger notifications via [shoutrrr](https://containrrr.dev/shoutrrr) which supports secrets
+* Switched to producing events only for _Updates_
 * Adapted logging which defaults to JSON encoding
-* ...
+* Updated dependencies
 
 ## [1.0.3] - 2024/01/21
 

@@ -52,13 +52,23 @@ func (h *webhookHandler) paginate(c *gin.Context) {
 	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewWebhookPageResponse(data, queryParams.Page, queryParams.PageSize, queryParams.OrderBy, queryParams.Order, totalElements, totalPages)))
 }
 
+func (h *webhookHandler) get(c *gin.Context) {
+	e, err := h.service.get(c.Param("id"))
+	if err != nil {
+		_ = c.AbortWithError(errToHttpStatus(err), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID, e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+}
+
 func (h *webhookHandler) create(c *gin.Context) {
 	var e *Webhook
 	var err error
 
 	var req api.CreateWebhookRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		errAbortWithValidatorPayload(c, err)
 		return
 	}
@@ -77,7 +87,7 @@ func (h *webhookHandler) updateLabel(c *gin.Context) {
 
 	var req api.ModifyWebhookLabelRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		errAbortWithValidatorPayload(c, err)
 		return
 	}
@@ -96,7 +106,7 @@ func (h *webhookHandler) updateIgnoreHost(c *gin.Context) {
 
 	var req api.ModifyWebhookIgnoreHostRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		errAbortWithValidatorPayload(c, err)
 		return
 	}

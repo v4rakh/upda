@@ -10,25 +10,34 @@ import (
 )
 
 type taskService struct {
-	updateService     *updateService
-	eventService      *eventService
-	webhookService    *webhookService
-	lockService       lockService
-	prometheusService *prometheusService
-	appConfig         *appConfig
-	taskConfig        *taskConfig
-	lockConfig        *lockConfig
-	prometheusConfig  *prometheusConfig
-	scheduler         *gocron.Scheduler
+	updateService           *updateService
+	eventService            *eventService
+	actionService           *actionService
+	actionInvocationService *actionInvocationService
+	webhookService          *webhookService
+	lockService             lockService
+	prometheusService       *prometheusService
+	appConfig               *appConfig
+	taskConfig              *taskConfig
+	lockConfig              *lockConfig
+	prometheusConfig        *prometheusConfig
+	scheduler               *gocron.Scheduler
 }
 
 const (
 	taskLockNameUpdatesCleanStale = "updates_clean_stale"
 	taskLockNameEventsCleanStale  = "events_clean_stale"
+	taskLockNameActionsEnqueue    = "actions_enqueue"
+	taskLockNameActionsInvoke     = "actions_invoke"
+	taskLockNameActionsCleanStale = "actions_clean_stale"
 	taskLockNamePrometheusUpdate  = "prometheus_update"
 )
 
-func newTaskService(u *updateService, e *eventService, w *webhookService, l lockService, p *prometheusService, ac *appConfig, tc *taskConfig, lc *lockConfig, pc *prometheusConfig) *taskService {
+var (
+	initialTasksStartDelay = time.Now().Add(10 * time.Second)
+)
+
+func newTaskService(u *updateService, e *eventService, w *webhookService, a *actionService, ai *actionInvocationService, l lockService, p *prometheusService, ac *appConfig, tc *taskConfig, lc *lockConfig, pc *prometheusConfig) *taskService {
 	location, err := time.LoadLocation(ac.timeZone)
 
 	if err != nil {
@@ -57,22 +66,27 @@ func newTaskService(u *updateService, e *eventService, w *webhookService, l lock
 	}
 
 	return &taskService{
-		updateService:     u,
-		eventService:      e,
-		webhookService:    w,
-		lockService:       l,
-		prometheusService: p,
-		appConfig:         ac,
-		taskConfig:        tc,
-		lockConfig:        lc,
-		prometheusConfig:  pc,
-		scheduler:         scheduler,
+		updateService:           u,
+		eventService:            e,
+		actionService:           a,
+		actionInvocationService: ai,
+		webhookService:          w,
+		lockService:             l,
+		prometheusService:       p,
+		appConfig:               ac,
+		taskConfig:              tc,
+		lockConfig:              lc,
+		prometheusConfig:        pc,
+		scheduler:               scheduler,
 	}
 }
 
 func (s *taskService) init() {
 	s.configureCleanupStaleUpdatesTask()
 	s.configureCleanupStaleEventsTask()
+	s.configureActionsEnqueueTask()
+	s.configureActionsInvokeTask()
+	s.configureCleanupStaleActionsTask()
 	s.configurePrometheusRefreshTask()
 }
 
@@ -92,9 +106,8 @@ func (s *taskService) configureCleanupStaleUpdatesTask() {
 	if !s.taskConfig.updateCleanStaleEnabled {
 		return
 	}
-	initialDelay := time.Now().Add(10 * time.Second)
 	_, err := s.scheduler.Every(s.taskConfig.updateCleanStaleInterval).
-		StartAt(initialDelay).
+		StartAt(initialTasksStartDelay).
 		Do(func() {
 			resource := taskLockNameUpdatesCleanStale
 			// distributed lock handled via gocron-redis-lock for tasks
@@ -127,7 +140,7 @@ func (s *taskService) configureCleanupStaleUpdatesTask() {
 			if c > 0 {
 				zap.L().Sugar().Infof("Cleaned up '%d' stale updates", c)
 			} else {
-				zap.L().Info("No stale updates found to clean up")
+				zap.L().Debug("No stale updates found to clean up")
 			}
 		})
 
@@ -141,9 +154,8 @@ func (s *taskService) configureCleanupStaleEventsTask() {
 		return
 	}
 
-	initialDelay := time.Now().Add(5 * time.Second)
 	_, err := s.scheduler.Every(s.taskConfig.eventCleanStaleInterval).
-		StartAt(initialDelay).
+		StartAt(initialTasksStartDelay).
 		Do(func() {
 			resource := taskLockNameEventsCleanStale
 			// distributed lock handled via gocron-redis-lock for tasks
@@ -168,7 +180,7 @@ func (s *taskService) configureCleanupStaleEventsTask() {
 			var err error
 			var c int64
 
-			if c, err = s.eventService.cleanStale(t, api.EventStateCreated); err != nil {
+			if c, err = s.eventService.cleanStale(t, api.EventStateCreated, api.EventStateEnqueued); err != nil {
 				zap.L().Sugar().Errorf("Could not clean up stale events older than %s (%s). Reason: %s", s.taskConfig.eventCleanStaleMaxAge, t, err.Error())
 				return
 			}
@@ -176,7 +188,7 @@ func (s *taskService) configureCleanupStaleEventsTask() {
 			if c > 0 {
 				zap.L().Sugar().Infof("Cleaned up '%d' stale events", c)
 			} else {
-				zap.L().Info("No stale events found to clean up")
+				zap.L().Debug("No stale events found to clean up")
 			}
 		})
 
@@ -185,14 +197,137 @@ func (s *taskService) configureCleanupStaleEventsTask() {
 	}
 }
 
+func (s *taskService) configureActionsEnqueueTask() {
+	if !s.taskConfig.actionsEnqueueEnabled {
+		return
+	}
+
+	_, err := s.scheduler.Every(s.taskConfig.actionsEnqueueInterval).
+		StartAt(initialTasksStartDelay).
+		Do(func() {
+			resource := taskLockNameActionsEnqueue
+			// distributed lock handled via gocron-redis-lock for tasks
+			if !s.lockConfig.redisEnabled {
+				// skip execution if lock already exists, wait otherwise
+				if lockExists := s.lockService.exists(resource); lockExists {
+					zap.L().Sugar().Debugf("Skipping task execution because task lock '%s' exists", resource)
+					return
+				}
+				_ = s.lockService.tryLock(resource)
+				defer func(lockService lockService, resource string) {
+					err := lockService.release(resource)
+					if err != nil {
+						zap.L().Sugar().Warnf("Could not release task lock '%s'", resource)
+					}
+				}(s.lockService, resource)
+			}
+
+			if err := s.actionInvocationService.enqueue(s.taskConfig.actionsEnqueueBatchSize); err != nil {
+				zap.L().Sugar().Errorf("Could enqueue actions. Reason: %s", err.Error())
+			}
+		})
+
+	if err != nil {
+		zap.L().Sugar().Fatalf("Could not create task for enqueueing actions. Reason: %s", err.Error())
+	}
+}
+
+func (s *taskService) configureActionsInvokeTask() {
+	if !s.taskConfig.actionsInvokeEnabled {
+		return
+	}
+
+	_, err := s.scheduler.Every(s.taskConfig.actionsInvokeInterval).
+		StartAt(initialTasksStartDelay).
+		Do(func() {
+			resource := taskLockNameActionsInvoke
+			// distributed lock handled via gocron-redis-lock for tasks
+			if !s.lockConfig.redisEnabled {
+				// skip execution if lock already exists, wait otherwise
+				if lockExists := s.lockService.exists(resource); lockExists {
+					zap.L().Sugar().Debugf("Skipping task execution because task lock '%s' exists", resource)
+					return
+				}
+				_ = s.lockService.tryLock(resource)
+				defer func(lockService lockService, resource string) {
+					err := lockService.release(resource)
+					if err != nil {
+						zap.L().Sugar().Warnf("Could not release task lock '%s'", resource)
+					}
+				}(s.lockService, resource)
+			}
+
+			if err := s.actionInvocationService.invoke(s.taskConfig.actionsInvokeBatchSize, s.taskConfig.actionsInvokeMaxRetries); err != nil {
+				zap.L().Sugar().Errorf("Could invoke actions. Reason: %s", err.Error())
+			}
+		})
+
+	if err != nil {
+		zap.L().Sugar().Fatalf("Could not create task for invoking actions. Reason: %s", err.Error())
+	}
+}
+
+func (s *taskService) configureCleanupStaleActionsTask() {
+	if !s.taskConfig.actionsCleanStaleEnabled {
+		return
+	}
+	_, err := s.scheduler.Every(s.taskConfig.actionsCleanStaleInterval).
+		StartAt(initialTasksStartDelay).
+		Do(func() {
+			resource := taskLockNameActionsCleanStale
+			// distributed lock handled via gocron-redis-lock for tasks
+			if !s.lockConfig.redisEnabled {
+				// skip execution if lock already exists, wait otherwise
+				if lockExists := s.lockService.exists(resource); lockExists {
+					zap.L().Sugar().Debugf("Skipping task execution because task lock '%s' exists", resource)
+					return
+				}
+				_ = s.lockService.tryLock(resource)
+				defer func(lockService lockService, resource string) {
+					err := lockService.release(resource)
+					if err != nil {
+						zap.L().Sugar().Warnf("Could not release task lock '%s'", resource)
+					}
+				}(s.lockService, resource)
+			}
+
+			t := time.Now()
+			t = t.Add(-s.taskConfig.actionsCleanStaleMaxAge)
+
+			var cError int64
+			var err error
+
+			if cError, err = s.actionInvocationService.cleanStale(t, s.taskConfig.actionsInvokeMaxRetries, api.ActionInvocationStateError); err != nil {
+				zap.L().Sugar().Errorf("Could not clean up error stale actions older than %s (%s). Reason: %s", s.taskConfig.actionsCleanStaleMaxAge, t, err.Error())
+				return
+			}
+
+			var cSuccess int64
+			if cSuccess, err = s.actionInvocationService.cleanStale(t, 0, api.ActionInvocationStateSuccess); err != nil {
+				zap.L().Sugar().Errorf("Could not clean up success stale actions older than %s (%s). Reason: %s", s.taskConfig.actionsCleanStaleMaxAge, t, err.Error())
+				return
+			}
+
+			c := cError + cSuccess
+			if c > 0 {
+				zap.L().Sugar().Infof("Cleaned up '%d' stale actions", c)
+			} else {
+				zap.L().Debug("No stale actions found to clean up")
+			}
+		})
+
+	if err != nil {
+		zap.L().Sugar().Fatalf("Could not create task for cleaning stale actions. Reason: %s", err.Error())
+	}
+}
+
 func (s *taskService) configurePrometheusRefreshTask() {
 	if !s.prometheusConfig.enabled {
 		return
 	}
 
-	initialDelay := time.Now().Add(10 * time.Second)
 	_, err := s.scheduler.Every(s.taskConfig.prometheusRefreshInterval).
-		StartAt(initialDelay).
+		StartAt(initialTasksStartDelay).
 		Do(func() {
 			resource := taskLockNamePrometheusUpdate
 			// distributed lock handled via gocron-redis-lock for tasks
@@ -223,20 +358,12 @@ func (s *taskService) configurePrometheusRefreshTask() {
 			var ackTotal int64
 
 			for _, update := range updates {
-				var updateState float64
 				if api.UpdateStatePending.Value() == update.State {
 					pendingTotal += 1
-					updateState = 0
 				} else if api.UpdateStateIgnored.Value() == update.State {
 					ignoredTotal += 1
-					updateState = 2
 				} else if api.UpdateStateApproved.Value() == update.State {
 					ackTotal += 1
-					updateState = 1
-				}
-
-				if updatesError = s.prometheusService.setGauge(metricUpdates, []string{update.Application, update.Provider, update.Host}, updateState); updatesError != nil {
-					zap.L().Sugar().Errorf("Could not refresh updates prometheus metric. Reason: %s", updatesError.Error())
 				}
 			}
 
@@ -264,6 +391,14 @@ func (s *taskService) configurePrometheusRefreshTask() {
 			eventsTotal, eventsError = s.eventService.count()
 			if eventsError = s.prometheusService.setGaugeNoLabels(metricEvents, float64(eventsTotal)); eventsError != nil {
 				zap.L().Sugar().Errorf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
+			}
+
+			// actions
+			var actionsTotal int64
+			var actionsError error
+			actionsTotal, actionsError = s.actionService.count()
+			if actionsError = s.prometheusService.setGaugeNoLabels(metricActions, float64(actionsTotal)); actionsError != nil {
+				zap.L().Sugar().Errorf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
 			}
 		})
 

@@ -82,7 +82,7 @@ func (h *updateHandler) updateState(c *gin.Context) {
 
 	var req api.ModifyUpdateStateRequest
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		errAbortWithValidatorPayload(c, err)
 		return
 	}

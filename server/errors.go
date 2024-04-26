@@ -6,10 +6,13 @@ import (
 )
 
 var (
-	errorValidationNotEmpty            = newServiceError(IllegalArgument, errors.New("assert: empty values are not allowed"))
-	errorValidationNotBlank            = newServiceError(IllegalArgument, errors.New("assert: blank values are not allowed"))
-	errorValidationPageGreaterZero     = newServiceError(IllegalArgument, errors.New("assert: page has to be greater 0"))
-	errorValidationPageSizeGreaterZero = newServiceError(IllegalArgument, errors.New("assert: pageSize has to be greater 0"))
+	errorValidationNotEmpty              = newServiceError(IllegalArgument, errors.New("assert: empty values are not allowed"))
+	errorValidationNotBlank              = newServiceError(IllegalArgument, errors.New("assert: blank values are not allowed"))
+	errorValidationPageGreaterZero       = newServiceError(IllegalArgument, errors.New("assert: page has to be greater 0"))
+	errorValidationPageSizeGreaterZero   = newServiceError(IllegalArgument, errors.New("assert: pageSize has to be greater 0"))
+	errorValidationLimitGreaterZero      = newServiceError(IllegalArgument, errors.New("assert: limit has to be greater 0"))
+	errorValidationSizeGreaterZero       = newServiceError(IllegalArgument, errors.New("assert: size has to be greater 0"))
+	errorValidationMaxRetriesGreaterZero = newServiceError(IllegalArgument, errors.New("assert: max retries has to be greater 0"))
 
 	errorResourceNotFound     = newServiceError(NotFound, errors.New("resource not found"))
 	errorResourceAccessDenied = newServiceError(Forbidden, errors.New("resource access denied"))
