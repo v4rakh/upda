@@ -1506,7 +1506,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"application\": \"Test App\",\n    \"host\": \"Test Host\",\n    \"provider\": \"Test Provider\",\n    \"version\": \"Test Version\"\n}",
+              "raw": "{\n    \"application\": \"Test App\",\n    \"host\": \"Test Host\",\n    \"provider\": \"Test Provider\",\n    \"version\": \"Test Version\",\n    \"state\": \"Test State\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

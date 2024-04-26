@@ -30,7 +30,7 @@ func (h *actionInvocationHandler) test(c *gin.Context) {
 		return
 	}
 
-	err = h.actionInvocationService.execute(e, &eventPayloadInformationDto{Application: req.Application, Host: req.Host, Provider: req.Provider, Version: req.Version})
+	err = h.actionInvocationService.execute(e, &eventPayloadInformationDto{Application: req.Application, Host: req.Host, Provider: req.Provider, Version: req.Version, State: req.State})
 
 	isSuccess := err == nil
 	var message string

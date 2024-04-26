@@ -79,6 +79,7 @@ type TestActionRequest struct {
 	Provider    string `json:"provider" binding:"required,min=1"`
 	Host        string `json:"host" binding:"required,min=1"`
 	Version     string `json:"version" binding:"required,min=1"`
+	State       string `json:"state" binding:"required,min=1"`
 }
 
 type PaginateUpdateRequest struct {

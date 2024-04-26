@@ -2750,6 +2750,7 @@ components:
         - provider
         - host
         - version
+        - state
       properties:
         application:
           type: string
@@ -2758,6 +2759,8 @@ components:
         host:
           type: string
         version:
+          type: string
+        state:
           type: string
     CreateSecretRequest:
       type: object
