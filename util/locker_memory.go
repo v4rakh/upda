@@ -63,7 +63,9 @@ func (l *InMemoryLockRegistry) Clear() {
 
 // Exists exists a lock by name
 func (l *InMemoryLockRegistry) Exists(name string) bool {
+	l.mu.Lock()
 	_, exists := l.locks[name]
+	l.mu.Unlock()
 	return exists
 }
 
