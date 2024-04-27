@@ -19,15 +19,15 @@ const (
 	desc    = "a commandline helper for upda"
 	version = server.Version
 
-	envServerUrl     = "UPDA_SERVER_URL"
-	envAdminUser     = "UPDA_ADMIN_USER"
-	envAdminPassword = "UPDA_ADMIN_PASSWORD"
-	envWebhookId     = "UPDA_WEBHOOK_ID"
-	envWebhookToken  = "UPDA_WEBHOOK_TOKEN"
+	envServerUrl    = "UPDA_SERVER_URL"
+	envUser         = "UPDA_USER"
+	envPassword     = "UPDA_PASSWORD"
+	envWebhookId    = "UPDA_WEBHOOK_ID"
+	envWebhookToken = "UPDA_WEBHOOK_TOKEN"
 
 	flagServerUrl      = "server-url"
-	flagAdminUser      = "admin-user"
-	flagAdminPass      = "admin-pass"
+	flagUser           = "user"
+	flagPass           = "pass"
 	flagWebhookId      = "webhook-id"
 	flagWebhookToken   = "webhook-token"
 	flagUpdatePageSize = "page-size"
@@ -41,8 +41,8 @@ const (
 func Start() {
 	var raw bool
 	var serverUrl string
-	var adminUser string
-	var adminPassword string
+	var user string
+	var password string
 	var webhookId string
 	var webhookToken string
 	var updatePageSize int64
@@ -63,21 +63,21 @@ func Start() {
 		EnvVars:     []string{envServerUrl},
 		Destination: &serverUrl,
 	}
-	adminUserFlag := &cli.StringFlag{
-		Name:        flagAdminUser,
-		Usage:       "admin user",
+	userFlag := &cli.StringFlag{
+		Name:        flagUser,
+		Usage:       "user",
 		Required:    true,
 		Aliases:     []string{"u"},
-		EnvVars:     []string{envAdminUser},
-		Destination: &adminUser,
+		EnvVars:     []string{envUser},
+		Destination: &user,
 	}
-	adminPasswordFlag := &cli.StringFlag{
-		Name:        flagAdminPass,
-		Usage:       "admin password",
+	passwordFlag := &cli.StringFlag{
+		Name:        flagPass,
+		Usage:       "password",
 		Required:    true,
 		Aliases:     []string{"p"},
-		EnvVars:     []string{envAdminPassword},
-		Destination: &adminPassword,
+		EnvVars:     []string{envPassword},
+		Destination: &password,
 	}
 	webhookIdFlag := &cli.StringFlag{
 		Name:        flagWebhookId,
@@ -126,8 +126,8 @@ func Start() {
 						Aliases: []string{"c"},
 						Flags: []cli.Flag{
 							serverUrlFlag,
-							adminUserFlag,
-							adminPasswordFlag,
+							userFlag,
+							passwordFlag,
 							rawFlag,
 						},
 						ArgsUsage: "<label> [<type (generic|diun, default: generic)>] [<ignore-host (true|false, default: false)>]",
@@ -158,8 +158,8 @@ func Start() {
 						Aliases: []string{"s"},
 						Flags: []cli.Flag{
 							serverUrlFlag,
-							adminUserFlag,
-							adminPasswordFlag,
+							userFlag,
+							passwordFlag,
 							updatePageSizeFlag,
 							rawFlag,
 						},
@@ -176,7 +176,7 @@ func Start() {
 }
 
 func webhookCreate(cCtx *cli.Context) error {
-	if err := failIfFlagsNotPresent(cCtx, []string{flagServerUrl, flagAdminUser, flagAdminPass}); err != nil {
+	if err := failIfFlagsNotPresent(cCtx, []string{flagServerUrl, flagUser, flagPass}); err != nil {
 		return cli.Exit(err, 1)
 	}
 	if !cCtx.Args().Present() {
@@ -214,7 +214,7 @@ func webhookCreate(cCtx *cli.Context) error {
 	client := resty.New()
 	client.SetDisableWarn(true)
 	res, err := client.R().
-		SetBasicAuth(cCtx.String(flagAdminUser), cCtx.String(flagAdminPass)).
+		SetBasicAuth(cCtx.String(flagUser), cCtx.String(flagPass)).
 		SetHeader("Content-Type", "application/json").
 		SetBody(&payload).
 		SetResult(&successRes).
@@ -280,7 +280,7 @@ func webhookSend(cCtx *cli.Context) error {
 }
 
 func updateShow(cCtx *cli.Context) error {
-	if err := failIfFlagsNotPresent(cCtx, []string{flagServerUrl, flagAdminUser, flagAdminPass}); err != nil {
+	if err := failIfFlagsNotPresent(cCtx, []string{flagServerUrl, flagUser, flagPass}); err != nil {
 		return cli.Exit(err, 1)
 	}
 
@@ -290,7 +290,7 @@ func updateShow(cCtx *cli.Context) error {
 	client := resty.New()
 	client.SetDisableWarn(true)
 	res, err := client.R().
-		SetBasicAuth(cCtx.String(flagAdminUser), cCtx.String(flagAdminPass)).
+		SetBasicAuth(cCtx.String(flagUser), cCtx.String(flagPass)).
 		SetHeader("Content-Type", "application/json").
 		SetResult(&successRes).
 		SetError(&errorRes).
