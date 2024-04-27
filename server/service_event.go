@@ -40,12 +40,14 @@ func (s *eventService) createUpdateUpdated(old *Update, new *Update) *Event {
 		return nil
 	}
 
-	var eventName api.EventName
+	eventName := api.EventNameUpdateUpdated
 
-	if old.State == new.State {
-		eventName = api.EventNameUpdateUpdated
-	} else {
+	if old.State != new.State {
 		eventName = api.EventNameUpdateUpdatedState
+	}
+
+	if old.Version != new.Version {
+		eventName = api.EventNameUpdateUpdatedVersion
 	}
 
 	s.createWithWarnOnly(eventName, &api.EventPayloadUpdateUpdatedDto{
@@ -209,6 +211,12 @@ func (s *eventService) extractPayloadInfo(event *Event) (*eventPayloadInformatio
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdatedState.Value():
+		var p api.EventPayloadUpdateUpdatedDto
+		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+			return nil, newServiceError(General, err)
+		}
+		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
+	case api.EventNameUpdateUpdatedVersion.Value():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, newServiceError(General, err)

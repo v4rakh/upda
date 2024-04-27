@@ -2331,6 +2331,7 @@ components:
             - update_created
             - update_updated
             - update_updated_state
+            - update_updated_version
             - update_deleted
         createdAt:
           type: string

@@ -39,10 +39,11 @@ func (e WebhookType) Value() string {
 type EventName string
 
 const (
-	EventNameUpdateCreated      EventName = "update_created"
-	EventNameUpdateUpdated      EventName = "update_updated"
-	EventNameUpdateUpdatedState EventName = "update_updated_state"
-	EventNameUpdateDeleted      EventName = "update_deleted"
+	EventNameUpdateCreated        EventName = "update_created"
+	EventNameUpdateUpdated        EventName = "update_updated"
+	EventNameUpdateUpdatedState   EventName = "update_updated_state"
+	EventNameUpdateUpdatedVersion EventName = "update_updated_version"
+	EventNameUpdateDeleted        EventName = "update_deleted"
 )
 
 func (e *EventName) Scan(value interface{}) error {
