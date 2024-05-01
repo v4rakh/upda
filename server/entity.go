@@ -26,7 +26,7 @@ type Update struct {
 	UpdatedAt   time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
-// BeforeCreate encrypts secret value before storing to database
+// BeforeCreate encrypts webhook token before storing to database
 func (wh *Webhook) BeforeCreate(tx *gorm.DB) (err error) {
 	var er error
 	var encryptedToken string
@@ -40,8 +40,33 @@ func (wh *Webhook) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-// AfterSave decrypt secret value after encrypted value has been retrieved from database
+// BeforeUpdate encrypts webhook token before storing to database
+func (wh *Webhook) BeforeUpdate(tx *gorm.DB) (err error) {
+	var er error
+	var encryptedValue string
+
+	if encryptedValue, er = util.EncryptAndEncode(wh.Token, os.Getenv(envSecret)); er != nil {
+		return er
+	}
+
+	wh.Token = encryptedValue
+	return
+}
+
+// AfterSave decrypt webhook token after encrypted value has been retrieved from database
 func (wh *Webhook) AfterSave(tx *gorm.DB) (err error) {
+	var er error
+	var decrypted string
+	if decrypted, er = util.DecryptAndDecode(wh.Token, os.Getenv(envSecret)); er != nil {
+		return er
+	}
+
+	wh.Token = decrypted
+	return
+}
+
+// AfterFind decrypt webhook token after encrypted value has been retrieved from database
+func (wh *Webhook) AfterFind(tx *gorm.DB) (err error) {
 	var er error
 	var decrypted string
 	if decrypted, er = util.DecryptAndDecode(wh.Token, os.Getenv(envSecret)); er != nil {

@@ -2,19 +2,21 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [2.0.1] - UNRELEASED
+## [2.0.1] - 2024/05/01
 
-* ...
+* Fixed retrieval of encrypted webhook token
 
 ## [2.0.0] - 2024/04/28
 
 > This is a major version upgrade. Other versions are incompatible with this release.
 
-* Added _Actions_, a simple way to trigger notifications via [shoutrrr](https://containrrr.dev/shoutrrr) which supports secrets
+* Added _Actions_, a simple way to trigger notifications via [shoutrrr](https://containrrr.dev/shoutrrr) which supports
+  secrets
 * Added new auth mode which allows setting multiple basic auth credentials
-  * Added `AUTH_MODE` which can be one of `basic_single` (_default_) and `basic_credentials`
-  * For `basic_credentials`: added `BASIC_AUTH_CREDENTIALS` which can be used as list of `username1=password1,...` (comma separated)
-  * For `basic_single`: renamed `ADMIN_USER` and `ADMIN_PASSWORD` to `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD`
+    * Added `AUTH_MODE` which can be one of `basic_single` (_default_) and `basic_credentials`
+    * For `basic_credentials`: added `BASIC_AUTH_CREDENTIALS` which can be used as list of `username1=password1,...` (
+      comma separated)
+    * For `basic_single`: renamed `ADMIN_USER` and `ADMIN_PASSWORD` to `BASIC_AUTH_USER` and `BASIC_AUTH_PASSWORD`
 * Added mandatory `SECRET` environment variable to encrypt some data inside the database
 * Switched to producing events only for _Updates_
 * Switched to encrypting webhook tokens in database
@@ -42,6 +44,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[2.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/2.0.1
 
 [2.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/2.0.0
 
