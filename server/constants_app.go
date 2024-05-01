@@ -2,5 +2,5 @@ package server
 
 const (
 	Name    = "upda"
-	Version = "2.0.1"
+	Version = "2.0.2"
 )
