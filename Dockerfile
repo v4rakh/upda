@@ -1,7 +1,7 @@
 #
 # Build image
 #
-FROM alpine:3.18 AS builder
+FROM alpine:3.19 AS builder
 LABEL maintainer="Varakh <varakh@varakh.de>"
 
 RUN apk --update upgrade && \
@@ -18,7 +18,7 @@ RUN rm -rf bin/ && \
 #
 # Actual image
 #
-FROM alpine:3.18
+FROM alpine:3.19
 LABEL maintainer="Varakh <varakh@varakh.de>" \
     description="upda" \
     org.opencontainers.image.authors="Varakh" \
@@ -26,7 +26,7 @@ LABEL maintainer="Varakh <varakh@varakh.de>" \
     org.opencontainers.image.vendor="Varakh" \
     org.opencontainers.image.title="upda" \
     org.opencontainers.image.description="upda" \
-    org.opencontainers.image.base.name="alpine:3.18"
+    org.opencontainers.image.base.name="alpine:3.19"
 
 ENV USER=appuser \
     GROUP=appuser \
