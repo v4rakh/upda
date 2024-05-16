@@ -4,7 +4,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 
 ## [2.0.2] - UNRELEASED
 
-* ...
+* Updated dependencies
 
 ## [2.0.1] - 2024/05/01
 

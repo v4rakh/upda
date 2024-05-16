@@ -47,22 +47,22 @@ type authConfig struct {
 
 type taskConfig struct {
 	updateCleanStaleEnabled   bool
-	updateCleanStaleInterval  string
+	updateCleanStaleInterval  time.Duration
 	updateCleanStaleMaxAge    time.Duration
 	eventCleanStaleEnabled    bool
-	eventCleanStaleInterval   string
+	eventCleanStaleInterval   time.Duration
 	eventCleanStaleMaxAge     time.Duration
 	actionsEnqueueEnabled     bool
-	actionsEnqueueInterval    string
+	actionsEnqueueInterval    time.Duration
 	actionsEnqueueBatchSize   int
 	actionsInvokeEnabled      bool
-	actionsInvokeInterval     string
+	actionsInvokeInterval     time.Duration
 	actionsInvokeBatchSize    int
 	actionsInvokeMaxRetries   int
 	actionsCleanStaleEnabled  bool
-	actionsCleanStaleInterval string
+	actionsCleanStaleInterval time.Duration
 	actionsCleanStaleMaxAge   time.Duration
-	prometheusRefreshInterval string
+	prometheusRefreshInterval time.Duration
 }
 
 type lockConfig struct {
@@ -236,15 +236,15 @@ func bootstrapEnvironment() *Environment {
 	// task config
 	var tc *taskConfig
 
-	var updateCleanStaleMaxAge time.Duration
-	if updateCleanStaleMaxAge, errParse = time.ParseDuration(os.Getenv(envTaskUpdateCleanStaleMaxAge)); errParse != nil {
-		zap.L().Sugar().Fatalf("Could not parse max age for cleaning stale updates. Reason: %s", errParse.Error())
-	}
-
-	var eventCleanStaleMaxAge time.Duration
-	if eventCleanStaleMaxAge, errParse = time.ParseDuration(os.Getenv(envTaskEventCleanStaleMaxAge)); errParse != nil {
-		zap.L().Sugar().Fatalf("Could not parse max age for cleaning stale events. Reason: %s", errParse.Error())
-	}
+	updateCleanStaleInterval := parseDuration(envTaskUpdateCleanStaleInterval)
+	updateCleanStaleMaxAge := parseDuration(envTaskUpdateCleanStaleMaxAge)
+	eventCleanStaleMaxAge := parseDuration(envTaskEventCleanStaleMaxAge)
+	actionsCleanStaleMaxAge := parseDuration(envTaskActionsCleanStaleMaxAge)
+	eventCleanStaleInterval := parseDuration(envTaskEventCleanStaleInterval)
+	actionsEnqueueInterval := parseDuration(envTaskActionsEnqueueInterval)
+	actionsInvokeInterval := parseDuration(envTaskActionsInvokeInterval)
+	actionsCleanStaleInterval := parseDuration(envTaskActionsCleanStaleInterval)
+	prometheusRefreshInterval := parseDuration(envTaskPrometheusRefreshInterval)
 
 	var actionsEnqueueBatchSize int
 	if actionsEnqueueBatchSize, err = strconv.Atoi(os.Getenv(envTaskActionsEnqueueBatchSize)); err != nil {
@@ -270,29 +270,24 @@ func bootstrapEnvironment() *Environment {
 		zap.L().Sugar().Fatalf("Invalid actions invoke max retries, must be a positive number.")
 	}
 
-	var actionsCleanStaleMaxAge time.Duration
-	if actionsCleanStaleMaxAge, errParse = time.ParseDuration(os.Getenv(envTaskActionsCleanStaleMaxAge)); errParse != nil {
-		zap.L().Sugar().Fatalf("Could not parse max age for cleaning stale actions. Reason: %s", errParse.Error())
-	}
-
 	tc = &taskConfig{
 		updateCleanStaleEnabled:   os.Getenv(envTaskUpdateCleanStaleEnabled) == "true",
-		updateCleanStaleInterval:  os.Getenv(envTaskUpdateCleanStaleInterval),
+		updateCleanStaleInterval:  updateCleanStaleInterval,
 		updateCleanStaleMaxAge:    updateCleanStaleMaxAge,
 		eventCleanStaleEnabled:    os.Getenv(envTaskEventCleanStaleEnabled) == "true",
-		eventCleanStaleInterval:   os.Getenv(envTaskEventCleanStaleInterval),
+		eventCleanStaleInterval:   eventCleanStaleInterval,
 		eventCleanStaleMaxAge:     eventCleanStaleMaxAge,
 		actionsEnqueueEnabled:     os.Getenv(envTaskActionsEnqueueEnabled) == "true",
-		actionsEnqueueInterval:    os.Getenv(envTaskActionsEnqueueInterval),
+		actionsEnqueueInterval:    actionsEnqueueInterval,
 		actionsEnqueueBatchSize:   actionsEnqueueBatchSize,
 		actionsInvokeEnabled:      os.Getenv(envTaskActionsInvokeEnabled) == "true",
-		actionsInvokeInterval:     os.Getenv(envTaskActionsInvokeInterval),
+		actionsInvokeInterval:     actionsInvokeInterval,
 		actionsInvokeBatchSize:    actionsInvokeBatchSize,
 		actionsInvokeMaxRetries:   actionsInvokeMaxRetries,
 		actionsCleanStaleEnabled:  os.Getenv(envTaskActionsCleanStaleEnabled) == "true",
-		actionsCleanStaleInterval: os.Getenv(envTaskActionsCleanStaleInterval),
+		actionsCleanStaleInterval: actionsCleanStaleInterval,
 		actionsCleanStaleMaxAge:   actionsCleanStaleMaxAge,
-		prometheusRefreshInterval: os.Getenv(envTaskPrometheusRefreshInterval),
+		prometheusRefreshInterval: prometheusRefreshInterval,
 	}
 
 	var lc *lockConfig
@@ -486,6 +481,17 @@ func setEnvKeyDefault(key string, defaultValue string) {
 
 		zap.L().Sugar().Infof("Set '%s' to '%s'", key, defaultValue)
 	}
+}
+
+func parseDuration(envProperty string) time.Duration {
+	var duration time.Duration
+	var err error
+
+	if duration, err = time.ParseDuration(os.Getenv(envProperty)); err != nil {
+		zap.L().Sugar().Fatalf("Could not parse duration for '%s'. Reason: %s", envProperty, err.Error())
+	}
+
+	return duration
 }
 
 func parseBasicAuthCredentials(envProperty string) map[string]string {
