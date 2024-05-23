@@ -1,6 +1,8 @@
 module git.myservermanager.com/varakh/upda
 
-go 1.21
+go 1.22
+
+toolchain go1.22.3
 
 require (
 	github.com/Depado/ginprom v1.8.1
@@ -12,7 +14,7 @@ require (
 	github.com/go-co-op/gocron-redis-lock/v2 v2.0.1
 	github.com/go-co-op/gocron/v2 v2.5.0
 	github.com/go-playground/validator/v10 v10.20.0
-	github.com/go-redsync/redsync/v4 v4.11.0
+	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.5.1

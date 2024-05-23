@@ -5,6 +5,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [2.0.2] - UNRELEASED
 
 * Updated dependencies
+* Updated OCI image base to alpine `3.20` with Go `1.22`
 
 ## [2.0.1] - 2024/05/01
 
