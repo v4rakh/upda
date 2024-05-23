@@ -1,52 +1,75 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"git.myservermanager.com/varakh/upda/util"
 	"go.uber.org/zap"
+	"time"
 )
 
 type lockMemService struct {
 	registry *util.InMemoryLockRegistry
 }
 
+var (
+	errLockMemNotReleased = newServiceError(Conflict, errors.New("lock service: could not release lock"))
+)
+
 func newLockMemService() lockService {
+	zap.L().Info("Initialized in-memory locking service")
 	return &lockMemService{registry: util.NewInMemoryLockRegistry()}
 }
 
-func (s *lockMemService) init() error {
-	zap.L().Info("Initialized in-memory locking service")
-	return nil
+// lock locks a given resource without any options (default expiration)
+func (s *lockMemService) lock(ctx context.Context, resource string) (appLock, error) {
+	return s.lockWithOptions(ctx, resource, withAppLockOptionExpiry(0))
 }
 
-func (s *lockMemService) tryLock(resource string) error {
+// lockWithOptions locks a given resource, only TTL as option is supported
+func (s *lockMemService) lockWithOptions(ctx context.Context, resource string, options ...appLockOption) (appLock, error) {
 	if resource == "" {
-		return errorValidationNotBlank
+		return nil, errorValidationNotBlank
+	}
+
+	var expiration time.Duration = 0
+	if options != nil {
+		lockOptions := &appLockOptions{}
+		for _, o := range options {
+			o.apply(lockOptions)
+		}
+
+		if lockOptions.expiry != nil {
+			expiration = *lockOptions.expiry
+		}
 	}
 
 	zap.L().Sugar().Debugf("Trying to lock '%s'", resource)
-	s.registry.Lock(resource)
+
+	s.registry.LockWithTTL(resource, expiration)
+
 	zap.L().Sugar().Debugf("Locked '%s'", resource)
 
-	return nil
-}
-
-func (s *lockMemService) release(resource string) error {
-	if resource == "" {
-		return errorValidationNotBlank
+	l := &inMemoryLock{
+		registry: s.registry,
+		resource: resource,
 	}
 
-	zap.L().Sugar().Debugf("Releasing lock '%s'", resource)
-	err := s.registry.Unlock(resource)
-	zap.L().Sugar().Debugf("Released lock '%s'", resource)
-
-	return err
+	return l, nil
 }
 
-func (s *lockMemService) exists(resource string) bool {
-	return s.registry.Exists(resource)
+var _ appLock = (*inMemoryLock)(nil)
+
+type inMemoryLock struct {
+	registry *util.InMemoryLockRegistry
+	resource string
 }
 
-func (s *lockMemService) stop() {
-	zap.L().Info("Clearing in-memory locking service")
-	s.registry.Clear()
+func (r inMemoryLock) unlock(ctx context.Context) error {
+	zap.L().Sugar().Debugf("Unlocking '%s'", r.resource)
+
+	if err := r.registry.Unlock(r.resource); err != nil {
+		return errLockMemNotReleased
+	}
+	return nil
 }

@@ -49,7 +49,18 @@ func Start() {
 	actionRepo := newActionDbRepo(env.db)
 	actionInvocationRepo := newActionInvocationDbRepo(env.db)
 
-	lockService := newLockMemService()
+	var lockService lockService
+
+	if env.lockConfig.redisEnabled {
+		var err error
+		lockService, err = newLockRedisService(env.lockConfig)
+
+		if err != nil {
+			zap.L().Fatal("Failed to create lock service", zap.Error(err))
+		}
+	} else {
+		lockService = newLockMemService()
+	}
 
 	eventService := newEventService(eventRepo)
 	updateService := newUpdateService(updateRepo, eventService)

@@ -37,6 +37,34 @@ LOGGING_LEVEL=debug
 
 Please look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml) and a Postman Collection.
 
+### Lock service
+
+The `lockService` can be used to lock resources. This works in-memory and also in a distributed fashion with REDIS.
+
+Ensure to provide proper locking options when using, although in-memory ignores those. 
+
+Example:
+
+```shell
+# invoked from an endpoint
+context := c.Request.Context()
+
+var err error
+var lock appLock
+
+if lock, err = h.lockService.lockWithOptions(context, "TEST-LOCK", withAppLockOptionExpiry(5*time.Minute), withAppLockOptionInfiniteRetries(), withAppLockOptionRetryDelay(5*time.Second)); err != nil {
+    _ = c.AbortWithError(errToHttpStatus(err), err)
+    return
+}
+# defer to avoid leakage
+defer func(lock appLock) {
+    _ = lock.unlock(context)
+}(lock)
+
+# simulate long running task
+time.Sleep(20 * time.Second)
+```
+
 ### Getting started
 
 1. Run `make clean dependencies` to fetch dependencies
