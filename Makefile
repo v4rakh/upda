@@ -55,10 +55,7 @@ checkstyle:
 
 checkstyle-ci: checkstyle
 
-checkstyle-ci:
-	go vet ./...
-
 test:
-	go test ./...
+	go test -race ./...
 
 test-ci: test
