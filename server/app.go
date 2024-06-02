@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
