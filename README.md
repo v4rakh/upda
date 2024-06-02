@@ -37,6 +37,8 @@ LOGGING_LEVEL=debug
 
 Please look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml) and a Postman Collection.
 
+**Pay attention to `make checkstyle` (invoked `go vet ./...`) output as pipeline will fail if issues are detected.**
+
 ### Lock service
 
 The `lockService` can be used to lock resources. This works in-memory and also in a distributed fashion with REDIS.

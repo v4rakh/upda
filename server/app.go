@@ -185,7 +185,7 @@ func Start() {
 	// gracefully handle shut down
 	// Wait for interrupt signal to gracefully shut down the server with
 	// a timeout of x seconds.
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall. SIGKILL but cannot be caught, thus no need to add
