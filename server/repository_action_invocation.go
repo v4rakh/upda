@@ -225,8 +225,8 @@ func (r *actionInvocationDbRepo) deleteByUpdatedAtBeforeAndStates(time time.Time
 }
 
 func translateActionInvocationState(state ...api.ActionInvocationState) []string {
-	states := make([]string, 0)
-	if len(state) > 0 {
+	states := make([]string, 0, len(state))
+	if len(states) > 0 {
 		for _, s := range state {
 			states = append(states, s.Value())
 		}

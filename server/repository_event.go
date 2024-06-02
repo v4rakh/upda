@@ -125,7 +125,7 @@ func (r *eventDbRepo) deleteByUpdatedAtBeforeAndStates(time time.Time, state ...
 		return 0, errorValidationNotEmpty
 	}
 
-	states := make([]string, 0)
+	states := make([]string, 0, len(state))
 	for _, i := range state {
 		states = append(states, i.Value())
 	}

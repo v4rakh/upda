@@ -29,7 +29,7 @@ func (h *webhookHandler) paginate(c *gin.Context) {
 	}
 
 	var data []*api.WebhookResponse
-	data = make([]*api.WebhookResponse, 0)
+	data = make([]*api.WebhookResponse, 0, len(webhooks))
 
 	for _, e := range webhooks {
 		data = append(data, &api.WebhookResponse{

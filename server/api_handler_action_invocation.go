@@ -56,7 +56,7 @@ func (h *actionInvocationHandler) paginate(c *gin.Context) {
 	}
 
 	var data []*api.ActionInvocationResponse
-	data = make([]*api.ActionInvocationResponse, 0)
+	data = make([]*api.ActionInvocationResponse, 0, len(actionInvocations))
 
 	for _, e := range actionInvocations {
 		data = append(data, &api.ActionInvocationResponse{

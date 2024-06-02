@@ -65,7 +65,8 @@ func (s *actionInvocationService) enqueueFromEvent(event *Event, actions []*Acti
 		return err
 	}
 
-	var filteredActions []*Action
+	filteredActions := make([]*Action, 0)
+
 	for _, action := range actions {
 		matchesEvent := action.MatchEvent == nil || *action.MatchEvent == event.Name
 		matchesHost := action.MatchHost == nil || *action.MatchHost == eventPayload.Host

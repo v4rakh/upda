@@ -29,7 +29,7 @@ func (h *eventHandler) window(c *gin.Context) {
 	}
 
 	var data []*api.EventResponse
-	data = make([]*api.EventResponse, 0)
+	data = make([]*api.EventResponse, 0, len(events))
 
 	for _, e := range events {
 		data = append(data, &api.EventResponse{

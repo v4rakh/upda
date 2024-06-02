@@ -199,7 +199,7 @@ func (r *updateDbRepo) deleteByUpdatedAtBeforeAndStates(time time.Time, state ..
 		return 0, errorValidationNotEmpty
 	}
 
-	states := make([]string, 0)
+	states := make([]string, 0, len(state))
 	for _, i := range state {
 		states = append(states, i.Value())
 	}
@@ -231,8 +231,8 @@ func (r *updateDbRepo) paginate(page int, pageSize int, orderBy string, order st
 		order = "desc"
 	}
 
-	states := make([]string, 0)
-	if len(state) > 0 {
+	states := make([]string, 0, len(state))
+	if len(states) > 0 {
 		for _, s := range state {
 			states = append(states, s.Value())
 		}
@@ -248,8 +248,8 @@ func (r *updateDbRepo) paginate(page int, pageSize int, orderBy string, order st
 func (r *updateDbRepo) count(searchTerm string, searchIn string, state ...api.UpdateState) (int64, error) {
 	var c int64
 
-	states := make([]string, 0)
-	if len(state) > 0 {
+	states := make([]string, 0, len(state))
+	if len(states) > 0 {
 		for _, s := range state {
 			states = append(states, s.Value())
 		}

@@ -28,7 +28,7 @@ func (h *updateHandler) paginate(c *gin.Context) {
 
 	s, stateQueryContainsAtLeastOne := c.GetQueryArray("state")
 
-	var states []api.UpdateState
+	states := make([]api.UpdateState, 0)
 	if stateQueryContainsAtLeastOne {
 		for _, state := range s {
 			states = append(states, api.UpdateState(state))

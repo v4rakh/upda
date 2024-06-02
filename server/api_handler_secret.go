@@ -24,7 +24,7 @@ func (h *secretHandler) getAll(c *gin.Context) {
 	}
 
 	var data []*api.SecretResponse
-	data = make([]*api.SecretResponse, 0)
+	data = make([]*api.SecretResponse, 0, len(secrets))
 
 	for _, e := range secrets {
 		data = append(data, &api.SecretResponse{
