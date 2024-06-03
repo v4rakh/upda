@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type prometheusService struct {
@@ -42,25 +41,34 @@ func newPrometheusService(r *gin.Engine, c *prometheusConfig) *prometheusService
 	}
 }
 
-func (s *prometheusService) init() {
+func (s *prometheusService) init() error {
 	if !s.config.enabled {
-		return
+		return nil
 	}
 
-	var err error
-
-	err = s.registerGaugeNoLabels(metricUpdatesTotal, metricUpdatesTotalHelp)
-	err = s.registerGaugeNoLabels(metricUpdatesPending, metricUpdatesPendingHelp)
-	err = s.registerGaugeNoLabels(metricUpdatesIgnored, metricUpdatesIgnoredHelp)
-	err = s.registerGaugeNoLabels(metricUpdatesApproved, metricUpdatesApprovedHelp)
-
-	err = s.registerGaugeNoLabels(metricWebhooks, metricWebhooksHelp)
-	err = s.registerGaugeNoLabels(metricEvents, metricEventsHelp)
-	err = s.registerGaugeNoLabels(metricActions, metricActionsHelp)
-
-	if err != nil {
-		zap.L().Sugar().Fatalf("Cannot initialize service. Reason: %v", err)
+	if err := s.registerGaugeNoLabels(metricUpdatesTotal, metricUpdatesTotalHelp); err != nil {
+		return err
 	}
+	if err := s.registerGaugeNoLabels(metricUpdatesPending, metricUpdatesPendingHelp); err != nil {
+		return err
+	}
+	if err := s.registerGaugeNoLabels(metricUpdatesIgnored, metricUpdatesIgnoredHelp); err != nil {
+		return err
+	}
+	if err := s.registerGaugeNoLabels(metricUpdatesApproved, metricUpdatesApprovedHelp); err != nil {
+		return err
+	}
+	if err := s.registerGaugeNoLabels(metricWebhooks, metricWebhooksHelp); err != nil {
+		return err
+	}
+	if err := s.registerGaugeNoLabels(metricEvents, metricEventsHelp); err != nil {
+		return err
+	}
+	if err := s.registerGaugeNoLabels(metricActions, metricActionsHelp); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *prometheusService) registerGaugeNoLabels(name string, help string) error {

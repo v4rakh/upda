@@ -23,7 +23,9 @@ func CreateFileWithParent(file string) error {
 	if _, err = os.Stat(file); errors.Is(err, os.ErrNotExist) {
 		var f *os.File
 		f, err = os.Create(file)
-		defer f.Close()
+		defer func(f *os.File) {
+			_ = f.Close()
+		}(f)
 		if err != nil {
 			return errors.New(fmt.Sprintf("cannot create file '%v': %v", file, fmt.Errorf("%w", err)))
 		}

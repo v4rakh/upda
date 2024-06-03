@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
 	redislock "github.com/go-co-op/gocron-redis-lock/v2"
 	"github.com/go-co-op/gocron/v2"
@@ -38,11 +39,11 @@ var (
 	initialTasksStartDelay = time.Now().Add(10 * time.Second)
 )
 
-func newTaskService(u *updateService, e *eventService, w *webhookService, a *actionService, ai *actionInvocationService, l lockService, p *prometheusService, ac *appConfig, tc *taskConfig, lc *lockConfig, pc *prometheusConfig) *taskService {
-	location, err := time.LoadLocation(ac.timeZone)
-
-	if err != nil {
-		zap.L().Sugar().Fatalf("Could not initialize correct timezone for scheduler. Reason: %s", err.Error())
+func newTaskService(u *updateService, e *eventService, w *webhookService, a *actionService, ai *actionInvocationService, l lockService, p *prometheusService, ac *appConfig, tc *taskConfig, lc *lockConfig, pc *prometheusConfig) (*taskService, error) {
+	var err error
+	var location *time.Location
+	if location, err = time.LoadLocation(ac.timeZone); err != nil {
+		return nil, fmt.Errorf("could not initialize correct timezone for scheduler: %s", err)
 	}
 
 	// global job options
@@ -64,13 +65,13 @@ func newTaskService(u *updateService, e *eventService, w *webhookService, a *act
 		redisOptions, err = redis.ParseURL(lc.redisUrl)
 
 		if err != nil {
-			zap.L().Sugar().Fatalf("Cannot parse REDIS URL '%s' to set up locking. Reason: %s", lc.redisUrl, err.Error())
+			return nil, fmt.Errorf("cannot parse REDIS URL '%s' to set up locking for scheduler: %s", lc.redisUrl, err)
 		}
 		redisClient := redis.NewClient(redisOptions)
 
 		var locker gocron.Locker
 		if locker, err = redislock.NewRedisLocker(redisClient, redislock.WithTries(1), redislock.WithExpiry(30*time.Second), redislock.WithRetryDelay(5*time.Second)); err != nil {
-			zap.L().Sugar().Fatalf("Cannot set up REDIS locker. Reason: %s", err.Error())
+			return nil, fmt.Errorf("cannot set up REDIS locker for scheduler: %s", err)
 		}
 
 		schedulerOptions = append(schedulerOptions, gocron.WithDistributedLocker(locker))
@@ -91,16 +92,30 @@ func newTaskService(u *updateService, e *eventService, w *webhookService, a *act
 		lockConfig:              lc,
 		prometheusConfig:        pc,
 		scheduler:               scheduler,
-	}
+	}, nil
 }
 
-func (s *taskService) init() {
-	s.configureCleanupStaleUpdatesTask()
-	s.configureCleanupStaleEventsTask()
-	s.configureActionsEnqueueTask()
-	s.configureActionsInvokeTask()
-	s.configureCleanupStaleActionsTask()
-	s.configurePrometheusRefreshTask()
+func (s *taskService) init() error {
+	if err := s.configureCleanupStaleUpdatesTask(); err != nil {
+		return err
+	}
+	if err := s.configureCleanupStaleEventsTask(); err != nil {
+		return err
+	}
+	if err := s.configureActionsEnqueueTask(); err != nil {
+		return err
+	}
+	if err := s.configureActionsInvokeTask(); err != nil {
+		return err
+	}
+	if err := s.configureCleanupStaleActionsTask(); err != nil {
+		return err
+	}
+	if err := s.configurePrometheusRefreshTask(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *taskService) stop() {
@@ -119,9 +134,9 @@ func (s *taskService) start() {
 	zap.L().Sugar().Infof("Started %d periodic tasks", len(s.scheduler.Jobs()))
 }
 
-func (s *taskService) configureCleanupStaleUpdatesTask() {
+func (s *taskService) configureCleanupStaleUpdatesTask() error {
 	if !s.taskConfig.updateCleanStaleEnabled {
-		return
+		return nil
 	}
 
 	runnable := func() {
@@ -145,13 +160,15 @@ func (s *taskService) configureCleanupStaleUpdatesTask() {
 
 	scheduledJob := gocron.DurationJob(s.taskConfig.updateCleanStaleInterval)
 	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobUpdatesCleanStale)); err != nil {
-		zap.L().Sugar().Fatalf("Could not create task for cleaning stale updates. Reason: %s", err.Error())
+		return fmt.Errorf("could not create task for cleaning stale updates: %w", err)
 	}
+
+	return nil
 }
 
-func (s *taskService) configureCleanupStaleEventsTask() {
+func (s *taskService) configureCleanupStaleEventsTask() error {
 	if !s.taskConfig.eventCleanStaleEnabled {
-		return
+		return nil
 	}
 
 	runnable := func() {
@@ -175,13 +192,15 @@ func (s *taskService) configureCleanupStaleEventsTask() {
 
 	scheduledJob := gocron.DurationJob(s.taskConfig.eventCleanStaleInterval)
 	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobEventsCleanStale)); err != nil {
-		zap.L().Sugar().Fatalf("Could not create task for cleaning stale events. Reason: %s", err.Error())
+		return fmt.Errorf("could not create task for cleaning stale events: %w", err)
 	}
+
+	return nil
 }
 
-func (s *taskService) configureActionsEnqueueTask() {
+func (s *taskService) configureActionsEnqueueTask() error {
 	if !s.taskConfig.actionsEnqueueEnabled {
-		return
+		return nil
 	}
 
 	runnable := func() {
@@ -192,13 +211,15 @@ func (s *taskService) configureActionsEnqueueTask() {
 
 	scheduledJob := gocron.DurationJob(s.taskConfig.actionsEnqueueInterval)
 	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobActionsEnqueue)); err != nil {
-		zap.L().Sugar().Fatalf("Could not create task for enqueueing actions. Reason: %s", err.Error())
+		return fmt.Errorf("could not create task for enqueueing actions: %w", err)
 	}
+
+	return nil
 }
 
-func (s *taskService) configureActionsInvokeTask() {
+func (s *taskService) configureActionsInvokeTask() error {
 	if !s.taskConfig.actionsInvokeEnabled {
-		return
+		return nil
 	}
 
 	runnable := func() {
@@ -209,13 +230,15 @@ func (s *taskService) configureActionsInvokeTask() {
 
 	scheduledJob := gocron.DurationJob(s.taskConfig.actionsInvokeInterval)
 	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobActionsInvoke)); err != nil {
-		zap.L().Sugar().Fatalf("Could not create task for invoking actions. Reason: %s", err.Error())
+		return fmt.Errorf("could not create task for invoking actions: %w", err)
 	}
+
+	return nil
 }
 
-func (s *taskService) configureCleanupStaleActionsTask() {
+func (s *taskService) configureCleanupStaleActionsTask() error {
 	if !s.taskConfig.actionsCleanStaleEnabled {
-		return
+		return nil
 	}
 
 	runnable := func() {
@@ -246,13 +269,15 @@ func (s *taskService) configureCleanupStaleActionsTask() {
 
 	scheduledJob := gocron.DurationJob(s.taskConfig.actionsCleanStaleInterval)
 	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobActionsCleanStale)); err != nil {
-		zap.L().Sugar().Fatalf("Could not create task for cleaning stale actions. Reason: %s", err.Error())
+		return fmt.Errorf("could not create task for cleaning stale actions: %w", err)
 	}
+
+	return nil
 }
 
-func (s *taskService) configurePrometheusRefreshTask() {
+func (s *taskService) configurePrometheusRefreshTask() error {
 	if !s.prometheusConfig.enabled {
-		return
+		return nil
 	}
 
 	runnable := func() {
@@ -310,6 +335,8 @@ func (s *taskService) configurePrometheusRefreshTask() {
 
 	scheduledJob := gocron.DurationJob(s.taskConfig.prometheusRefreshInterval)
 	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobPrometheusRefresh)); err != nil {
-		zap.L().Sugar().Fatalf("Could not create task for refreshing prometheus. Reason: %s", err.Error())
+		return fmt.Errorf("could not create task for refreshing prometheus: %w", err)
 	}
+
+	return nil
 }

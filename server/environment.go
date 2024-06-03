@@ -165,7 +165,9 @@ func bootstrapEnvironment() *Environment {
 	}
 
 	zapLogger := zap.Must(zapConfig.Build())
-	defer zapLogger.Sync()
+	defer func(zapLogger *zap.Logger) {
+		_ = zapLogger.Sync()
+	}(zapLogger)
 	zap.ReplaceGlobals(zapLogger)
 
 	// assign defaults from given environment variables and validate
@@ -323,7 +325,9 @@ func bootstrapEnvironment() *Environment {
 	gormConfig := &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)}
 	if isDebug && isDevelopment {
 		gormZapLogger := zap.Must(zapConfig.Build())
-		defer gormZapLogger.Sync()
+		defer func(gormZapLogger *zap.Logger) {
+			_ = gormZapLogger.Sync()
+		}(gormZapLogger)
 		gormLogger := zapgorm2.New(gormZapLogger)
 		gormConfig = &gorm.Config{Logger: gormLogger}
 	}

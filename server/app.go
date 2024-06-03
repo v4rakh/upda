@@ -31,16 +31,20 @@ func Start() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	// app init (router, services, handlers)
 	router := gin.New()
 	router.Use(ginzap.Ginzap(zap.L(), time.RFC3339, false))
 	router.Use(ginzap.RecoveryWithZap(zap.L(), true))
 
-	// metrics
-	prometheusService := newPrometheusService(router, env.prometheusConfig)
+	var err error
+
+	ps := newPrometheusService(router, env.prometheusConfig)
 
 	if env.prometheusConfig.enabled {
-		prometheusService.init()
-		router.Use(prometheusService.prometheus.Instrument())
+		if err = ps.init(); err != nil {
+			zap.L().Sugar().Fatalf("Prometheus service init failed: %s", err.Error())
+		}
+		router.Use(ps.prometheus.Instrument())
 	}
 
 	updateRepo := newUpdateDbRepo(env.db)
@@ -50,43 +54,51 @@ func Start() {
 	actionRepo := newActionDbRepo(env.db)
 	actionInvocationRepo := newActionInvocationDbRepo(env.db)
 
-	var lockService lockService
+	var ls lockService
 
 	if env.lockConfig.redisEnabled {
-		var err error
-		lockService, err = newLockRedisService(env.lockConfig)
+		var e error
+		ls, e = newLockRedisService(env.lockConfig)
 
 		if err != nil {
-			zap.L().Fatal("Failed to create lock service", zap.Error(err))
+			zap.L().Fatal("Failed to create lock service", zap.Error(e))
 		}
 	} else {
-		lockService = newLockMemService()
+		ls = newLockMemService()
 	}
 
-	eventService := newEventService(eventRepo)
-	updateService := newUpdateService(updateRepo, eventService)
-	webhookService := newWebhookService(webhookRepo, env.webhookConfig)
-	webhookInvocationService := newWebhookInvocationService(webhookService, updateService, env.webhookConfig)
+	es := newEventService(eventRepo)
+	us := newUpdateService(updateRepo, es)
+	ws := newWebhookService(webhookRepo, env.webhookConfig)
+	wis := newWebhookInvocationService(ws, us, env.webhookConfig)
 
-	secretService := newSecretService(secretRepo)
-	actionService := newActionService(actionRepo, eventService)
-	actionInvocationService := newActionInvocationService(actionInvocationRepo, actionService, eventService, secretService)
+	ss := newSecretService(secretRepo)
+	as := newActionService(actionRepo, es)
+	ais := newActionInvocationService(actionInvocationRepo, as, es, ss)
 
-	taskService := newTaskService(updateService, eventService, webhookService, actionService, actionInvocationService, lockService, prometheusService, env.appConfig, env.taskConfig, env.lockConfig, env.prometheusConfig)
-	taskService.init()
-	taskService.start()
+	var ts *taskService
 
-	updateHandler := newUpdateHandler(updateService, env.appConfig)
-	webhookHandler := newWebhookHandler(webhookService)
-	webhookInvocationHandler := newWebhookInvocationHandler(webhookInvocationService, webhookService)
-	eventHandler := newEventHandler(eventService)
-	secretHandler := newSecretHandler(secretService)
-	actionHandler := newActionHandler(actionService)
-	actionInvocationHandler := newActionInvocationHandler(actionService, actionInvocationService)
+	if ts, err = newTaskService(us, es, ws, as, ais, ls, ps, env.appConfig, env.taskConfig, env.lockConfig, env.prometheusConfig); err != nil {
+		zap.L().Sugar().Fatalf("Task service creation failed: %v", err)
+	}
 
-	infoHandler := newInfoHandler(env.appConfig)
-	healthHandler := newHealthHandler()
-	authHandler := newAuthHandler()
+	if err = ts.init(); err != nil {
+		zap.L().Sugar().Fatalf("Task service initialization failed: %v", err)
+	}
+
+	ts.start()
+
+	uh := newUpdateHandler(us, env.appConfig)
+	wh := newWebhookHandler(ws)
+	wih := newWebhookInvocationHandler(wis, ws)
+	eh := newEventHandler(es)
+	sh := newSecretHandler(ss)
+	ah := newActionHandler(as)
+	aih := newActionInvocationHandler(as, ais)
+
+	ih := newInfoHandler(env.appConfig)
+	hh := newHealthHandler()
+	authH := newAuthHandler()
 
 	router.Use(middlewareAppName())
 	router.Use(middlewareAppVersion())
@@ -102,10 +114,10 @@ func Start() {
 	}))
 
 	apiPublicGroup := router.Group("/api/v1")
-	apiPublicGroup.GET("/health", healthHandler.show)
-	apiPublicGroup.GET("/info", infoHandler.show)
+	apiPublicGroup.GET("/health", hh.show)
+	apiPublicGroup.GET("/info", ih.show)
 
-	apiPublicGroup.POST("/webhooks/:id", webhookInvocationHandler.execute)
+	apiPublicGroup.POST("/webhooks/:id", wih.execute)
 
 	var authMethodHandler gin.HandlerFunc
 
@@ -121,48 +133,47 @@ func Start() {
 
 	apiAuthGroup := router.Group("/api/v1", authMethodHandler)
 
-	apiAuthGroup.GET("/login", authHandler.login)
+	apiAuthGroup.GET("/login", authH.login)
 
-	apiAuthGroup.GET("/updates", updateHandler.paginate)
-	apiAuthGroup.GET("/updates/:id", updateHandler.get)
-	apiAuthGroup.PATCH("/updates/:id/state", updateHandler.updateState)
-	apiAuthGroup.DELETE("/updates/:id", updateHandler.delete)
+	apiAuthGroup.GET("/updates", uh.paginate)
+	apiAuthGroup.GET("/updates/:id", uh.get)
+	apiAuthGroup.PATCH("/updates/:id/state", uh.updateState)
+	apiAuthGroup.DELETE("/updates/:id", uh.delete)
 
-	apiAuthGroup.GET("/webhooks", webhookHandler.paginate)
-	apiAuthGroup.POST("/webhooks", webhookHandler.create)
-	apiAuthGroup.GET("/webhooks/:id", webhookHandler.get)
-	apiAuthGroup.PATCH("/webhooks/:id/label", webhookHandler.updateLabel)
-	apiAuthGroup.PATCH("/webhooks/:id/ignore-host", webhookHandler.updateIgnoreHost)
-	apiAuthGroup.DELETE("/webhooks/:id", webhookHandler.delete)
+	apiAuthGroup.GET("/webhooks", wh.paginate)
+	apiAuthGroup.POST("/webhooks", wh.create)
+	apiAuthGroup.GET("/webhooks/:id", wh.get)
+	apiAuthGroup.PATCH("/webhooks/:id/label", wh.updateLabel)
+	apiAuthGroup.PATCH("/webhooks/:id/ignore-host", wh.updateIgnoreHost)
+	apiAuthGroup.DELETE("/webhooks/:id", wh.delete)
 
-	apiAuthGroup.GET("/events", eventHandler.window)
-	apiAuthGroup.GET("/events/:id", eventHandler.get)
-	apiAuthGroup.DELETE("/events/:id", eventHandler.delete)
+	apiAuthGroup.GET("/events", eh.window)
+	apiAuthGroup.GET("/events/:id", eh.get)
+	apiAuthGroup.DELETE("/events/:id", eh.delete)
 
-	apiAuthGroup.GET("/secrets", secretHandler.getAll)
-	apiAuthGroup.GET("/secrets/:id", secretHandler.get)
-	apiAuthGroup.POST("/secrets", secretHandler.create)
-	apiAuthGroup.PATCH("/secrets/:id/value", secretHandler.updateValue)
-	apiAuthGroup.DELETE("/secrets/:id", secretHandler.delete)
+	apiAuthGroup.GET("/secrets", sh.getAll)
+	apiAuthGroup.GET("/secrets/:id", sh.get)
+	apiAuthGroup.POST("/secrets", sh.create)
+	apiAuthGroup.PATCH("/secrets/:id/value", sh.updateValue)
+	apiAuthGroup.DELETE("/secrets/:id", sh.delete)
 
-	apiAuthGroup.GET("/actions", actionHandler.paginate)
-	apiAuthGroup.POST("/actions", actionHandler.create)
-	apiAuthGroup.GET("/actions/:id", actionHandler.get)
-	apiAuthGroup.PATCH("/actions/:id/label", actionHandler.updateLabel)
-	apiAuthGroup.PATCH("/actions/:id/match-event", actionHandler.updateMatchEvent)
-	apiAuthGroup.PATCH("/actions/:id/match-host", actionHandler.updateMatchHost)
-	apiAuthGroup.PATCH("/actions/:id/match-application", actionHandler.updateMatchApplication)
-	apiAuthGroup.PATCH("/actions/:id/match-provider", actionHandler.updateMatchProvider)
-	apiAuthGroup.PATCH("/actions/:id/payload", actionHandler.updatePayload)
-	apiAuthGroup.PATCH("/actions/:id/enabled", actionHandler.updateEnabled)
-	apiAuthGroup.DELETE("/actions/:id", actionHandler.delete)
-	apiAuthGroup.POST("/actions/:id/test", actionInvocationHandler.test)
+	apiAuthGroup.GET("/actions", ah.paginate)
+	apiAuthGroup.POST("/actions", ah.create)
+	apiAuthGroup.GET("/actions/:id", ah.get)
+	apiAuthGroup.PATCH("/actions/:id/label", ah.updateLabel)
+	apiAuthGroup.PATCH("/actions/:id/match-event", ah.updateMatchEvent)
+	apiAuthGroup.PATCH("/actions/:id/match-host", ah.updateMatchHost)
+	apiAuthGroup.PATCH("/actions/:id/match-application", ah.updateMatchApplication)
+	apiAuthGroup.PATCH("/actions/:id/match-provider", ah.updateMatchProvider)
+	apiAuthGroup.PATCH("/actions/:id/payload", ah.updatePayload)
+	apiAuthGroup.PATCH("/actions/:id/enabled", ah.updateEnabled)
+	apiAuthGroup.DELETE("/actions/:id", ah.delete)
+	apiAuthGroup.POST("/actions/:id/test", aih.test)
 
-	apiAuthGroup.GET("/action-invocations", actionInvocationHandler.paginate)
-	apiAuthGroup.GET("/action-invocations/:id", actionInvocationHandler.get)
-	apiAuthGroup.DELETE("/action-invocations/:id", actionInvocationHandler.delete)
+	apiAuthGroup.GET("/action-invocations", aih.paginate)
+	apiAuthGroup.GET("/action-invocations/:id", aih.get)
+	apiAuthGroup.DELETE("/action-invocations/:id", aih.delete)
 
-	// start server
 	serverAddress := fmt.Sprintf("%s:%d", env.serverConfig.listen, env.serverConfig.port)
 	srv := &http.Server{
 		Addr:    serverAddress,
@@ -170,16 +181,16 @@ func Start() {
 	}
 
 	go func() {
-		var err error
+		var e error
 
 		if env.serverConfig.tlsEnabled {
-			err = srv.ListenAndServeTLS(env.serverConfig.tlsCertPath, env.serverConfig.tlsKeyPath)
+			e = srv.ListenAndServeTLS(env.serverConfig.tlsCertPath, env.serverConfig.tlsKeyPath)
 		} else {
-			err = srv.ListenAndServe()
+			e = srv.ListenAndServe()
 		}
 
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			zap.L().Sugar().Fatalf("Application cannot be started: %v", err)
+		if e != nil && !errors.Is(e, http.ErrServerClosed) {
+			zap.L().Sugar().Fatalf("Application cannot be started: %v", e)
 		}
 	}()
 
@@ -193,11 +204,11 @@ func Start() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	zap.L().Info("Shutting down...")
-	taskService.stop()
+	ts.stop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), env.serverConfig.timeout)
 	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
+	if err = srv.Shutdown(ctx); err != nil {
 		zap.L().Sugar().Fatalf("Shutdown failed, exited directly: %v", err)
 	}
 	// catching ctx.Done() for configured timeout

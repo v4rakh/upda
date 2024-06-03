@@ -12,62 +12,36 @@ Contributions are very welcome!
 
 ## Development & contribution
 
-* Ensure to set the following environment variables for proper debug logs during development
+* Pay attention to `make checkstyle` (uses `go vet ./...`); pipeline fails if issues are detected.
+* Each entity has its own repository
+* Each entity is only used in repository and service (otherwise, mapping happens)
+* Presenter layer is constructed from the entity, e.g., in REST responses and mapped
+* No entity is directly returned in any REST response
+* All log calls should be handled by `zap.L()`
+* Configuration is bootstrapped via separated `struct` types which are given to the service which need them
+* Error handling
+    * Always throw an error with `NewServiceError` for repositories, services and handlers
+    * Always throw an error wrapping the cause with `fmt.Errorf`
+    * Forward/bubble up the error directly, when original error is already a `NewServiceError` (most likely internal
+      calls)
+    * Always abort handler chain with `AbortWithError`
+    * Utils can throw any error
+    * Repositories, handlers and services should always properly return `error` including any `init`-like function (
+      best to avoid them and call in `newXXX`). **Do not abort with `Fatalf` or similar**
+    * `log.Fatalf` or `zap.L().Fatal` is allowed in `environment.go` or `app.go`
+* Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml) and a Postman Collection.
+* Consider reading [Effective Go](https://go.dev/doc/effective_go)
+* Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
+
+### Getting started
+
+Ensure to set the following environment variables for proper debug logs during development
 
 ```shell
 DEVELOPMENT=true
 LOGGING_ENCODING=console
 LOGGING_LEVEL=debug
 ```
-
-* Code guidelines
-    * Each entity has its own repository
-    * Each entity is only used in repository and service (otherwise, mapping happens)
-    * Presenter layer is constructed from the entity, e.g., in REST responses and mapped
-    * No entity is directly returned in any REST response
-    * All log calls should be handled by `zap.L()`
-    * Configuration is bootstrapped via separated `struct` types which are given to the service which need them
-    * Error handling
-        * Always throw an error with `NewServiceError`
-        * Always wrap the cause error with `fmt.Errorf`
-        * Forward/bubble up the error directly, when original error is already a `NewServiceError` (most likely internal
-          calls)
-        * Always abort handler chain with `AbortWithError`
-        * Utils can throw any error
-
-Please look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml) and a Postman Collection.
-
-**Pay attention to `make checkstyle` (invoked `go vet ./...`) output as pipeline will fail if issues are detected.**
-
-### Lock service
-
-The `lockService` can be used to lock resources. This works in-memory and also in a distributed fashion with REDIS.
-
-Ensure to provide proper locking options when using, although in-memory ignores those. 
-
-Example:
-
-```shell
-# invoked from an endpoint
-context := c.Request.Context()
-
-var err error
-var lock appLock
-
-if lock, err = h.lockService.lockWithOptions(context, "TEST-LOCK", withAppLockOptionExpiry(5*time.Minute), withAppLockOptionInfiniteRetries(), withAppLockOptionRetryDelay(5*time.Second)); err != nil {
-    _ = c.AbortWithError(errToHttpStatus(err), err)
-    return
-}
-# defer to avoid leakage
-defer func(lock appLock) {
-    _ = lock.unlock(context)
-}(lock)
-
-# simulate long running task
-time.Sleep(20 * time.Second)
-```
-
-### Getting started
 
 1. Run `make clean dependencies` to fetch dependencies
 2. Start `git.myservermanager.com/varakh/upda/cmd/server` (or `cli`) as Go application and ensure to have _required_
@@ -99,6 +73,34 @@ path.
 
 For any `go` command you run, ensure that your `PATH` has the `gcc` binary and that you add `CGO_ENABLED=1` as
 environment.
+
+### Using the `lockService` correctly
+
+The `lockService` can be used to lock resources. This works in-memory and also in a distributed fashion with REDIS.
+
+Ensure to provide proper locking options when using, although in-memory ignores those.
+
+Example:
+
+```shell
+# invoked from an endpoint
+context := c.Request.Context()
+
+var err error
+var lock appLock
+
+if lock, err = h.lockService.lockWithOptions(context, "TEST-LOCK", withAppLockOptionExpiry(5*time.Minute), withAppLockOptionInfiniteRetries(), withAppLockOptionRetryDelay(5*time.Second)); err != nil {
+    _ = c.AbortWithError(errToHttpStatus(err), err)
+    return
+}
+# defer to avoid leakage
+defer func(lock appLock) {
+    _ = lock.unlock(context)
+}(lock)
+
+# simulate long running task
+time.Sleep(20 * time.Second)
+```
 
 ### Release
 

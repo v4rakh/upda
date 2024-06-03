@@ -14,7 +14,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// JSONMap defined JSON data type, need to implements driver.Valuer, sql.Scanner interface
+// JSONMap defined JSON data type, need to implement driver.Valuer, sql.Scanner interface
 type JSONMap map[string]interface {
 }
 
@@ -27,7 +27,7 @@ func (m JSONMap) Value() (driver.Value, error) {
 	return string(ba), err
 }
 
-// Scan scan value into Jsonb, implements sql.Scanner interface
+// Scan value into JSONB, implements sql.Scanner interface
 func (m *JSONMap) Scan(val interface{}) error {
 	if val == nil {
 		*m = make(JSONMap)

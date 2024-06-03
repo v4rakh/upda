@@ -17,7 +17,7 @@ var (
 )
 
 func newLockMemService() lockService {
-	zap.L().Info("Initialized in-memory locking service")
+	zap.L().Info("Initializing in-memory locking service")
 	return &lockMemService{registry: util.NewInMemoryLockRegistry()}
 }
 
