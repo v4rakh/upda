@@ -2,7 +2,7 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [3.0.0] - UNRELEASED
+## [3.0.0] - 2024/06/10
 
 > This is a major version upgrade. Other versions are incompatible with this release.
 
@@ -58,6 +58,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[3.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/3.0.0
 
 [2.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/2.0.1
 
