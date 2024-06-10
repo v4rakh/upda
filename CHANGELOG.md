@@ -2,9 +2,9 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [3.0.1] - UNRELEASED
+## [3.0.1] - 2024/06/10
 
-* ...
+* Fixed finding proper remaining Action invocations by their state
 
 ## [3.0.0] - 2024/06/10
 
@@ -62,6 +62,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[3.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/3.0.1
 
 [3.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/3.0.0
 
