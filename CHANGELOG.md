@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [3.0.1] - UNRELEASED
+
+* ...
+
 ## [3.0.0] - 2024/06/10
 
 > This is a major version upgrade. Other versions are incompatible with this release.
