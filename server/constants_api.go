@@ -1,10 +1,10 @@
 package server
 
 const (
-	HeaderAppName    = "X-App-Name"
-	HeaderAppVersion = "X-App-Version"
+	headerAppName    = "X-App-Name"
+	headerAppVersion = "X-App-Version"
 
-	HeaderWebhookToken = "X-Webhook-Token"
+	headerWebhookToken = "X-Webhook-Token"
 
 	headerContentType                = "Content-Type"
 	headerContentTypeApplicationJson = "application/json"

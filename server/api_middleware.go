@@ -5,18 +5,43 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func middlewareAppName() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(HeaderAppName, Name)
+		c.Header(headerAppName, name)
+		c.Next()
+	}
+}
+
+func middlewareGlobalNotFound() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, api.NewErrorResponseWithStatusAndMessage(string(notFound), "page not found"))
+		return
+	}
+}
+
+func middlewareGlobalMethodNotAllowed() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, api.NewErrorResponseWithStatusAndMessage(string(methodNotAllowed), "method not allowed"))
+		return
+	}
+}
+
+func middlewareEnforceJsonContentType() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Method != http.MethodOptions && !strings.HasPrefix(c.GetHeader(headerContentType), headerContentTypeApplicationJson) {
+			c.AbortWithStatusJSON(http.StatusBadRequest, api.NewErrorResponseWithStatusAndMessage(string(illegalArgument), "content-type must be application/json"))
+			return
+		}
 		c.Next()
 	}
 }
 
 func middlewareAppVersion() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(HeaderAppVersion, Version)
+		c.Header(headerAppVersion, version)
 		c.Next()
 	}
 }
@@ -47,7 +72,7 @@ func middlewareAppErrorRecoveryHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, api.NewErrorResponseWithStatusAndMessage(string(General), fmt.Sprintf("%s", err)))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, api.NewErrorResponseWithStatusAndMessage(string(general), fmt.Sprintf("%s", err)))
 			}
 		}()
 		c.Next()

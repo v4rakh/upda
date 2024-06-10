@@ -100,17 +100,21 @@ func Start() {
 	hh := newHealthHandler()
 	authH := newAuthHandler()
 
+	router.Use(middlewareEnforceJsonContentType())
 	router.Use(middlewareAppName())
 	router.Use(middlewareAppVersion())
 	router.Use(middlewareAppContentType())
 	router.Use(middlewareErrorHandler())
 	router.Use(middlewareAppErrorRecoveryHandler())
+	router.NoRoute(middlewareGlobalNotFound())
+	router.NoMethod(middlewareGlobalMethodNotAllowed())
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     env.serverConfig.corsAllowOrigin,
+		AllowOrigins:     env.serverConfig.corsAllowOrigins,
 		AllowMethods:     env.serverConfig.corsAllowMethods,
 		AllowHeaders:     env.serverConfig.corsAllowHeaders,
-		AllowCredentials: true,
+		AllowCredentials: env.serverConfig.corsAllowCredentials,
+		ExposeHeaders:    env.serverConfig.corsExposeHeaders,
 	}))
 
 	apiPublicGroup := router.Group("/api/v1")

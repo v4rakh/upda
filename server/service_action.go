@@ -39,7 +39,7 @@ func (s *actionService) create(label string, t api.ActionType, matchEvent *strin
 	}
 
 	if isValid, validationErr := s.isValidPayload(t, payload); !isValid {
-		return nil, newServiceError(IllegalArgument, validationErr)
+		return nil, newServiceError(illegalArgument, validationErr)
 	}
 
 	var err error
@@ -197,7 +197,7 @@ func (s *actionService) updateTypeAndPayload(id string, t api.ActionType, payloa
 	}
 
 	if isValid, validationErr := s.isValidPayload(t, payload); !isValid {
-		return nil, newServiceError(IllegalArgument, validationErr)
+		return nil, newServiceError(illegalArgument, validationErr)
 	}
 
 	if e, err = s.repo.updateTypeAndPayload(id, t, payload); err != nil {

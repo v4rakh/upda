@@ -15,8 +15,8 @@ type lockRedisService struct {
 }
 
 var (
-	errLockRedisNotObtained = newServiceError(Conflict, errors.New("lock service: could not obtain lock"))
-	errLockRedisNotReleased = newServiceError(Conflict, errors.New("lock service: could not release lock"))
+	errLockRedisNotObtained = newServiceError(conflict, errors.New("lock service: could not obtain lock"))
+	errLockRedisNotReleased = newServiceError(conflict, errors.New("lock service: could not release lock"))
 )
 
 func newLockRedisService(lc *lockConfig) (lockService, error) {

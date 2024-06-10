@@ -194,41 +194,41 @@ func (s *eventService) extractPayloadInfo(event *Event) (*eventPayloadInformatio
 	var bytes []byte
 
 	if bytes, err = event.Payload.MarshalJSON(); err != nil {
-		return nil, newServiceError(General, err)
+		return nil, newServiceError(general, err)
 	}
 
 	switch event.Name {
 	case api.EventNameUpdateCreated.Value():
 		var p api.EventPayloadUpdateCreatedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateCreatedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
+			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateDeleted.Value():
 		var p api.EventPayloadUpdateDeletedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateDeletedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
+			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdatedState.Value():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
+			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdatedVersion.Value():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
+			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdated.Value():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
-			return nil, newServiceError(General, err)
+			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	}
 
-	return nil, newServiceError(General, errors.New("no matching event found"))
+	return nil, newServiceError(general, errors.New("no matching event found"))
 }

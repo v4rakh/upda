@@ -18,7 +18,7 @@ func newPrometheusService(r *gin.Engine, c *prometheusConfig) *prometheusService
 		if c.secureTokenEnabled {
 			p = ginprom.New(
 				ginprom.Engine(r),
-				ginprom.Namespace(Name),
+				ginprom.Namespace(name),
 				ginprom.Subsystem(""),
 				ginprom.Path(c.path),
 				ginprom.Ignore(c.path),
@@ -27,7 +27,7 @@ func newPrometheusService(r *gin.Engine, c *prometheusConfig) *prometheusService
 		} else {
 			p = ginprom.New(
 				ginprom.Engine(r),
-				ginprom.Namespace(Name),
+				ginprom.Namespace(name),
 				ginprom.Subsystem(""),
 				ginprom.Ignore(c.path),
 				ginprom.Path(c.path),

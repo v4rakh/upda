@@ -17,7 +17,7 @@ func newWebhookInvocationHandler(i *webhookInvocationService, w *webhookService)
 }
 
 func (h *webhookInvocationHandler) execute(c *gin.Context) {
-	tokenHeader := c.GetHeader(HeaderWebhookToken)
+	tokenHeader := c.GetHeader(headerWebhookToken)
 	webhookId := c.Param("id")
 
 	var w *Webhook
@@ -52,7 +52,7 @@ func (h *webhookInvocationHandler) execute(c *gin.Context) {
 		}
 		break
 	default:
-		err = newServiceError(IllegalArgument, errors.New("no default handler for webhook type found"))
+		err = newServiceError(illegalArgument, errors.New("no default handler for webhook type found"))
 		_ = c.AbortWithError(errToHttpStatus(err), err)
 		return
 	}

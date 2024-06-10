@@ -8,11 +8,11 @@ import (
 )
 
 type webhookService struct {
-	repo          WebhookRepository
+	repo          webhookRepository
 	webhookConfig *webhookConfig
 }
 
-func newWebhookService(r WebhookRepository, c *webhookConfig) *webhookService {
+func newWebhookService(r webhookRepository, c *webhookConfig) *webhookService {
 	return &webhookService{
 		repo:          r,
 		webhookConfig: c,
@@ -42,7 +42,7 @@ func (s *webhookService) create(label string, t api.WebhookType, ignoreHost bool
 	var token string
 
 	if token, err = util.GenerateSecureRandomString(s.webhookConfig.tokenLength); err != nil {
-		return nil, newServiceError(General, fmt.Errorf("token generation failed: %w", err))
+		return nil, newServiceError(general, fmt.Errorf("token generation failed: %w", err))
 	}
 
 	var e *Webhook

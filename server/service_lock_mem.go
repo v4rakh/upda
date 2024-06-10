@@ -13,7 +13,7 @@ type lockMemService struct {
 }
 
 var (
-	errLockMemNotReleased = newServiceError(Conflict, errors.New("lock service: could not release lock"))
+	errLockMemNotReleased = newServiceError(conflict, errors.New("lock service: could not release lock"))
 )
 
 func newLockMemService() lockService {

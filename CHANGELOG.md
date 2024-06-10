@@ -2,8 +2,17 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [2.0.2] - UNRELEASED
+## [3.0.0] - UNRELEASED
 
+> This is a major version upgrade. Other versions are incompatible with this release.
+
+* Added automatic detection of `GOMAXPROCS`
+* Switched to enforce JSON as `Content-Type` for all incoming requests
+* Switched to properly respond with JSON on page not found or method not allowed
+* Renamed `CORS_ALLOW_ORIGIN` to `CORS_ALLOW_ORIGINS`
+* Added `CORS_ALLOW_CREDENTIALS` which defaults to `true`
+* Added `CORS_EXPOSE_HEADERS` which defaults to `*`
+* Overhauled package visibility for server module
 * Updated dependencies
 * Updated OCI image base to alpine `3.20` with Go `1.22`
 

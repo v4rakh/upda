@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/server"
 	"git.myservermanager.com/varakh/upda/util"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v2"
@@ -17,7 +16,7 @@ import (
 const (
 	name    = "upda-cli"
 	desc    = "a commandline helper for upda"
-	version = server.Version
+	version = "3.0.0"
 
 	envServerUrl    = "UPDA_SERVER_URL"
 	envUser         = "UPDA_USER"
@@ -264,7 +263,7 @@ func webhookSend(cCtx *cli.Context) error {
 	client.SetDisableWarn(true)
 	res, err := client.R().
 		SetHeader("Content-Type", "application/json").
-		SetHeader(server.HeaderWebhookToken, cCtx.String(flagWebhookToken)).
+		SetHeader("X-Webhook-Token", cCtx.String(flagWebhookToken)).
 		SetBody(payloadArg).
 		SetError(&errorRes).
 		Post(url)

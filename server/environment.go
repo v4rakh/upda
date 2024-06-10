@@ -27,15 +27,17 @@ type appConfig struct {
 }
 
 type serverConfig struct {
-	port             int
-	listen           string
-	tlsEnabled       bool
-	tlsCertPath      string
-	tlsKeyPath       string
-	timeout          time.Duration
-	corsAllowOrigin  []string
-	corsAllowMethods []string
-	corsAllowHeaders []string
+	port                 int
+	listen               string
+	tlsEnabled           bool
+	tlsCertPath          string
+	tlsKeyPath           string
+	timeout              time.Duration
+	corsAllowCredentials bool
+	corsAllowOrigins     []string
+	corsAllowMethods     []string
+	corsAllowHeaders     []string
+	corsExposeHeaders    []string
 }
 
 type authConfig struct {
@@ -203,15 +205,17 @@ func bootstrapEnvironment() *Environment {
 	}
 
 	sc = &serverConfig{
-		port:             serverPort,
-		timeout:          serverTimeout,
-		listen:           os.Getenv(envServerListen),
-		tlsEnabled:       serverTlsEnabled,
-		tlsCertPath:      os.Getenv(envServerTlsCertPath),
-		tlsKeyPath:       os.Getenv(envServerTlsKeyPath),
-		corsAllowOrigin:  []string{os.Getenv(envCorsAllowOrigin)},
-		corsAllowMethods: []string{os.Getenv(envCorsAllowMethods)},
-		corsAllowHeaders: []string{os.Getenv(envCorsAllowHeaders)},
+		port:                 serverPort,
+		timeout:              serverTimeout,
+		listen:               os.Getenv(envServerListen),
+		tlsEnabled:           serverTlsEnabled,
+		tlsCertPath:          os.Getenv(envServerTlsCertPath),
+		tlsKeyPath:           os.Getenv(envServerTlsKeyPath),
+		corsAllowCredentials: os.Getenv(envCorsAllowCredentials) == "true",
+		corsExposeHeaders:    []string{os.Getenv(envCorsExposeHeaders)},
+		corsAllowOrigins:     []string{os.Getenv(envCorsAllowOrigins)},
+		corsAllowMethods:     []string{os.Getenv(envCorsAllowMethods)},
+		corsAllowHeaders:     []string{os.Getenv(envCorsAllowHeaders)},
 	}
 
 	authMode := os.Getenv(envAuthMode)
@@ -338,7 +342,7 @@ func bootstrapEnvironment() *Environment {
 	if os.Getenv(envDbType) == dbTypeSqlite {
 		if os.Getenv(envDbSqliteFile) == "" {
 			var defaultDbFile string
-			if defaultDbFile, err = xdg.DataFile(Name + "/" + dbTypeSqliteDbNameDefault); err != nil {
+			if defaultDbFile, err = xdg.DataFile(name + "/" + dbTypeSqliteDbNameDefault); err != nil {
 				zap.L().Sugar().Fatalf("Database file '%s' could not be created. Reason: %v", defaultDbFile, err)
 			}
 			setEnvKeyDefault(envDbSqliteFile, defaultDbFile)
@@ -464,9 +468,11 @@ func bootstrapFromEnvironmentAndValidate() {
 	setEnvKeyDefault(envServerPort, serverPortDefault)
 	setEnvKeyDefault(envServerListen, serverListenDefault)
 	setEnvKeyDefault(envServerTlsEnabled, serverTlsEnabledDefault)
-	setEnvKeyDefault(envCorsAllowOrigin, corsAllowOriginDefault)
+	setEnvKeyDefault(envCorsAllowOrigins, corsAllowOriginsDefault)
 	setEnvKeyDefault(envCorsAllowMethods, corsAllowMethodsDefault)
 	setEnvKeyDefault(envCorsAllowHeaders, corsAllowHeadersDefault)
+	setEnvKeyDefault(envCorsAllowCredentials, corsAllowCredentialsDefault)
+	setEnvKeyDefault(envCorsExposeHeaders, corsExposeHeadersDefault)
 	setEnvKeyDefault(envServerTimeout, serverTimeoutDefault)
 }
 

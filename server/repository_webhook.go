@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type WebhookRepository interface {
+type webhookRepository interface {
 	paginate(page int, pageSize int, orderBy string, order string) ([]*Webhook, error)
 	count() (int64, error)
 	find(id string) (*Webhook, error)

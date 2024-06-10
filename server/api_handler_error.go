@@ -19,7 +19,7 @@ func errAbortWithValidatorPayload(c *gin.Context, err error) {
 		errorMap[key] = txt
 	}
 
-	resErr := newServiceError(IllegalArgument, fmt.Errorf("validation error: %v (%w)", util.ValuesString(errorMap), err))
+	resErr := newServiceError(illegalArgument, fmt.Errorf("validation error: %v (%w)", util.ValuesString(errorMap), err))
 	c.Header(headerContentType, headerContentTypeApplicationJson)
 	_ = c.AbortWithError(http.StatusBadRequest, resErr)
 	return
@@ -29,17 +29,19 @@ func errToHttpStatus(err error) int {
 	var e *serviceError
 	switch {
 	case errors.As(err, &e):
-		if e.Status == IllegalArgument {
+		if e.Status == illegalArgument {
 			return http.StatusBadRequest
-		} else if e.Status == Unauthorized {
+		} else if e.Status == unauthorized {
 			return http.StatusUnauthorized
-		} else if e.Status == Forbidden {
+		} else if e.Status == forbidden {
 			return http.StatusForbidden
-		} else if e.Status == NotFound {
+		} else if e.Status == notFound {
 			return http.StatusNotFound
-		} else if e.Status == Conflict {
+		} else if e.Status == methodNotAllowed {
+			return http.StatusMethodNotAllowed
+		} else if e.Status == conflict {
 			return http.StatusConflict
-		} else if e.Status == General {
+		} else if e.Status == general {
 			return http.StatusInternalServerError
 		}
 	default:
@@ -57,7 +59,7 @@ func errCodeToStr(err error) string {
 		return string(e.Status)
 	}
 
-	return string(General)
+	return string(general)
 }
 
 func validatorErrorToText(e *validator.FieldError) (string, string) {

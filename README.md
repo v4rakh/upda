@@ -110,6 +110,7 @@ platform, uploads produced artifacts to that release and publishes docker images
 built successfully:
 
 * Adapt `constants_app.go` and change `Version` to the correct version number
+* Adapt `app.go` and change `version` to the correct version number (CLI)
 * Adapt `CHANGELOG.md` to reflect changes and ensure a date is properly set in the header, also add a reference link
   in footer (link to scm git tag source)
 * Adapt `api.yaml`: `version` attribute must reflect the to be released version
@@ -118,6 +119,7 @@ built successfully:
 After the release has been created, ensure to change the following settings for the _next development cycle_:
 
 * Adapt `constants_app.go` and change `Version` to the _next_ version number
+* Adapt `app.go` and change `version` to the _next_ version number (CLI)
 * Adapt `CHANGELOG.md` and add an _UNRELEASED_ section
 * Adapt `api.yaml`: `version` attribute must reflect the _next_ version number
 * Adapt `env: VERSION_*` in `.forgejo/workflows/release.yaml` to _next_ version number

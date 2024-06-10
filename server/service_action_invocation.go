@@ -28,7 +28,7 @@ func newActionInvocationService(r ActionInvocationRepository, a *actionService, 
 
 func (s *actionInvocationService) enqueue(batchSize int) error {
 	if batchSize <= 0 {
-		return newServiceError(General, errors.New("cannot enqueue actions from events with invalid configured batch size"))
+		return newServiceError(general, errors.New("cannot enqueue actions from events with invalid configured batch size"))
 	}
 
 	var events []*Event
@@ -54,7 +54,7 @@ func (s *actionInvocationService) enqueue(batchSize int) error {
 
 func (s *actionInvocationService) enqueueFromEvent(event *Event, actions []*Action) error {
 	if event == nil || actions == nil {
-		return newServiceError(IllegalArgument, errorValidationNotEmpty)
+		return newServiceError(illegalArgument, errorValidationNotEmpty)
 	}
 
 	var err error
@@ -99,10 +99,10 @@ func (s *actionInvocationService) enqueueFromEvent(event *Event, actions []*Acti
 
 func (s *actionInvocationService) invoke(batchSize int, maxRetries int) error {
 	if batchSize <= 0 {
-		return newServiceError(General, errors.New("cannot invoke actions with invalid configured batch size"))
+		return newServiceError(general, errors.New("cannot invoke actions with invalid configured batch size"))
 	}
 	if maxRetries <= 0 {
-		return newServiceError(General, errors.New("cannot invoke actions with invalid configured max retries"))
+		return newServiceError(general, errors.New("cannot invoke actions with invalid configured max retries"))
 	}
 
 	var err error
@@ -198,14 +198,14 @@ func (s *actionInvocationService) execute(action *Action, eventPayloadInfo *even
 	var bytes []byte
 
 	if bytes, err = action.Payload.MarshalJSON(); err != nil {
-		return newServiceError(General, err)
+		return newServiceError(general, err)
 	}
 
 	switch action.Type {
 	case api.ActionTypeShoutrrr.Value():
 		var payload actionPayloadShoutrrrDto
 		if payload, err = util.UnmarshalGenericJSON[actionPayloadShoutrrrDto](bytes); err != nil {
-			return newServiceError(General, err)
+			return newServiceError(general, err)
 		}
 
 		body := s.replaceVars(payload.Body, eventPayloadInfo)
@@ -220,7 +220,7 @@ func (s *actionInvocationService) execute(action *Action, eventPayloadInfo *even
 		}
 		break
 	default:
-		return newServiceError(General, errors.New("no matching action type found for invocation"))
+		return newServiceError(general, errors.New("no matching action type found for invocation"))
 	}
 
 	return nil
