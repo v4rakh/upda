@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [3.0.2] - UNRELEASED
+
+* ...
+
 ## [3.0.1] - 2024/06/10
 
 * Fixed finding proper remaining Action invocations by their state

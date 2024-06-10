@@ -16,7 +16,7 @@ import (
 const (
 	name    = "upda-cli"
 	desc    = "a commandline helper for upda"
-	version = "3.0.1"
+	version = "3.0.2"
 
 	envServerUrl    = "UPDA_SERVER_URL"
 	envUser         = "UPDA_USER"
