@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/commons"
 	"git.myservermanager.com/varakh/upda/util"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v2"
@@ -16,7 +17,7 @@ import (
 const (
 	name    = "upda-cli"
 	desc    = "a commandline helper for upda"
-	version = "3.0.2"
+	version = commons.Version
 
 	envServerUrl    = "UPDA_SERVER_URL"
 	envUser         = "UPDA_USER"
@@ -214,7 +215,7 @@ func webhookCreate(cCtx *cli.Context) error {
 	client.SetDisableWarn(true)
 	res, err := client.R().
 		SetBasicAuth(cCtx.String(flagUser), cCtx.String(flagPass)).
-		SetHeader("Content-Type", "application/json").
+		SetHeader(api.HeaderContentType, api.HeaderContentTypeApplicationJson).
 		SetBody(&payload).
 		SetResult(&successRes).
 		SetError(&errorRes).
@@ -262,8 +263,8 @@ func webhookSend(cCtx *cli.Context) error {
 	client := resty.New()
 	client.SetDisableWarn(true)
 	res, err := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetHeader("X-Webhook-Token", cCtx.String(flagWebhookToken)).
+		SetHeader(api.HeaderContentType, api.HeaderContentTypeApplicationJson).
+		SetHeader(api.HeaderWebhookToken, cCtx.String(flagWebhookToken)).
 		SetBody(payloadArg).
 		SetError(&errorRes).
 		Post(url)
@@ -290,7 +291,7 @@ func updateShow(cCtx *cli.Context) error {
 	client.SetDisableWarn(true)
 	res, err := client.R().
 		SetBasicAuth(cCtx.String(flagUser), cCtx.String(flagPass)).
-		SetHeader("Content-Type", "application/json").
+		SetHeader(api.HeaderContentType, api.HeaderContentTypeApplicationJson).
 		SetResult(&successRes).
 		SetError(&errorRes).
 		Get(url)

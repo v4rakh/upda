@@ -17,7 +17,7 @@ func newWebhookInvocationHandler(i *webhookInvocationService, w *webhookService)
 }
 
 func (h *webhookInvocationHandler) execute(c *gin.Context) {
-	tokenHeader := c.GetHeader(headerWebhookToken)
+	tokenHeader := c.GetHeader(api.HeaderWebhookToken)
 	webhookId := c.Param("id")
 
 	var w *Webhook
@@ -57,6 +57,6 @@ func (h *webhookInvocationHandler) execute(c *gin.Context) {
 		return
 	}
 
-	c.Header(headerContentType, headerContentTypeApplicationJson)
+	c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 	c.Status(http.StatusNoContent)
 }

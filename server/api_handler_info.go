@@ -2,6 +2,7 @@ package server
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/commons"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -17,7 +18,7 @@ func newInfoHandler(a *appConfig) *infoHandler {
 func (h *infoHandler) show(c *gin.Context) {
 	c.JSON(http.StatusOK, api.DataResponse{Data: gin.H{
 		"name":     name,
-		"version":  version,
+		"Version":  commons.Version,
 		"timeZone": h.appConfig.timeZone,
 	}})
 }

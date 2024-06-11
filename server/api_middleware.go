@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/commons"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -10,7 +11,7 @@ import (
 
 func middlewareAppName() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(headerAppName, name)
+		c.Header(api.HeaderAppName, name)
 		c.Next()
 	}
 }
@@ -31,7 +32,7 @@ func middlewareGlobalMethodNotAllowed() gin.HandlerFunc {
 
 func middlewareEnforceJsonContentType() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method != http.MethodOptions && !strings.HasPrefix(c.GetHeader(headerContentType), headerContentTypeApplicationJson) {
+		if c.Request.Method != http.MethodOptions && !strings.HasPrefix(c.GetHeader(api.HeaderContentType), api.HeaderContentTypeApplicationJson) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, api.NewErrorResponseWithStatusAndMessage(string(illegalArgument), "content-type must be application/json"))
 			return
 		}
@@ -41,14 +42,14 @@ func middlewareEnforceJsonContentType() gin.HandlerFunc {
 
 func middlewareAppVersion() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(headerAppVersion, version)
+		c.Header(api.HeaderAppVersion, commons.Version)
 		c.Next()
 	}
 }
 
 func middlewareAppContentType() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(headerContentType, headerContentTypeApplicationJson)
+		c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 		c.Next()
 	}
 }
@@ -61,7 +62,7 @@ func middlewareErrorHandler() gin.HandlerFunc {
 
 		if len(c.Errors) > 0 {
 			// status -1 doesn't overwrite existing status code
-			c.Header(headerContentType, headerContentTypeApplicationJson)
+			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 			c.JSON(-1, api.NewErrorResponseWithStatusAndMessage(errCodeToStr(c.Errors.Last()), c.Errors.Last().Error()))
 			return
 		}

@@ -100,7 +100,6 @@ func Start() {
 	hh := newHealthHandler()
 	authH := newAuthHandler()
 
-	router.Use(middlewareEnforceJsonContentType())
 	router.Use(middlewareAppName())
 	router.Use(middlewareAppVersion())
 	router.Use(middlewareAppContentType())
@@ -121,7 +120,7 @@ func Start() {
 	apiPublicGroup.GET("/health", hh.show)
 	apiPublicGroup.GET("/info", ih.show)
 
-	apiPublicGroup.POST("/webhooks/:id", wih.execute)
+	apiPublicGroup.POST("/webhooks/:id", middlewareEnforceJsonContentType(), wih.execute)
 
 	var authMethodHandler gin.HandlerFunc
 
@@ -141,14 +140,14 @@ func Start() {
 
 	apiAuthGroup.GET("/updates", uh.paginate)
 	apiAuthGroup.GET("/updates/:id", uh.get)
-	apiAuthGroup.PATCH("/updates/:id/state", uh.updateState)
+	apiAuthGroup.PATCH("/updates/:id/state", middlewareEnforceJsonContentType(), uh.updateState)
 	apiAuthGroup.DELETE("/updates/:id", uh.delete)
 
 	apiAuthGroup.GET("/webhooks", wh.paginate)
-	apiAuthGroup.POST("/webhooks", wh.create)
+	apiAuthGroup.POST("/webhooks", middlewareEnforceJsonContentType(), wh.create)
 	apiAuthGroup.GET("/webhooks/:id", wh.get)
-	apiAuthGroup.PATCH("/webhooks/:id/label", wh.updateLabel)
-	apiAuthGroup.PATCH("/webhooks/:id/ignore-host", wh.updateIgnoreHost)
+	apiAuthGroup.PATCH("/webhooks/:id/label", middlewareEnforceJsonContentType(), wh.updateLabel)
+	apiAuthGroup.PATCH("/webhooks/:id/ignore-host", middlewareEnforceJsonContentType(), wh.updateIgnoreHost)
 	apiAuthGroup.DELETE("/webhooks/:id", wh.delete)
 
 	apiAuthGroup.GET("/events", eh.window)
@@ -157,22 +156,22 @@ func Start() {
 
 	apiAuthGroup.GET("/secrets", sh.getAll)
 	apiAuthGroup.GET("/secrets/:id", sh.get)
-	apiAuthGroup.POST("/secrets", sh.create)
-	apiAuthGroup.PATCH("/secrets/:id/value", sh.updateValue)
+	apiAuthGroup.POST("/secrets", middlewareEnforceJsonContentType(), sh.create)
+	apiAuthGroup.PATCH("/secrets/:id/value", middlewareEnforceJsonContentType(), sh.updateValue)
 	apiAuthGroup.DELETE("/secrets/:id", sh.delete)
 
 	apiAuthGroup.GET("/actions", ah.paginate)
-	apiAuthGroup.POST("/actions", ah.create)
+	apiAuthGroup.POST("/actions", middlewareEnforceJsonContentType(), ah.create)
 	apiAuthGroup.GET("/actions/:id", ah.get)
-	apiAuthGroup.PATCH("/actions/:id/label", ah.updateLabel)
-	apiAuthGroup.PATCH("/actions/:id/match-event", ah.updateMatchEvent)
-	apiAuthGroup.PATCH("/actions/:id/match-host", ah.updateMatchHost)
-	apiAuthGroup.PATCH("/actions/:id/match-application", ah.updateMatchApplication)
-	apiAuthGroup.PATCH("/actions/:id/match-provider", ah.updateMatchProvider)
-	apiAuthGroup.PATCH("/actions/:id/payload", ah.updatePayload)
-	apiAuthGroup.PATCH("/actions/:id/enabled", ah.updateEnabled)
+	apiAuthGroup.PATCH("/actions/:id/label", middlewareEnforceJsonContentType(), ah.updateLabel)
+	apiAuthGroup.PATCH("/actions/:id/match-event", middlewareEnforceJsonContentType(), ah.updateMatchEvent)
+	apiAuthGroup.PATCH("/actions/:id/match-host", middlewareEnforceJsonContentType(), ah.updateMatchHost)
+	apiAuthGroup.PATCH("/actions/:id/match-application", middlewareEnforceJsonContentType(), ah.updateMatchApplication)
+	apiAuthGroup.PATCH("/actions/:id/match-provider", middlewareEnforceJsonContentType(), ah.updateMatchProvider)
+	apiAuthGroup.PATCH("/actions/:id/payload", middlewareEnforceJsonContentType(), ah.updatePayload)
+	apiAuthGroup.PATCH("/actions/:id/enabled", middlewareEnforceJsonContentType(), ah.updateEnabled)
 	apiAuthGroup.DELETE("/actions/:id", ah.delete)
-	apiAuthGroup.POST("/actions/:id/test", aih.test)
+	apiAuthGroup.POST("/actions/:id/test", middlewareEnforceJsonContentType(), aih.test)
 
 	apiAuthGroup.GET("/action-invocations", aih.paginate)
 	apiAuthGroup.GET("/action-invocations/:id", aih.get)

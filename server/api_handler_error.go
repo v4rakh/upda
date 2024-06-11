@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -20,7 +21,7 @@ func errAbortWithValidatorPayload(c *gin.Context, err error) {
 	}
 
 	resErr := newServiceError(illegalArgument, fmt.Errorf("validation error: %v (%w)", util.ValuesString(errorMap), err))
-	c.Header(headerContentType, headerContentTypeApplicationJson)
+	c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 	_ = c.AbortWithError(http.StatusBadRequest, resErr)
 	return
 }

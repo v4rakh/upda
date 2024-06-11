@@ -101,6 +101,6 @@ func (h *updateHandler) delete(c *gin.Context) {
 		return
 	}
 
-	c.Header(headerContentType, headerContentTypeApplicationJson)
+	c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 	c.Status(http.StatusNoContent)
 }

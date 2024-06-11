@@ -4,7 +4,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 
 ## [3.0.2] - UNRELEASED
 
-* ...
+* Don't enforce JSON content type for GET and DELETE requests
 
 ## [3.0.1] - 2024/06/10
 
