@@ -9,6 +9,7 @@ Changes adhere to [semantic versioning](https://semver.org).
   * github.com/go-playground/validator/v10 v10.22.0
   * gorm.io/driver/postgres v1.5.9
   * gorm.io/driver/sqlite v1.5.6
+* Fixed filter for Updates ignoring desired state
 
 ## [3.0.1] - 2024/06/10
 

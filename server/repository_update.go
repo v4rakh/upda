@@ -232,7 +232,7 @@ func (r *updateDbRepo) paginate(page int, pageSize int, orderBy string, order st
 	}
 
 	states := make([]string, 0, len(state))
-	if len(states) > 0 {
+	if len(state) > 0 {
 		for _, s := range state {
 			states = append(states, s.Value())
 		}
@@ -249,7 +249,7 @@ func (r *updateDbRepo) count(searchTerm string, searchIn string, state ...api.Up
 	var c int64
 
 	states := make([]string, 0, len(state))
-	if len(states) > 0 {
+	if len(state) > 0 {
 		for _, s := range state {
 			states = append(states, s.Value())
 		}
