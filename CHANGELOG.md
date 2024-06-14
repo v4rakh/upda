@@ -5,6 +5,10 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [3.0.2] - UNRELEASED
 
 * Don't enforce JSON content type for GET and DELETE requests
+* Updates
+  * github.com/go-playground/validator/v10 v10.22.0
+  * gorm.io/driver/postgres v1.5.9
+  * gorm.io/driver/sqlite v1.5.6
 
 ## [3.0.1] - 2024/06/10
 
