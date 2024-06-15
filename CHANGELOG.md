@@ -2,10 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [3.0.2] - UNRELEASED
+## [3.0.2] - 2024/06/15
 
 * Don't enforce JSON content type for GET and DELETE requests
-* Updates
+* Dependency updates
   * github.com/go-playground/validator/v10 v10.22.0
   * gorm.io/driver/postgres v1.5.9
   * gorm.io/driver/sqlite v1.5.6
@@ -71,6 +71,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[3.0.2]: https://git.myservermanager.com/varakh/upda/releases/tag/3.0.2
 
 [3.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/3.0.1
 
