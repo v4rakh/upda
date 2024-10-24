@@ -6,25 +6,25 @@ toolchain go1.22.3
 
 require (
 	github.com/Depado/ginprom v1.8.1
-	github.com/adrg/xdg v0.5.0
+	github.com/adrg/xdg v0.5.1
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.0.1
-	github.com/go-co-op/gocron/v2 v2.11.0
-	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-co-op/gocron/v2 v2.12.1
+	github.com/go-playground/validator/v10 v10.22.1
 	github.com/go-redsync/redsync/v4 v4.13.0
-	github.com/go-resty/resty/v2 v2.14.0
+	github.com/go-resty/resty/v2 v2.15.3
 	github.com/google/uuid v1.6.0
-	github.com/redis/go-redis/v9 v9.6.1
+	github.com/redis/go-redis/v9 v9.7.0
 	github.com/stretchr/testify v1.9.0
-	github.com/urfave/cli/v2 v2.27.4
-	go.uber.org/automaxprocs v1.5.3
+	github.com/urfave/cli/v2 v2.27.5
+	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.27.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/driver/sqlite v1.5.6
-	gorm.io/gorm v1.25.11
+	gorm.io/gorm v1.25.12
 	moul.io/zapgorm2 v1.3.0
 )
 
@@ -35,7 +35,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.15.0 // indirect
@@ -79,7 +79,7 @@ require (
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
