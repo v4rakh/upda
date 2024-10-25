@@ -16,6 +16,7 @@
   "dependencyDashboardOSVVulnerabilitySummary": "all",
   // skip next alpine, see https://github.com/mattn/go-sqlite3/issues/1164
   "packageRules": [
+    // oci
     {
       "matchPackageNames": [
         "alpine"
@@ -26,25 +27,70 @@
       ],
       "enabled": false
     },
+    // go
     {
+      "matchManagers": [
+        "gomod"
+      ],
       "matchPackagePrefixes": [
         "github.com/go-co-op/gocron"
       ],
       "groupName": "gocron"
     },
     {
+      "matchManagers": [
+        "gomod"
+      ],
       "matchUpdateTypes": [
         "minor"
       ],
-      "groupName": "all minor dependencies",
-      "groupSlug": "all-minor-deps"
+      "groupName": "GoLang: all minor dependencies",
+      "groupSlug": "golang-all-minor-deps"
     },
     {
+      "matchManagers": [
+        "gomod"
+      ],
       "matchUpdateTypes": [
         "patch"
       ],
-      "groupName": "all patch dependencies",
-      "groupSlug": "all-patch-deps"
+      "groupName": "GoLang: all patch dependencies",
+      "groupSlug": "golang-all-patch-deps"
+    },
+    // node
+    // GLOBAL: ignore @types/node major and minor (manual upgrade with pipeline required)
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "@types/node"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false
+    },
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "groupName": "Node: all minor dependencies",
+      "groupSlug": "node-all-minor-deps"
+    },
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "groupName": "Node: all patch dependencies",
+      "groupSlug": "node-all-patch-deps"
     }
   ]
 }

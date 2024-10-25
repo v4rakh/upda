@@ -26,6 +26,11 @@ type appConfig struct {
 	isDebug       bool
 }
 
+type webConfig struct {
+	title  string
+	apiUrl string
+}
+
 type serverConfig struct {
 	port                 int
 	listen               string
@@ -85,6 +90,7 @@ type prometheusConfig struct {
 
 type Environment struct {
 	appConfig        *appConfig
+	webConfig        *webConfig
 	authConfig       *authConfig
 	serverConfig     *serverConfig
 	taskConfig       *taskConfig
@@ -181,6 +187,13 @@ func bootstrapEnvironment() *Environment {
 		timeZone:      os.Getenv(envTZ),
 		isDebug:       isDebug,
 		isDevelopment: isDevelopment,
+	}
+
+	// web config
+	var webC *webConfig
+	webC = &webConfig{
+		title:  os.Getenv(envWebTitle),
+		apiUrl: os.Getenv(envWebApiUrl),
 	}
 
 	// server config
@@ -391,6 +404,7 @@ func bootstrapEnvironment() *Environment {
 	}
 
 	env := &Environment{appConfig: ac,
+		webConfig:        webC,
 		authConfig:       authC,
 		serverConfig:     sc,
 		taskConfig:       tc,
@@ -419,6 +433,10 @@ func bootstrapFromEnvironmentAndValidate() {
 
 	// app
 	setEnvKeyDefault(envTZ, tzDefault)
+
+	// web
+	setEnvKeyDefault(envWebTitle, webTitleDefault)
+	setEnvKeyDefault(envWebApiUrl, webApiUrlDefault)
 
 	// webhook
 	setEnvKeyDefault(envWebhooksTokenLength, webhooksTokenLengthDefault)

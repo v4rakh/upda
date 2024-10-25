@@ -1,6 +1,6 @@
 # README
 
-Backend for upda - **Up**date **Da**shboard in Go.
+upda - **Up**date **Da**shboard in Go.
 
 The main git repository is hosted at
 _[https://git.myservermanager.com/varakh/upda](https://git.myservermanager.com/varakh/upda)_.
@@ -8,9 +8,11 @@ Other repositories are mirrors and pull requests, issues, and planning are manag
 
 Contributions are very welcome!
 
-[Official documentation](https://git.myservermanager.com/varakh/upda-docs) is hosted in a separate git repository.
+See [official documentation](./_doc/Home.md).
 
 ## Development & contribution
+
+There's also a [embedded frontend](#embedded-frontend).
 
 * Pay attention to `make checkstyle` (uses `go vet ./...`); pipeline fails if issues are detected.
 * Each entity has its own repository
@@ -32,6 +34,18 @@ Contributions are very welcome!
 * Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml) and a Postman Collection.
 * Consider reading [Effective Go](https://go.dev/doc/effective_go)
 * Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
+
+## Embedded Frontend
+
+_upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
+embedded into the GoLang binary itself.
+
+For _development_, no other steps are required. Simply follow the [frontend instructions](./server/web/README.md) and
+start the frontend separately.
+
+If you like to have a look on the _production_ experience, the frontend needs to be build first and you need to build
+the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
+the `Makefile` (additional `rm -rf` cmd).
 
 ### Getting started
 

@@ -2,9 +2,12 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [3.0.3] - UNRELEASED
+## [4.0.0] - UNRELEASED
 
-* ...
+> This is a major version upgrade. Other versions are incompatible with this release.
+
+* Embed frontend into Go binary and only ship _one_ OCI image
+* Switch license to GPLv3
 
 ## [3.0.2] - 2024/06/15
 

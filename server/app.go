@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/util"
 	"github.com/gin-contrib/cors"
+	ginstatic "github.com/gin-contrib/static"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	_ "go.uber.org/automaxprocs"
@@ -102,11 +103,38 @@ func Start() {
 
 	router.Use(middlewareAppName())
 	router.Use(middlewareAppVersion())
-	router.Use(middlewareAppContentType())
 	router.Use(middlewareErrorHandler())
 	router.Use(middlewareAppErrorRecoveryHandler())
 	router.NoRoute(middlewareGlobalNotFound())
 	router.NoMethod(middlewareGlobalMethodNotAllowed())
+
+	// in production mode, the frontend is embedded on / during compile time utilizing -tags prod
+	// if the prod tag is missing, development setup is used and a dummy frontend is shown on /
+	var targetPath string
+	if env.appConfig.isDevelopment {
+		targetPath = "web_dev"
+	} else {
+		targetPath = "web/build"
+	}
+	router.Use(ginstatic.Serve("/", ginstatic.EmbedFolder(embeddedFiles, targetPath)))
+
+	if !env.appConfig.isDevelopment {
+		embeddedFrontendGroup := router.Group("/")
+		embeddedFrontendGroup.GET("/conf/runtime-config.js", func(c *gin.Context) {
+			config := `
+const runtime_config = Object.freeze({
+  VITE_API_URL: '%s/api/v1/',
+  VITE_APP_TITLE: '%s'
+});
+
+Object.defineProperty(window, 'runtime_config', {
+    value: runtime_config,
+    writable: false
+});
+	`
+			c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(config, env.webConfig.apiUrl, env.webConfig.title)))
+		})
+	}
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     env.serverConfig.corsAllowOrigins,

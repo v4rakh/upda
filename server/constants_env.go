@@ -16,6 +16,12 @@ const (
 	envTZ     = "TZ"
 	tzDefault = "Europe/Berlin"
 
+	envWebApiUrl     = "WEB_API_URL"
+	webApiUrlDefault = "http://localhost"
+
+	envWebTitle     = "WEB_TITLE"
+	webTitleDefault = "upda"
+
 	envAuthMode              = "AUTH_MODE"
 	authModeDefault          = authModeBasicSingle
 	authModeBasicSingle      = "basic_single"

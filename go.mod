@@ -9,6 +9,7 @@ require (
 	github.com/adrg/xdg v0.5.1
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/gin-contrib/cors v1.7.2
+	github.com/gin-contrib/static v1.1.2
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.0.1

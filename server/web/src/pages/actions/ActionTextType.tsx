@@ -1,0 +1,18 @@
+import { ActionType } from '../../types';
+import { Typography } from 'antd';
+import { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+
+const { Text } = Typography;
+
+export interface ActionTextTypeProps {
+	type: ActionType;
+}
+
+const ActionTextType: FC<ActionTextTypeProps> = ({ type }): JSX.Element => {
+	const [t] = useTranslation('action_text_type');
+
+	return <Text>{t(type)}</Text>;
+};
+
+export default ActionTextType;

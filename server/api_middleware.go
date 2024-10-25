@@ -47,13 +47,6 @@ func middlewareAppVersion() gin.HandlerFunc {
 	}
 }
 
-func middlewareAppContentType() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
-		c.Next()
-	}
-}
-
 // middlewareErrorHandler handles global error handling, does not overwrite any given status (see -1)
 func middlewareErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
