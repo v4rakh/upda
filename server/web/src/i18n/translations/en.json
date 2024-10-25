@@ -1,7 +1,7 @@
 {
   "version": {
     "version": "Version",
-    "number": "4.0.0"
+    "number": "4.0.1"
   },
   "common": {
     "404_title": "Not found.",
