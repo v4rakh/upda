@@ -1,14 +1,12 @@
-# upda-ui
+# README
 
-Frontend for upda - **Up**date **Da**shboard in React, TypeScript, Redux.
+Frontend for _upda_.
 
-The main git repository is hosted at
-_[https://git.myservermanager.com/varakh/upda-ui](https://git.myservermanager.com/varakh/upda-ui)_. Other repositories
-are mirrors and pull requests, issues, and planning are managed there.
+## Configuration
 
-Contributions are very welcome!
-
-[Official documentation](https://git.myservermanager.com/varakh/upda-docs) is hosted in a separate git repository.
+* During development: `.env.development`
+* Production derives the values from their main GoLang application, some environment variables are coupled with their
+  backend one, some are exposed via `WEB_*`, but internally mapped to `VITE_` in the `app.go` file
 
 ## Development & contribution
 
@@ -28,48 +26,18 @@ Run `npm install` which should install all dependencies.
 
 Use the `npm run start` command to start the development setup. Backend should be running.
 
-### Configuration magic in docker
+### Translation files
 
-What about configuration? How does the pre-compiled set of html, js and css files know about the environment variables?
+Pipeline checks for existing i18n keys, if you need to manually sync any language file, run `npm run i18n-sync`.
 
-In contrast to manual build, the docker image allows dynamic override of configuration, but only those outlined in
-the `.env` file.
+### Dependencies
 
-In production, all configuration values are dynamically generated inside the Docker image with a helper script
-called `docker-env.sh`:
+To track unused dependencies
 
-1. During docker build a template `.env` file and the helper script are copied to the docker image
-2. Before the container's nginx is started, the helper script
-    1. scans the `.env` file for known configuration variables and then
-    2. adds their values to `conf/runtime-config.js` which is sourced inside the application in the
-       immutable `window.runtime_config` object
+```shell
+# install (if not yet present)
+npm install -g depcheck typescript
 
-During development, this `runtime-config.js` file is still loaded, but empty and thus the `getConfiguration()` ignores
-it and prefers values from the sourced `.env.development`.
-
-This means that new environment variables need to be added to all `.env*` files!
-
-### Release
-
-Releases are handled by the SCM platform and pipeline. Creating a **new git tag**, creates a new release in the SCM
-platform, uploads produced artifacts to that release and publishes docker images automatically.
-**Before** doing so, please ensure that the **commit on `master`** has the **correct version settings** and has been
-built successfully:
-
-* Adapt `package.json` and change `version` to the correct version number
-* Invoke `npm install` once which properly sets the version inside the lock file
-* Adapt language files, e.g., `en.json` and change `version` to the correct version number
-* Adapt `CHANGELOG.md` to reflect changes and ensure a date is properly set in the header, also add a reference link
-  in footer
-* Adapt `env: VERSION_*` in `.forgejo/workflows/release.yaml`
-
-After the release has been created, ensure to change the following settings for the _next development cycle_:
-
-* Adapt `package.json` and change `version` to the _next_ version number (semantic versioning applied, so `patch`
-  should bump patch level version and prepare branch for `develop` should bump minor or major version)
-* Invoke `npm install` for each of those branches which properly sets the version inside the lock file
-* Adapt language files, e.g., `en.json` and change `version` to the _next_ version number (semantic versioning
-  applied, so `patch` should bump patch level version and prepare branch for `develop` should bump minor or major
-  version)
-* Adapt `CHANGELOG.md` and add an _UNRELEASED_ section
-* Adapt `env: VERSION_*` in `.forgejo/workflows/release.yaml` to _next_ version number
+# run
+depcheck
+```

@@ -35,22 +35,6 @@ There's also a [embedded frontend](#embedded-frontend).
 * Consider reading [Effective Go](https://go.dev/doc/effective_go)
 * Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
 
-### Translation files
-
-Pipeline checks for existing i18n keys, if you need to manually sync any language file, run `npm run i18n-sync`.
-
-### Dependencies
-
-To track unused dependencies
-
-```shell
-# install (if not yet present)
-npm install -g depcheck typescript
-
-# run
-depcheck
-```
-
 Be aware that some are false positives and actually required.
 
 ## Embedded Frontend
