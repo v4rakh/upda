@@ -1,7 +1,7 @@
 import EventFilterQueryParamNames from '../constants/api/eventFilterQueryParamNames';
 import { SIZE_DEFAULT, SKIP_DEFAULT } from '../constants/pagination';
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const useEventsFilterQueryParams = () => {
 	const [queryParams] = useSearchParams();

@@ -13,7 +13,7 @@ import { Button, Col, List, Result, Row, Skeleton, Space, Switch, Tooltip, Typog
 import parse from 'html-react-parser';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const DEFAULT_POLLING_INTERVAL = 10000;
 

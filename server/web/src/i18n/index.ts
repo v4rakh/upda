@@ -3,6 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
 import en from './translations/en.json';
+import { isDevelopment } from '../utils/envHelper';
 
 const resources = {
 	en: {
@@ -18,7 +19,7 @@ i18next
 			resources,
 			lng: 'en',
 			fallbackLng: 'en',
-			debug: import.meta.env.DEV,
+			debug: isDevelopment(),
 			interpolation: {
 				escapeValue: false // not needed for react as it escapes by default
 			},

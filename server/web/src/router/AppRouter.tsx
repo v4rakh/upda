@@ -14,7 +14,7 @@ import UpdatesPage from '../pages/updates/UpdatesPage';
 import WebhooksPage from '../pages/webhooks/WebhooksPage';
 import { getAppBasePath } from '../utils/urlHelper';
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
 const AppRouter = () => {
 	return (

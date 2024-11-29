@@ -4,7 +4,7 @@ import { updateAuth } from '../slices/authSlice';
 import { useAppDispatch } from '../store';
 import { getPageFullPath } from '../utils/urlHelper';
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export interface AuthHook {
 	logout: () => void;

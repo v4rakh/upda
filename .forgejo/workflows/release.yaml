@@ -11,7 +11,6 @@ env:
   FORGEJO_URL: https://git.myservermanager.com
   FORGEJO_FQDN: git.myservermanager.com
   FORGEJO_REPO: varakh/upda
-  REVISION: ${{ github.sha }}
 jobs:
   release:
     runs-on: docker

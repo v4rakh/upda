@@ -9,7 +9,7 @@ import AppBreadcrumb from '../common/AppBreadcrumb';
 import { Button, Card, Flex, Form, Input, Space } from 'antd';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const Login = () => {
 	const [t] = useTranslation('login');

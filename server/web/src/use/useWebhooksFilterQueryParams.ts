@@ -1,7 +1,7 @@
 import WebhookFilterQueryParamNames from '../constants/api/webhookFilterQueryParamNames';
 import { PAGE_DEFAULT, PAGE_SIZE_DEFAULT } from '../constants/pagination';
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const useWebhooksFilterQueryParams = () => {
 	const [queryParams] = useSearchParams();

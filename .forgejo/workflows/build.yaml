@@ -6,7 +6,6 @@ on:
       - master
 env:
   IMAGE_TAG: varakh/upda
-  REVISION: ${{ github.sha }}
 jobs:
   build:
     runs-on: docker

@@ -23,7 +23,6 @@ FROM alpine:3.20
 LABEL maintainer="Varakh <varakh@varakh.de>" \
     description="upda" \
     org.opencontainers.image.authors="Varakh" \
-    org.opencontainers.image.revision="${REVISION}" \
     org.opencontainers.image.vendor="Varakh" \
     org.opencontainers.image.title="upda" \
     org.opencontainers.image.description="upda" \

@@ -4,4 +4,5 @@ enum ApiErrorCodes {
 	CONFLICT = 'Conflict',
 	ILLEGAL_ARGUMENT = 'IllegalArgument'
 }
+
 export default ApiErrorCodes;

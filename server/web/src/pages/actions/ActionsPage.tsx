@@ -21,7 +21,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface';
 import parse from 'html-react-parser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const DEFAULT_POLLING_INTERVAL = 5000;
 

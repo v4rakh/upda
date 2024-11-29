@@ -4,7 +4,7 @@ import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb, Typography } from 'antd';
 import { forEach } from 'lodash';
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export interface AppBreadcrumbProps {
 	items: { label: string; path: string; active?: boolean }[];

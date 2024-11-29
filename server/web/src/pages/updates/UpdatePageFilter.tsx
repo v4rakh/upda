@@ -9,7 +9,7 @@ import { Badge, Button, Collapse, Divider, Form, Input, Select } from 'antd';
 import { compact, forEach, uniq } from 'lodash';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const COLLAPSE_KEY = 'filter';
 

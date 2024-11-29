@@ -3,7 +3,7 @@ import HealthHandler from './HealthHandler';
 import Menu from './Menu';
 import { Layout } from 'antd';
 import { FC } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 
 const AppLayout: FC = () => {
 	return (

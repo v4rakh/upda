@@ -2,7 +2,7 @@ import UpdateFilterQueryParamNames from '../constants/api/updateFilterQueryParam
 import { PAGE_DEFAULT, PAGE_SIZE_DEFAULT } from '../constants/pagination';
 import { compact, isEmpty, parseInt, uniq } from 'lodash';
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 export interface UseUpdatesFilterQueryParams {
 	searchTerm: string | undefined | number;

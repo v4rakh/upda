@@ -5,7 +5,7 @@ import useWebhooksFilterQueryParams from '../../use/useWebhooksFilterQueryParams
 import { Form, Select } from 'antd';
 import { FC, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 const WebhookPageFilter: FC = () => {
 	const [t] = useTranslation('webhooks_filters');

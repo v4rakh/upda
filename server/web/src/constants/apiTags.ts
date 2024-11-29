@@ -8,4 +8,5 @@ enum ApiTags {
 	ActionInvocations = 'ActionInvocations',
 	Events = 'Events'
 }
+
 export default ApiTags;

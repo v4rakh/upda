@@ -4,4 +4,5 @@ enum HttpStatusCode {
 	STATUS_403 = 403,
 	STATUS_404 = 404
 }
+
 export default HttpStatusCode;

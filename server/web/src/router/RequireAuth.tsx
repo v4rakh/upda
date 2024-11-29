@@ -2,7 +2,7 @@ import AppPaths from '../constants/appPaths';
 import { useAuthenticatedSelector } from '../selectors/authSelectors';
 import { getPageFullPath } from '../utils/urlHelper';
 import { FC, ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router';
 
 export const RequireAuth: FC<{ children: ReactNode | ReactNode[] }> = ({ children }): JSX.Element => {
 	const isAuthenticated = useAuthenticatedSelector();
