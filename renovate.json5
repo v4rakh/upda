@@ -8,26 +8,26 @@
     "group:recommended"
   ],
   "prConcurrentLimit": 0,
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "all",
+  "rangeStrategy": "bump",
+  "baseBranches": [
+    "master"
+  ],
   "schedule": [
     "monthly"
   ],
-  // security
-  "osvVulnerabilityAlerts": true,
-  "dependencyDashboardOSVVulnerabilitySummary": "all",
-  // skip next alpine, see https://github.com/mattn/go-sqlite3/issues/1164
   "packageRules": [
-    // oci
+    // global: do not upgrade internally used development tools (docker-compose)
     {
-      "matchPackageNames": [
-        "alpine"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "major"
+      "matchManagers": [
+        "dockerfile",
+        "docker-compose"
       ],
       "enabled": false
     },
     // go
+    // go: group certain dependencies together
     {
       "matchManagers": [
         "gomod"
@@ -37,6 +37,18 @@
       ],
       "groupName": "gocron"
     },
+    // go: package all major upgrades into one PR
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "GoLang: all major dependencies",
+      "groupSlug": "golang-all-major-deps"
+    },
+    // go: package all minor upgrades into one PR
     {
       "matchManagers": [
         "gomod"
@@ -47,6 +59,7 @@
       "groupName": "GoLang: all minor dependencies",
       "groupSlug": "golang-all-minor-deps"
     },
+    // go: package all patch upgrades into one PR
     {
       "matchManagers": [
         "gomod"
@@ -58,7 +71,49 @@
       "groupSlug": "golang-all-patch-deps"
     },
     // node
-    // GLOBAL: ignore @types/node major and minor (manual upgrade with pipeline required)
+    // node: group certain dependencies together
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "@types/react"
+      ],
+      "matchPackagePrefixes": [
+        "react"
+      ]
+    },
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "prettier",
+        "standard"
+      ]
+    },
+    // node: do not upgrade node itself
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "npm",
+        "node"
+      ],
+      "matchDepTypes": [
+        "engines"
+      ],
+      "enabled": false
+    },
+    // node: do not upgrade node itself
+    {
+      "matchPackageNames": [
+        "node"
+      ],
+      "enabled": false
+    },
+    // node:: ignore @types/node major and minor (manual upgrade with pipeline required)
     {
       "matchManagers": [
         "npm"
@@ -66,12 +121,20 @@
       "matchPackageNames": [
         "@types/node"
       ],
-      "matchUpdateTypes": [
-        "major",
-        "minor"
-      ],
       "enabled": false
     },
+    // node: package all major upgrades into one PR
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "Node: all major dependencies",
+      "groupSlug": "node-all-major-deps"
+    },
+    // node: package all minor upgrades into one PR
     {
       "matchManagers": [
         "npm"
@@ -82,6 +145,7 @@
       "groupName": "Node: all minor dependencies",
       "groupSlug": "node-all-minor-deps"
     },
+    // node: package all patch upgrades into one PR
     {
       "matchManagers": [
         "npm"
