@@ -6,7 +6,9 @@ import UpdateLabelAction from './UpdateLabelAction';
 import { useGetActionsQuery } from '../../api/actionsApi';
 import ActionFilterQueryParamNames from '../../constants/api/actionFilterQueryParamNames';
 import ActionOrder from '../../constants/api/actionOrder';
+import DateTimeStyle from '../../constants/dateTimeStyle';
 import { PAGE_DEFAULT, PAGE_DEFAULT_OPTIONS, PAGE_SIZE_DEFAULT } from '../../constants/pagination';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { ActionResponse, ActionsRequestParams, ActionType } from '../../types';
 import useActionsFilterQueryParams from '../../use/useActionsFilterQueryParams';
 import { convertToLowerCaseUnderscore } from '../../utils/apiHelper';
@@ -27,6 +29,7 @@ const DEFAULT_POLLING_INTERVAL = 5000;
 
 const ActionsPage = () => {
 	const [t] = useTranslation('actions');
+	const { locale } = useLocaleProviderContext();
 	const [pollingInterval, setPollingInterval] = useState<number>(0);
 
 	const [queryParams, setSearchQueryParams] = useSearchParams();
@@ -135,7 +138,7 @@ const ActionsPage = () => {
 				ellipsis: true,
 				responsive: ['sm', 'md', 'lg', 'xl', 'xxl'],
 				sorter: (a, b) => sortAlphaIgnoringCase(a.createdAt, b.createdAt),
-				render: (value) => formatDateTimeWithTimeZone(value)
+				render: (value) => formatDateTimeWithTimeZone(value, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)
 			},
 			{
 				title: t('col_updated_at'),
@@ -144,10 +147,10 @@ const ActionsPage = () => {
 				ellipsis: true,
 				responsive: ['sm', 'md', 'lg', 'xl', 'xxl'],
 				sorter: (a, b) => sortAlphaIgnoringCase(a.updatedAt, b.updatedAt),
-				render: (value) => formatDateTimeWithTimeZone(value)
+				render: (value) => formatDateTimeWithTimeZone(value, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)
 			}
 		];
-	}, [t]);
+	}, [locale, t]);
 
 	return (
 		<>

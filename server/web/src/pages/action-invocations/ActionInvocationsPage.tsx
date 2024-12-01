@@ -2,7 +2,9 @@ import ItemActionInvocation from './ItemActionInvocation';
 import { useGetActionInvocationsQuery } from '../../api/actionInvocationsApi';
 import ActionInvocationFilterQueryParamNames from '../../constants/api/actionInvocationFilterQueryParamNames';
 import ActionInvocationOrder from '../../constants/api/actionInvocationOrder';
+import DateTimeStyle from '../../constants/dateTimeStyle';
 import { PAGE_DEFAULT, PAGE_DEFAULT_OPTIONS, PAGE_SIZE_DEFAULT } from '../../constants/pagination';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { ActionInvocationResponse, ActionInvocationsRequestParams, ActionInvocationState } from '../../types';
 import useActionInvocationsFilterQueryParams from '../../use/useActionInvocationsFilterQueryParams';
 import { convertToLowerCaseUnderscore } from '../../utils/apiHelper';
@@ -30,6 +32,7 @@ const DEFAULT_POLLING_INTERVAL = 5000;
 
 const ActionInvocationsPage = () => {
 	const [t] = useTranslation('action_invocations');
+	const { locale } = useLocaleProviderContext();
 	const [pollingInterval, setPollingInterval] = useState<number>(DEFAULT_POLLING_INTERVAL);
 
 	const [queryParams, setSearchQueryParams] = useSearchParams();
@@ -172,7 +175,7 @@ const ActionInvocationsPage = () => {
 				ellipsis: true,
 				responsive: ['sm', 'md', 'lg', 'xl', 'xxl'],
 				sorter: (a, b) => sortAlphaIgnoringCase(a.createdAt, b.createdAt),
-				render: (value) => formatDateTimeWithTimeZone(value)
+				render: (value) => formatDateTimeWithTimeZone(value, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)
 			},
 			{
 				title: t('col_updated_at'),
@@ -181,10 +184,10 @@ const ActionInvocationsPage = () => {
 				ellipsis: true,
 				responsive: ['sm', 'md', 'lg', 'xl', 'xxl'],
 				sorter: (a, b) => sortAlphaIgnoringCase(a.updatedAt, b.updatedAt),
-				render: (value) => formatDateTimeWithTimeZone(value)
+				render: (value) => formatDateTimeWithTimeZone(value, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)
 			}
 		];
-	}, [renderState, t]);
+	}, [locale, renderState, t]);
 
 	return (
 		<>

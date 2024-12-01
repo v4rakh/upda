@@ -4,6 +4,8 @@ import { useGetUpdateByIdQuery } from '../../api/updatesApi';
 import ApiErrorCodes from '../../constants/apiErrorCodes';
 import AppPathParamNames from '../../constants/appPathParamNames';
 import AppPaths from '../../constants/appPaths';
+import DateTimeStyle from '../../constants/dateTimeStyle';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { getPageFullPath } from '../../utils/urlHelper';
 import AppBreadcrumb from '../common/AppBreadcrumb';
@@ -17,6 +19,7 @@ const { Text } = Typography;
 
 const UpdateSinglePage: FC = (): JSX.Element => {
 	const [t] = useTranslation('updates_single');
+	const { locale } = useLocaleProviderContext();
 
 	const { [AppPathParamNames.UPDATE_ID]: updateId } = useParams();
 
@@ -76,10 +79,20 @@ const UpdateSinglePage: FC = (): JSX.Element => {
 						<Descriptions.Item label={t('host')}>{data.data.host}</Descriptions.Item>
 						<Descriptions.Item label={t('provider')}>{data.data.provider}</Descriptions.Item>
 						<Descriptions.Item label={t('created')}>
-							{formatDateTimeWithTimeZone(data.data.createdAt)}
+							{formatDateTimeWithTimeZone(
+								data.data.createdAt,
+								DateTimeStyle.LONG,
+								DateTimeStyle.MEDIUM,
+								locale
+							)}
 						</Descriptions.Item>
 						<Descriptions.Item label={t('updated')}>
-							{formatDateTimeWithTimeZone(data.data.updatedAt)}
+							{formatDateTimeWithTimeZone(
+								data.data.updatedAt,
+								DateTimeStyle.LONG,
+								DateTimeStyle.MEDIUM,
+								locale
+							)}
 						</Descriptions.Item>
 					</Descriptions>
 					<Descriptions

@@ -1,6 +1,8 @@
 import UpdateStateTag from './UpdateStateTag';
 import { useDeleteUpdateMutation, useModifyUpdateStateMutation } from '../../api/updatesApi';
 import AppPaths from '../../constants/appPaths';
+import DateTimeStyle from '../../constants/dateTimeStyle';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { UpdateResponse, UpdateState } from '../../types';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { getUpdateStateColor } from '../../utils/updateHelper';
@@ -28,6 +30,7 @@ export interface UpdateProps {
 
 const Update: FC<UpdateProps> = ({ entity }): JSX.Element => {
 	const [t] = useTranslation('update');
+	const { locale } = useLocaleProviderContext();
 	const navigate = useNavigate();
 
 	const redirectToDetails = useCallback(() => {
@@ -178,7 +181,12 @@ const Update: FC<UpdateProps> = ({ entity }): JSX.Element => {
 							<Tooltip
 								placement={'bottom'}
 								title={t('created_at', {
-									created: formatDateTimeWithTimeZone(entity.createdAt)
+									created: formatDateTimeWithTimeZone(
+										entity.createdAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)
 								})}>
 								<FieldTimeOutlined />
 							</Tooltip>
@@ -187,8 +195,18 @@ const Update: FC<UpdateProps> = ({ entity }): JSX.Element => {
 							<Tooltip
 								placement={'bottom'}
 								title={t('created_at_diff', {
-									created: formatDateTimeWithTimeZone(entity.createdAt),
-									updated: formatDateTimeWithTimeZone(entity.updatedAt)
+									created: formatDateTimeWithTimeZone(
+										entity.createdAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									),
+									updated: formatDateTimeWithTimeZone(
+										entity.updatedAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)
 								})}>
 								<FieldTimeOutlined />
 							</Tooltip>
@@ -243,7 +261,14 @@ const Update: FC<UpdateProps> = ({ entity }): JSX.Element => {
 								<Text type="secondary" ellipsis>
 									{t('created')}
 								</Text>
-								<Text>{formatDateTimeWithTimeZone(entity.createdAt)}</Text>
+								<Text>
+									{formatDateTimeWithTimeZone(
+										entity.createdAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)}
+								</Text>
 							</Space>
 						</Col>
 					</Row>
@@ -253,7 +278,14 @@ const Update: FC<UpdateProps> = ({ entity }): JSX.Element => {
 								<Text type="secondary" ellipsis>
 									{t('updated')}
 								</Text>
-								<Text>{formatDateTimeWithTimeZone(entity.updatedAt)}</Text>
+								<Text>
+									{formatDateTimeWithTimeZone(
+										entity.updatedAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)}
+								</Text>
 							</Space>
 						</Col>
 					</Row>

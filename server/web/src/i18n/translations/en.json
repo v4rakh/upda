@@ -209,6 +209,7 @@
     "back_home": "Go back",
     "events": "Events",
     "home": "Home",
+    "loading": "Loading...",
     "login": "Login",
     "logout": "Logout",
     "secrets": "Secrets",

@@ -1,5 +1,6 @@
 import './i18n';
 import App from './App';
+import LocaleContextProvider from './providers/LocaleContextProvider';
 import store from './store';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -15,7 +16,9 @@ root.render(
 		 * Fix not yet available. follow thread: https://github.com/ant-design/ant-design/issues/22493 */}
 		{/*<React.StrictMode>*/}
 		<Router>
-			<App />
+			<LocaleContextProvider>
+				<App />
+			</LocaleContextProvider>
 		</Router>
 		{/*</React.StrictMode>*/}
 	</Provider>

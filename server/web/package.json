@@ -26,8 +26,8 @@
     "checkstyle:format": "npm run format:check",
     "checkstyle:ts": "eslint \"./src/**/*.{ts,tsx}\" -f checkstyle > ci/eslint.xml",
     "checkstyle:less": "stylelint \"./src/**/*.less\"",
-    "checkstyle:i18n": "sync-i18n --check --files '**/translations/*.json' --primary en --space 2 --lineendings LF",
-    "i18n-sync": "sync-i18n --files '**/translations/*.json' --primary en --space 2 --lineendings LF",
+    "checkstyle:i18n": "sync-i18n --check --files '**/translations/*.json' --primary en --languages en --space 2 --lineendings LF",
+    "i18n-sync": "sync-i18n --files '**/translations/*.json' --primary en --languages en --space 2 --lineendings LF",
     "clean": "npx --quiet rimraf build && npx --quiet rimraf node_modules"
   },
   "dependencies": {

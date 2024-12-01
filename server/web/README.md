@@ -30,6 +30,74 @@ Use the `npm run start` command to start the development setup. Backend should b
 
 Pipeline checks for existing i18n keys, if you need to manually sync any language file, run `npm run i18n-sync`.
 
+#### New translation languages
+
+Adapt `package.json` and add the respective key to `i18n-sync` and `checkstyle:i18n` for the `--languages` argument,
+e.g. `--languages en,new`.
+
+Run `npm run i18n-sync` to create and sync new language
+
+Adapt `languages.ts`
+
+```typescript
+enum Languages {
+    // ...
+    NEW = 'new'
+}
+```
+
+Adapt `locales.ts`
+
+```typescript
+enum Locales {
+    // ...
+    NEW = 'new-NEW'
+}
+```
+
+Adapt `LocaleProvider.tsx` to detect the new language, assign proper _momentjs_ locale.
+
+```typescript
+// add import for Ant Design
+import new_NEW from 'antd/lib/locale/new_NEW';
+
+// add import for moment
+// @ts-ignore
+import new_localization from 'moment/dist/locale/new.js';
+
+// getLocaleFromLanguage
+if (LANGUAGES.NEW === language) {
+    // ...
+}
+
+// getLanguageFromLocale
+if (LANGUAGES.NEW === language) {
+    // ...
+}
+
+// setLocales (uses import of moment)
+// ...
+else if (Languages.NEW === language) {
+    // use import for Ant Design
+    setAntLocale(new_NEW);
+    // use import for moment
+    moment.updateLocale(language, de_localization);
+}
+```
+
+Adapt `i18n/index.ts` and import new language and make i18n detect it (locales are derived from it)
+
+```typescript jsx
+import newTranslation from './translations/new.json';
+
+const resources = {
+    //...
+    new: {
+        ...newTranslation
+    }
+};
+```
+
 ### Dependencies
 
 To track unused dependencies

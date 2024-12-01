@@ -17,7 +17,6 @@ i18next
 	.init(
 		{
 			resources,
-			lng: 'en',
 			fallbackLng: 'en',
 			debug: isDevelopment(),
 			interpolation: {

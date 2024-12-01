@@ -1,5 +1,7 @@
 import EventText from './EventText';
 import { useDeleteEventMutation } from '../../api/eventsApi';
+import DateTimeStyle from '../../constants/dateTimeStyle';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { EventResponse } from '../../types/event';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { apiNotification } from '../common/apiNotification';
@@ -17,6 +19,7 @@ export interface EventProps {
 
 const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): JSX.Element => {
 	const [t] = useTranslation('event');
+	const { locale } = useLocaleProviderContext();
 
 	const [deleteEvent, { isSuccess, isLoading, isError, error }] = useDeleteEventMutation();
 
@@ -44,7 +47,7 @@ const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): JSX.Element => {
 			size="small"
 			actions={[
 				<Text key={`${entity.id}_created`} italic type="secondary">
-					{formatDateTimeWithTimeZone(entity.createdAt)}
+					{formatDateTimeWithTimeZone(entity.createdAt, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)}
 				</Text>,
 				<Popconfirm
 					key={`${entity.id}_del_confirm`}

@@ -3,7 +3,9 @@ import {
 	useModifyIgnoreHostWebhookMutation,
 	useModifyLabelWebhookMutation
 } from '../../api/webhooksApi';
+import DateTimeStyle from '../../constants/dateTimeStyle';
 import getConfiguration from '../../getConfiguration';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { WebhookResponse, WebhookType } from '../../types';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { apiNotification } from '../common/apiNotification';
@@ -21,6 +23,7 @@ export interface WebhookProps {
 
 const Webhook: FC<WebhookProps> = ({ entity }): JSX.Element => {
 	const [t] = useTranslation('webhook');
+	const { locale } = useLocaleProviderContext();
 
 	const [deleteWebhook, { isLoading: isDeleteLoading, isError: isErrorDelete, error: deleteError }] =
 		useDeleteWebhookMutation();
@@ -123,7 +126,12 @@ const Webhook: FC<WebhookProps> = ({ entity }): JSX.Element => {
 							<Tooltip
 								placement={'bottom'}
 								title={t('created_at', {
-									created: formatDateTimeWithTimeZone(entity.createdAt)
+									created: formatDateTimeWithTimeZone(
+										entity.createdAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)
 								})}>
 								<FieldTimeOutlined />
 							</Tooltip>
@@ -132,8 +140,18 @@ const Webhook: FC<WebhookProps> = ({ entity }): JSX.Element => {
 							<Tooltip
 								placement={'bottom'}
 								title={t('created_at_diff', {
-									created: formatDateTimeWithTimeZone(entity.createdAt),
-									updated: formatDateTimeWithTimeZone(entity.updatedAt)
+									created: formatDateTimeWithTimeZone(
+										entity.createdAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									),
+									updated: formatDateTimeWithTimeZone(
+										entity.updatedAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)
 								})}>
 								<FieldTimeOutlined />
 							</Tooltip>
@@ -193,7 +211,14 @@ const Webhook: FC<WebhookProps> = ({ entity }): JSX.Element => {
 								<Text type="secondary" ellipsis>
 									{t('created')}
 								</Text>
-								<Text>{formatDateTimeWithTimeZone(entity.createdAt)}</Text>
+								<Text>
+									{formatDateTimeWithTimeZone(
+										entity.createdAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)}
+								</Text>
 							</Space>
 						</Col>
 					</Row>
@@ -203,7 +228,14 @@ const Webhook: FC<WebhookProps> = ({ entity }): JSX.Element => {
 								<Text type="secondary" ellipsis>
 									{t('updated')}
 								</Text>
-								<Text>{formatDateTimeWithTimeZone(entity.updatedAt)}</Text>
+								<Text>
+									{formatDateTimeWithTimeZone(
+										entity.updatedAt,
+										DateTimeStyle.LONG,
+										DateTimeStyle.MEDIUM,
+										locale
+									)}
+								</Text>
 							</Space>
 						</Col>
 					</Row>

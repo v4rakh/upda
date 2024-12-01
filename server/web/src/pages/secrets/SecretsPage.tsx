@@ -2,6 +2,8 @@ import CreateSecret from './CreateSecret';
 import DeleteSecret from './DeleteSecret';
 import UpdateValueSecret from './UpdateValueSecret';
 import { useGetSecretsQuery } from '../../api/secretsApi';
+import DateTimeStyle from '../../constants/dateTimeStyle';
+import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { SecretResponse } from '../../types';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { sortAlphaIgnoringCase } from '../../utils/sortHelper';
@@ -18,6 +20,7 @@ const { Text } = Typography;
 
 const SecretsPage: FC = () => {
 	const [t] = useTranslation('secrets');
+	const { locale } = useLocaleProviderContext();
 
 	const { isLoading, isError, refetch, isFetching, isSuccess, data } = useGetSecretsQuery();
 
@@ -52,7 +55,7 @@ const SecretsPage: FC = () => {
 				ellipsis: true,
 				responsive: ['sm', 'md', 'lg', 'xl', 'xxl'],
 				sorter: (a, b) => sortAlphaIgnoringCase(a.createdAt, b.createdAt),
-				render: (value) => formatDateTimeWithTimeZone(value)
+				render: (value) => formatDateTimeWithTimeZone(value, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)
 			},
 			{
 				title: t('col_updated_at'),
@@ -61,7 +64,7 @@ const SecretsPage: FC = () => {
 				ellipsis: true,
 				responsive: ['sm', 'md', 'lg', 'xl', 'xxl'],
 				sorter: (a, b) => sortAlphaIgnoringCase(a.updatedAt, b.updatedAt),
-				render: (value) => formatDateTimeWithTimeZone(value)
+				render: (value) => formatDateTimeWithTimeZone(value, DateTimeStyle.LONG, DateTimeStyle.MEDIUM, locale)
 			},
 			{
 				title: t('actions'),
@@ -73,7 +76,7 @@ const SecretsPage: FC = () => {
 				}
 			}
 		];
-	}, [t]);
+	}, [locale, t]);
 
 	return (
 		<>
