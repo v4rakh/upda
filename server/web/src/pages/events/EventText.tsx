@@ -1,7 +1,7 @@
 import { EventName } from '../../types/event';
 import { Typography } from 'antd';
 import parse from 'html-react-parser';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -11,7 +11,7 @@ export interface EventTextProps {
 	payload: Record<string, string>;
 }
 
-const EventText: FC<EventTextProps> = ({ name, payload }): JSX.Element => {
+const EventText: FC<EventTextProps> = ({ name, payload }): ReactNode => {
 	const [t] = useTranslation('event_text');
 
 	return <Text>{parse(t(`${name.toLowerCase()}`, payload))}</Text>;

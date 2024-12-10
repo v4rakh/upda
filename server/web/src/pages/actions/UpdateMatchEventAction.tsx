@@ -2,7 +2,7 @@ import ActionSelectEvent from './ActionSelectEvent';
 import { useModifyMatchEventActionMutation } from '../../api/actionsApi';
 import { EventName } from '../../types/event';
 import { apiNotification } from '../common/apiNotification';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateMatchEventActionProps {
@@ -10,7 +10,7 @@ export interface UpdateMatchEventActionProps {
 	matchEvent?: EventName;
 }
 
-const UpdateMatchEventAction: FC<UpdateMatchEventActionProps> = ({ id, matchEvent }): JSX.Element => {
+const UpdateMatchEventAction: FC<UpdateMatchEventActionProps> = ({ id, matchEvent }): ReactNode => {
 	const [t] = useTranslation('action_update_match_event');
 
 	const [modify, { isLoading, isError, error }] = useModifyMatchEventActionMutation();

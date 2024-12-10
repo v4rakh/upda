@@ -1,13 +1,13 @@
 import ActionFormPayloadShoutrrr from './ActionFormPayloadShoutrrr';
 import { ActionType } from '../../types';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 export interface ActionFormPayloadSwitchProps {
 	isLoading: boolean;
 	type: ActionType;
 }
 
-const ActionFormPayloadSwitch: FC<ActionFormPayloadSwitchProps> = ({ isLoading, type }): JSX.Element => {
+const ActionFormPayloadSwitch: FC<ActionFormPayloadSwitchProps> = ({ isLoading, type }): ReactNode => {
 	return <>{ActionType.SHOUTRRR == type && <ActionFormPayloadShoutrrr isLoading={isLoading} />}</>;
 };
 

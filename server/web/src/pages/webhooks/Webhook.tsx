@@ -12,7 +12,7 @@ import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
 import { CheckOutlined, CloseOutlined, DeleteOutlined, DeleteTwoTone, FieldTimeOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Popconfirm, Row, Space, Switch, Tag, Tooltip, Typography } from 'antd';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -21,7 +21,7 @@ export interface WebhookProps {
 	entity: WebhookResponse;
 }
 
-const Webhook: FC<WebhookProps> = ({ entity }): JSX.Element => {
+const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 	const [t] = useTranslation('webhook');
 	const { locale } = useLocaleProviderContext();
 

@@ -2,14 +2,14 @@ import { useDeleteActionInvocationMutation } from '../../api/actionInvocationsAp
 import { apiNotification } from '../common/apiNotification';
 import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
-import { FC, useEffect } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface DeleteActionInvocationProps {
 	id: string;
 }
 
-const DeleteActionInvocation: FC<DeleteActionInvocationProps> = ({ id }): JSX.Element => {
+const DeleteActionInvocation: FC<DeleteActionInvocationProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('action_invocation_delete');
 
 	const [deleteActionInvocation, { isLoading, isError, error }] = useDeleteActionInvocationMutation();

@@ -2,14 +2,14 @@ import { useDeleteSecretMutation } from '../../api/secretsApi';
 import { apiNotification } from '../common/apiNotification';
 import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
-import { FC, useEffect } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface DeleteSecretProps {
 	id: string;
 }
 
-const DeleteSecret: FC<DeleteSecretProps> = ({ id }): JSX.Element => {
+const DeleteSecret: FC<DeleteSecretProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('secret_delete');
 
 	const [deleteSecret, { isLoading, isError, error }] = useDeleteSecretMutation();

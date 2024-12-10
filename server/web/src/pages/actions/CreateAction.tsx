@@ -6,12 +6,12 @@ import { ActionPayloadShoutrrr, ActionType } from '../../types';
 import { apiNotification } from '../common/apiNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Collapse, Divider, Form, Input, Switch } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const COLLAPSE_KEY = 'edit_type_payload';
 
-const CreateAction = (): JSX.Element => {
+const CreateAction = (): ReactNode => {
 	const [t] = useTranslation('action_create');
 	const [form] = Form.useForm();
 	const type = Form.useWatch('type', form);

@@ -14,6 +14,7 @@ RUN apk --update upgrade && \
 WORKDIR /app
 COPY . .
 RUN rm -rf bin/ && \
+    npm install --global pnpm@^9 && \
     CC=gcc make ci
 
 #

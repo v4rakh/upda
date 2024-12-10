@@ -17,14 +17,14 @@ import {
 import { Menu, Typography } from 'antd';
 import { TFunction } from 'i18next';
 import { forEach } from 'lodash';
-import { FC, useMemo } from 'react';
+import { FC, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 export type PrimaryMenuProps = {
 	t: TFunction;
 };
 
-const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): JSX.Element => {
+const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 	const navigate = useNavigate();
 	const isAuthenticated = useAuthenticatedSelector();
 	const { logout, getUserName } = useAuthorization();

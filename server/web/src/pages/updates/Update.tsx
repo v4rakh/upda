@@ -18,7 +18,7 @@ import {
 	StopTwoTone
 } from '@ant-design/icons';
 import { Badge, Button, Card, Col, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -28,7 +28,7 @@ export interface UpdateProps {
 	entity: UpdateResponse;
 }
 
-const Update: FC<UpdateProps> = ({ entity }): JSX.Element => {
+const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 	const [t] = useTranslation('update');
 	const { locale } = useLocaleProviderContext();
 	const navigate = useNavigate();

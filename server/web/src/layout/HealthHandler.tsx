@@ -5,7 +5,7 @@ import { Modal, ModalFuncProps, Skeleton } from 'antd';
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const HealthHandler: FC<{ children: ReactNode | ReactNode[] }> = ({ children }): JSX.Element => {
+const HealthHandler: FC<{ children: ReactNode | ReactNode[] }> = ({ children }): ReactNode => {
 	const [t] = useTranslation('health');
 	const { isLoading, isSuccess, isError, data } = useGetHealthQuery(undefined);
 

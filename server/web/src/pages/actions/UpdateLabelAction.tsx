@@ -1,7 +1,7 @@
 import { useModifyLabelActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateLabelActionProps {
@@ -9,7 +9,7 @@ export interface UpdateLabelActionProps {
 	label: string;
 }
 
-const UpdateLabelAction: FC<UpdateLabelActionProps> = ({ id, label }): JSX.Element => {
+const UpdateLabelAction: FC<UpdateLabelActionProps> = ({ id, label }): ReactNode => {
 	const [t] = useTranslation('action_update_label');
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyLabelActionMutation();

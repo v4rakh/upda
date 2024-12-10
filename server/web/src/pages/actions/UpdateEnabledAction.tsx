@@ -2,7 +2,7 @@ import { useModifyEnabledActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Switch } from 'antd';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateEnabledActionProps {
@@ -10,7 +10,7 @@ export interface UpdateEnabledActionProps {
 	enabled: boolean;
 }
 
-const UpdateEnabledAction: FC<UpdateEnabledActionProps> = ({ id, enabled }): JSX.Element => {
+const UpdateEnabledAction: FC<UpdateEnabledActionProps> = ({ id, enabled }): ReactNode => {
 	const [t] = useTranslation('action_update_enabled');
 
 	const [modify, { isLoading, isError, error }] = useModifyEnabledActionMutation();

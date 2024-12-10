@@ -1,7 +1,7 @@
 import { useModifyMatchHostActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateMatchHostActionProps {
@@ -9,7 +9,7 @@ export interface UpdateMatchHostActionProps {
 	matchHost?: string;
 }
 
-const UpdateMatchHostAction: FC<UpdateMatchHostActionProps> = ({ id, matchHost }): JSX.Element => {
+const UpdateMatchHostAction: FC<UpdateMatchHostActionProps> = ({ id, matchHost }): ReactNode => {
 	const [t] = useTranslation('action_update_match_host');
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyMatchHostActionMutation();

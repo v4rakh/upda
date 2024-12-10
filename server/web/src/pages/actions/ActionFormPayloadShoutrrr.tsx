@@ -1,13 +1,13 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface ActionFormShoutrrrProps {
 	isLoading: boolean;
 }
 
-const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): JSX.Element => {
+const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): ReactNode => {
 	const [t] = useTranslation('action_form_shoutrrrr');
 
 	return (

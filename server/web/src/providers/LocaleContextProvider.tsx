@@ -19,7 +19,7 @@ type LocaleProviderProviderProps = {
 
 const LocaleContext = createContext<LocaleProviderContextType | undefined>(undefined);
 
-const LocaleContextProvider: FC<LocaleProviderProviderProps> = ({ children }): React.JSX.Element => {
+const LocaleContextProvider: FC<LocaleProviderProviderProps> = ({ children }): ReactNode => {
 	const { i18n, t } = useTranslation();
 	const [antLocale, setAntLocale] = useState<Locale>();
 	const [language, setLanguage] = useState<string>(Languages.DEFAULT);

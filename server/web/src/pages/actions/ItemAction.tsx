@@ -7,7 +7,7 @@ import UpdateMatchProviderAction from './UpdateMatchProviderAction';
 import UpdatePayloadAction from './UpdatePayloadAction';
 import { ActionResponse } from '../../types';
 import { Descriptions, Space } from 'antd';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { Item } = Descriptions;
@@ -16,7 +16,7 @@ export interface ItemActionProps {
 	e: ActionResponse;
 }
 
-const ItemActionInvocation: FC<ItemActionProps> = ({ e }): JSX.Element => {
+const ItemActionInvocation: FC<ItemActionProps> = ({ e }): ReactNode => {
 	const [t] = useTranslation('action_item');
 
 	return (

@@ -6,7 +6,7 @@ import ActionTextType from '../actions/ActionTextType';
 import EventText from '../events/EventText';
 import { ReloadOutlined } from '@ant-design/icons';
 import { Button, Descriptions, Result, Skeleton, Tooltip, Typography } from 'antd';
-import { FC, useCallback } from 'react';
+import { FC, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -16,7 +16,7 @@ export interface ItemActionInvocationProps {
 	e: ActionInvocationResponse;
 }
 
-const ItemActionInvocation: FC<ItemActionInvocationProps> = ({ e }): JSX.Element => {
+const ItemActionInvocation: FC<ItemActionInvocationProps> = ({ e }): ReactNode => {
 	const [t] = useTranslation('action_invocation_item');
 
 	const {

@@ -11,13 +11,13 @@ import { getPageFullPath } from '../../utils/urlHelper';
 import AppBreadcrumb from '../common/AppBreadcrumb';
 import { PageHeader } from '@ant-design/pro-layout';
 import { Descriptions, Result, Skeleton, Typography } from 'antd';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 const { Text } = Typography;
 
-const UpdateSinglePage: FC = (): JSX.Element => {
+const UpdateSinglePage: FC = (): ReactNode => {
 	const [t] = useTranslation('updates_single');
 	const { locale } = useLocaleProviderContext();
 

@@ -2,14 +2,14 @@ import { useDeleteActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
-import { FC, useEffect } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface DeleteActionProps {
 	id: string;
 }
 
-const DeleteAction: FC<DeleteActionProps> = ({ id }): JSX.Element => {
+const DeleteAction: FC<DeleteActionProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('action_delete');
 
 	const [deleteAction, { isLoading, isError, error }] = useDeleteActionMutation();

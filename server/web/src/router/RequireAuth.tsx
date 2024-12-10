@@ -4,7 +4,7 @@ import { getPageFullPath } from '../utils/urlHelper';
 import { FC, ReactNode } from 'react';
 import { Navigate } from 'react-router';
 
-export const RequireAuth: FC<{ children: ReactNode | ReactNode[] }> = ({ children }): JSX.Element => {
+export const RequireAuth: FC<{ children: ReactNode | ReactNode[] }> = ({ children }): ReactNode => {
 	const isAuthenticated = useAuthenticatedSelector();
 
 	if (isAuthenticated) {

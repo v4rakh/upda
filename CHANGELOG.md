@@ -5,6 +5,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [4.0.1] - UNRELEASED
 
 * Library updates
+* Move away from `npm` to `pnpm` 
 
 ## [4.0.0] - 2024/10/25
 

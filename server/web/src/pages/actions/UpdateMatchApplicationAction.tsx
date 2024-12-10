@@ -1,7 +1,7 @@
 import { useModifyMatchApplicationActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateMatchApplicationActionProps {
@@ -9,7 +9,7 @@ export interface UpdateMatchApplicationActionProps {
 	matchApplication?: string;
 }
 
-const UpdateMatchApplicationAction: FC<UpdateMatchApplicationActionProps> = ({ id, matchApplication }): JSX.Element => {
+const UpdateMatchApplicationAction: FC<UpdateMatchApplicationActionProps> = ({ id, matchApplication }): ReactNode => {
 	const [t] = useTranslation('action_update_match_application');
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyMatchApplicationActionMutation();

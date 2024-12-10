@@ -2,14 +2,14 @@ import { useTestActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import { PlayCircleTwoTone } from '@ant-design/icons';
 import { Button } from 'antd';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface TestActionProps {
 	id: string;
 }
 
-const TestAction: FC<TestActionProps> = ({ id }): JSX.Element => {
+const TestAction: FC<TestActionProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('action_test');
 
 	const [test, { data, isLoading, isSuccess, isError, error }] = useTestActionMutation();

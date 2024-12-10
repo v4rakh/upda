@@ -1,6 +1,6 @@
 import { ActionType } from '../../types';
 import { Select, Form } from 'antd';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface ActionFormTypeProps {
@@ -8,7 +8,7 @@ export interface ActionFormTypeProps {
 	initialValue?: ActionType;
 }
 
-const ActionFormType: FC<ActionFormTypeProps> = ({ isLoading, initialValue }): JSX.Element => {
+const ActionFormType: FC<ActionFormTypeProps> = ({ isLoading, initialValue }): ReactNode => {
 	const [t] = useTranslation('action_form_type');
 
 	return (

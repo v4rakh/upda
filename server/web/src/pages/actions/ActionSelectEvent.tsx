@@ -1,6 +1,6 @@
 import { EventName } from '../../types/event';
 import { Select } from 'antd';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface ActionSelectEventProps {
@@ -13,7 +13,7 @@ const noop = () => {
 	return;
 };
 
-const ActionSelectEvent: FC<ActionSelectEventProps> = ({ name, onChange = noop, loading }): JSX.Element => {
+const ActionSelectEvent: FC<ActionSelectEventProps> = ({ name, onChange = noop, loading }): ReactNode => {
 	const [t] = useTranslation('action_select_event');
 
 	return (

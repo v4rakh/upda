@@ -16,21 +16,21 @@ dependencies: dependencies-web dependencies-server
 dependencies-server:
 	GO111MODULE=on go mod download
 dependencies-web:
-	cd ${WEB_DIR}; npm install
+	cd ${WEB_DIR}; pnpm install
 
 # checkstyle steps
 checkstyle: checkstyle-web checkstyle-server
 checkstyle-server:
 	go vet ./...
 checkstyle-web:
-	cd ${WEB_DIR}; npm run checkstyle
+	cd ${WEB_DIR}; pnpm run checkstyle
 
 # test steps
 test: test-web test-server
 test-server:
 	go test -race ./...
 test-web:
-	cd ${WEB_DIR}; npm run test:ci
+	cd ${WEB_DIR}; pnpm run test:ci
 
 # build steps
 
@@ -74,7 +74,7 @@ build-cli-windows-arm64:
 
 # remove built build/conf directory to be served live from the running binary
 build-web:
-	cd ${WEB_DIR}; npm run build; rm -rf build/conf
+	cd ${WEB_DIR}; pnpm run build; rm -rf build/conf
 
 # ci
 clean-ci: clean

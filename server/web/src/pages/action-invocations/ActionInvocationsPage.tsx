@@ -24,7 +24,7 @@ import { Button, Result, Skeleton, Space, Switch, Table, TablePaginationConfig, 
 import { ColumnsType } from 'antd/es/table';
 import { FilterValue, SorterResult } from 'antd/es/table/interface';
 import parse from 'html-react-parser';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
@@ -109,7 +109,7 @@ const ActionInvocationsPage = () => {
 	}, [isError, setPollingInterval, t]);
 
 	const renderState = useCallback(
-		(state: ActionInvocationState): JSX.Element => {
+		(state: ActionInvocationState): ReactNode => {
 			switch (state) {
 				case ActionInvocationState.CREATED:
 					return (

@@ -2,7 +2,7 @@ import { UpdateMetadataResponse } from '../../types';
 import { Typography } from 'antd';
 import parse from 'html-react-parser';
 import linkifyHtml from 'linkify-html';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 export interface UpdateMetadataProps {
 	metadata: UpdateMetadataResponse;
@@ -10,7 +10,7 @@ export interface UpdateMetadataProps {
 
 const { Paragraph } = Typography;
 
-const UpdateMetadata: FC<UpdateMetadataProps> = ({ metadata }): JSX.Element => {
+const UpdateMetadata: FC<UpdateMetadataProps> = ({ metadata }): ReactNode => {
 	return (
 		<Paragraph>
 			<pre>

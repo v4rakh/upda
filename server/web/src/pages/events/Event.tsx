@@ -7,7 +7,7 @@ import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { apiNotification } from '../common/apiNotification';
 import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { Button, Card, Popconfirm, Tooltip, Typography } from 'antd';
-import { FC, useEffect } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -17,7 +17,7 @@ export interface EventProps {
 	onDeleteSuccess?: () => void;
 }
 
-const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): JSX.Element => {
+const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): ReactNode => {
 	const [t] = useTranslation('event');
 	const { locale } = useLocaleProviderContext();
 

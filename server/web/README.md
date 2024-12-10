@@ -16,26 +16,29 @@ Contributions are very welcome!
 
 It's probably worth checking out a node environment manager like [nvm manager](https://github.com/nvm-sh/nvm).
 
-Required node and npm versions are outlined in the `package.json`.
+Required node and npm versions are outlined in the `package.json` in the `"engines"` section.
+
+The application uses `pnpm`. Make sure to install it. For this you can use your global npm installation and invoke
+`npm install --global pnpm@^9` or have it as system package.
 
 ### Setup instructions
 
-Run `npm install` which should install all dependencies.
+Run `pnpm install` which should install all dependencies.
 
 ### Start
 
-Use the `npm run start` command to start the development setup. Backend should be running.
+Use the `pnpm start` command to start the development setup. Backend should be running.
 
 ### Translation files
 
-Pipeline checks for existing i18n keys, if you need to manually sync any language file, run `npm run i18n-sync`.
+Pipeline checks for existing i18n keys, if you need to manually sync any language file, run `pnpm i18n-sync`.
 
 #### New translation languages
 
 Adapt `package.json` and add the respective key to `i18n-sync` and `checkstyle:i18n` for the `--languages` argument,
 e.g. `--languages en,new`.
 
-Run `npm run i18n-sync` to create and sync new language
+Run `pnpm i18n-sync` to create and sync new language
 
 Adapt `languages.ts`
 
@@ -104,8 +107,21 @@ To track unused dependencies
 
 ```shell
 # install (if not yet present)
-npm install -g depcheck typescript
+npm install --global depcheck typescript
 
 # run
 depcheck
+```
+
+To manage (outdated) dependencies, `pnpm` helps:
+
+```shell
+# shows outdated dependencies
+pnpm outdated
+
+# upgrades to latest in range definition of package.json
+pnpm up
+
+# upgrades to latest available, this includes major upgrades
+pnpm up --latest
 ```

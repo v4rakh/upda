@@ -1,7 +1,7 @@
 import { useModifyMatchProviderActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateMatchProviderActionProps {
@@ -9,7 +9,7 @@ export interface UpdateMatchProviderActionProps {
 	matchProvider?: string;
 }
 
-const UpdateMatchProviderAction: FC<UpdateMatchProviderActionProps> = ({ id, matchProvider }): JSX.Element => {
+const UpdateMatchProviderAction: FC<UpdateMatchProviderActionProps> = ({ id, matchProvider }): ReactNode => {
 	const [t] = useTranslation('action_update_match_provider');
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyMatchProviderActionMutation();

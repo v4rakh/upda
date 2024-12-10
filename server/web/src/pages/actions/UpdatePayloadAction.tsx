@@ -5,7 +5,7 @@ import { ActionPayloadShoutrrr, ActionType } from '../../types';
 import { apiNotification } from '../common/apiNotification';
 import { SettingOutlined } from '@ant-design/icons';
 import { Button, Collapse, Form, Space, Typography } from 'antd';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdatePayloadActionProps {
@@ -16,7 +16,7 @@ export interface UpdatePayloadActionProps {
 
 const COLLAPSE_KEY = 'update_type_and_payload';
 
-const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, payload }): JSX.Element => {
+const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, payload }): ReactNode => {
 	const [t] = useTranslation('action_update_payload');
 	const [form] = Form.useForm();
 	const typeValue = Form.useWatch('type', form);

@@ -7,17 +7,11 @@ import svgrPlugin from 'vite-plugin-svgr';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 
 const stylelintOptions = {
-	fix: true,
-	test: true,
-	dev: true,
-	build: true
+	dev: true
 };
 
 const eslintOptions = {
-	fix: true,
-	test: true,
-	dev: true,
-	build: true
+	dev: true
 };
 
 // https://vitejs.dev/config/
@@ -31,6 +25,7 @@ export default defineConfig({
 	build: {
 		outDir: 'build'
 	},
+	// @ts-ignore
 	test: {
 		globals: true,
 		environment: 'jsdom',

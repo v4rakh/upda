@@ -1,7 +1,7 @@
 import { useModifyValueSecretMutation } from '../../api/secretsApi';
 import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface UpdateValueSecretProps {
@@ -9,7 +9,7 @@ export interface UpdateValueSecretProps {
 	entityValue?: string;
 }
 
-const UpdateValueSecret: FC<UpdateValueSecretProps> = ({ id, entityValue }): JSX.Element => {
+const UpdateValueSecret: FC<UpdateValueSecretProps> = ({ id, entityValue }): ReactNode => {
 	const [t] = useTranslation('secret_update_value');
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyValueSecretMutation();
