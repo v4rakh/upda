@@ -1,0 +1,8 @@
+.forgejo
+.run
+_doc
+bin
+server/web/node_modules
+server/web/build
+server/web/ci/*
+server/web/coverage

@@ -13,8 +13,7 @@ RUN apk --update upgrade && \
 
 WORKDIR /app
 COPY . .
-RUN rm -rf bin/ && \
-    npm install --global pnpm@^9 && \
+RUN npm install --global pnpm@^9 && \
     CC=gcc make ci
 
 #
@@ -29,10 +28,10 @@ LABEL maintainer="Varakh <varakh@varakh.de>" \
     org.opencontainers.image.description="upda" \
     org.opencontainers.image.base.name="alpine:3.20"
 
-ENV USER=appuser \
-    GROUP=appuser \
-    UID=2033 \
-    GID=2033
+ENV USER appuser
+ENV GROUP appuser
+ENV UID 2033
+ENV GID 2033
 
 RUN apk --update upgrade && \
     apk add sqlite tzdata && \
