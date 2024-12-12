@@ -28,10 +28,10 @@ LABEL maintainer="Varakh <varakh@varakh.de>" \
     org.opencontainers.image.description="upda" \
     org.opencontainers.image.base.name="alpine:3.20"
 
-ENV USER appuser
-ENV GROUP appuser
-ENV UID 2033
-ENV GID 2033
+ENV USER=appuser
+ENV GROUP=appuser
+ENV UID=2033
+ENV GID=2033
 
 RUN apk --update upgrade && \
     apk add sqlite tzdata && \
@@ -44,6 +44,6 @@ COPY --from=builder /app/bin/upda-server-linux-amd64 /usr/bin/upda-server
 
 USER ${USER}
 
-ENV SERVER_PORT 8080
+ENV SERVER_PORT=8080
 EXPOSE ${SERVER_PORT}
 CMD ["/usr/bin/upda-server"]
