@@ -15,7 +15,7 @@ jobs:
   release:
     runs-on: docker
     container:
-      image: git.myservermanager.com/msm/forgejo-base-executor-image-make-cgo:latest
+      image: git.myservermanager.com/msm/executor-ubuntu-build-essential:latest
     steps:
       - name: Set up node
         uses: actions/setup-node@v4
