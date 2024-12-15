@@ -13,7 +13,7 @@ require (
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.0.1
-	github.com/go-co-op/gocron/v2 v2.12.4
+	github.com/go-co-op/gocron/v2 v2.13.0
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/go-redsync/redsync/v4 v4.13.0
 	github.com/go-resty/resty/v2 v2.16.2
