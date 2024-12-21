@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [5.0.1] - UNRELEASED
+
+* ...
+
 ## [5.0.0] - 2024/12/21
 
 > This is a major version upgrade. Other versions are incompatible with this release.
