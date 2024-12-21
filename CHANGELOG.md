@@ -2,14 +2,14 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [5.0.0] - UNRELEASED
+## [5.0.0] - 2024/12/21
 
 > This is a major version upgrade. Other versions are incompatible with this release.
 
 * Drop support for SQLite (only Postgres is supported)
 * Library updates
 * Update OCI image base to alpine `3.21` with Go `1.23`
-* Move away from `npm` to `pnpm` 
+* Move away from `npm` to `pnpm`
 
 ## [4.0.0] - 2024/10/25
 
@@ -22,9 +22,9 @@ Changes adhere to [semantic versioning](https://semver.org).
 
 * Don't enforce JSON content type for GET and DELETE requests
 * Dependency updates
-  * github.com/go-playground/validator/v10 v10.22.0
-  * gorm.io/driver/postgres v1.5.9
-  * gorm.io/driver/sqlite v1.5.6
+    * github.com/go-playground/validator/v10 v10.22.0
+    * gorm.io/driver/postgres v1.5.9
+    * gorm.io/driver/sqlite v1.5.6
 * Fixed filter for Updates ignoring desired state
 
 ## [3.0.1] - 2024/06/10
@@ -87,6 +87,10 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[5.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/5.0.0
+
+[4.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/4.0.0
 
 [3.0.2]: https://git.myservermanager.com/varakh/upda/releases/tag/3.0.2
 
