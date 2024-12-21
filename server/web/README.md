@@ -19,7 +19,7 @@ It's probably worth checking out a node environment manager like [nvm manager](h
 Required node and npm versions are outlined in the `package.json` in the `"engines"` section.
 
 The application uses `pnpm`. Make sure to install it. For this you can use your global npm installation and invoke
-`npm install --global pnpm@^9` or have it as system package.
+`npm install --global pnpm` or have it as system package.
 
 ### Setup instructions
 

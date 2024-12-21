@@ -2,9 +2,13 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [4.0.1] - UNRELEASED
+## [5.0.0] - UNRELEASED
 
+> This is a major version upgrade. Other versions are incompatible with this release.
+
+* Drop support for SQLite (only Postgres is supported)
 * Library updates
+* Update OCI image base to alpine `3.21` with Go `1.23`
 * Move away from `npm` to `pnpm` 
 
 ## [4.0.0] - 2024/10/25

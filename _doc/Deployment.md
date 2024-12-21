@@ -38,7 +38,6 @@ services:
             - WEB_TITLE=upda
             - TZ=Europe/Berlin
             - DB_POSTGRES_TZ=Europe/Berlin
-            - DB_TYPE=postgres
             - DB_POSTGRES_HOST=db
             - DB_POSTGRES_PORT=5432
             - DB_POSTGRES_NAME=upda
@@ -58,7 +57,7 @@ services:
 
     db:
         container_name: upda_db
-        image: postgres:16
+        image: postgres:17
         restart: unless-stopped
         environment:
             - POSTGRES_USER=upda
@@ -72,67 +71,6 @@ services:
 volumes:
     upda-db-vol:
         external: false
-```
-
-### SQLite
-
-#### docker-compose
-
-You can use the following to get it up running quickly via docker compose.
-
-```yaml
-networks:
-    internal:
-        external: false
-        driver: bridge
-        driver_opts:
-            com.docker.network.bridge.name: br-upda
-
-services:
-    app:
-        container_name: upda_app
-        image: git.myservermanager.com/varakh/upda:latest
-        environment:
-            - WEB_API_URL=https://upda.domain.tld
-            - WEB_TITLE=upda
-            - TZ=Europe/Berlin
-            - BASIC_AUTH_USER=admin
-            - BASIC_AUTH_PASSWORD=changeit
-            # generate 32 character long secret, e.g., with "openssl rand -hex 16"
-            - SECRET=generated-secure-secret-32-chars
-        restart: unless-stopped
-        networks:
-            - internal
-        volumes:
-            - upda-app-vol:/home/appuser
-        ports:
-            - "127.0.0.1:8080:8080"
-
-volumes:
-    upda-app-vol:
-        external: false
-```
-
-#### Local example
-
-For spinning it up **locally** and without a [reverse proxy](#reverse-proxy), you can use the following simple `docker`
-commands.
-
-Make sure to adapt `DOMAIN` and pipe in your device IP address (LAN), e.g., `192.168.1.42`.
-
-```shell
-# create volume
-docker volume create upda-app-vol
-
-# run locally binding to your LAN IP address
-docker run --name upda_app \
-  -p 8080:8080 \
-  -e TZ=Europe/Berlin \
-  -e WEB_API_URL=http://192.168.1.42:8080 \
-  -e BASIC_AUTH_USER=admin \
-  -e BASIC_AUTH_PASSWORD=changeit \
-  -v upda-app-vol:/home/appuser \
-  varakh/upda:latest
 ```
 
 ## High availability
@@ -165,8 +103,6 @@ Make changes to your docker-compose deployment similar to the following:
             - "127.0.0.1:6379:6379"
 
     volumes:
-        # other already defined volumes
-        # ...
         redis-data-vol:
             external: false
 ```

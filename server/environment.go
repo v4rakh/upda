@@ -1,14 +1,20 @@
 package server
 
 import (
+	"database/sql"
+	"embed"
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/util"
-	"github.com/adrg/xdg"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database"
+	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
+	"github.com/golang-migrate/migrate/v4/source"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
+	_ "github.com/golang-migrate/migrate/v4/source/iofs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"log"
@@ -19,6 +25,9 @@ import (
 	"strings"
 	"time"
 )
+
+//go:embed migrations_postgres/*.sql
+var migrationPostgresFS embed.FS
 
 type appConfig struct {
 	timeZone      string
@@ -350,42 +359,20 @@ func bootstrapEnvironment() *Environment {
 	}
 
 	var db *gorm.DB
+	var migrationDriver database.Driver
+	var migrationDatabaseName string
+	var migrationFS source.Driver
+
 	zap.L().Sugar().Infof("Using database type '%s'", os.Getenv(envDbType))
 
-	if os.Getenv(envDbType) == dbTypeSqlite {
-		if os.Getenv(envDbSqliteFile) == "" {
-			var defaultDbFile string
-			if defaultDbFile, err = xdg.DataFile(name + "/" + dbTypeSqliteDbNameDefault); err != nil {
-				zap.L().Sugar().Fatalf("Database file '%s' could not be created. Reason: %v", defaultDbFile, err)
-			}
-			setEnvKeyDefault(envDbSqliteFile, defaultDbFile)
-		}
-
-		dbFile := os.Getenv(envDbSqliteFile)
-		zap.L().Sugar().Infof("Using database file '%s'", dbFile)
-
-		if err = util.CreateFileWithParent(dbFile); err != nil {
-			zap.L().Sugar().Fatalf("Database file '%s' cannot be created: %v", dbFile, err)
-		}
-
-		if db, err = gorm.Open(sqlite.Open(dbFile), gormConfig); err != nil {
-			zap.L().Sugar().Fatalf("Could not setup database: %v", err)
-		}
-
-		if res := db.Exec("PRAGMA foreign_keys = ON"); res.Error != nil {
-			zap.L().Sugar().Fatalf("Could not execute foreign key for SQLite: %v", res.Error)
-		}
-
-		sqlDb, _ := db.DB()
-		sqlDb.SetMaxOpenConns(1)
-		zap.L().Sugar().Infof("SQLite: restricting max connections to '1'")
-	} else if os.Getenv(envDbType) == dbTypePostgres {
+	if os.Getenv(envDbType) == dbTypePostgres {
 		host := os.Getenv(envDbPostgresHost)
 		port := os.Getenv(envDbPostgresPort)
 		dbUser := os.Getenv(envDbPostgresUser)
 		dbPass := os.Getenv(envDbPostgresPassword)
 		dbName := os.Getenv(envDbPostgresName)
 		dbTZ := os.Getenv(envDbPostgresTimeZone)
+		migrationDatabaseName = dbName
 
 		if host == "" || port == "" || dbUser == "" || dbPass == "" || dbName == "" || dbTZ == "" {
 			zap.L().Sugar().Fatalf("Some configuration for database type '%s' is missing", os.Getenv(envDbType))
@@ -395,8 +382,25 @@ func bootstrapEnvironment() *Environment {
 		if db, err = gorm.Open(postgres.Open(dsn), gormConfig); err != nil {
 			zap.L().Sugar().Fatalf("Could not setup database: %v", err)
 		}
+
+		var sqlDb *sql.DB
+		if sqlDb, err = db.DB(); err != nil {
+			zap.L().Sugar().Fatalf("Could not retrieve database: %v", err)
+		}
+
+		if err = sqlDb.Ping(); err != nil {
+			zap.L().Sugar().Fatalf("Could not connect to database: %v", err)
+		}
+
+		if migrationDriver, err = migratepostgres.WithInstance(sqlDb, &migratepostgres.Config{}); err != nil {
+			zap.L().Sugar().Fatalf("Could not create migration driver: %v", err)
+		}
+
+		if migrationFS, err = iofs.New(migrationPostgresFS, "migrations_postgres"); err != nil {
+			zap.L().Sugar().Fatalf("Could not create migration source: %v", err)
+		}
 	} else {
-		zap.L().Sugar().Fatalf("Database type '%s' or '%s' is required", dbTypeSqlite, dbTypePostgres)
+		zap.L().Sugar().Fatalf("Database type '%s' is required", dbTypePostgres)
 	}
 
 	if db == nil {
@@ -413,14 +417,47 @@ func bootstrapEnvironment() *Environment {
 		prometheusConfig: pc,
 		db:               db}
 
-	if err = env.db.AutoMigrate(&Update{}, &Webhook{}, &Event{}, &Secret{}, &Action{}, &ActionInvocation{}); err != nil {
-		zap.L().Sugar().Fatalf("Could not migrate database schema: %s", err)
+	migrationEnabled := os.Getenv(envDbMigrationEnabled) == "true"
+	if !migrationEnabled {
+		zap.L().Warn("Database schema migration is disabled and not executed automatically. Make sure to run them manually, otherwise the application might misbehave. You can safely ignore this warning if application is started in high availability mode and you're sure necessary database schema already exists.")
+	} else {
+		var migrator *migrate.Migrate
+		if migrator, err = migrate.NewWithInstance("iofs", migrationFS, migrationDatabaseName, migrationDriver); err != nil {
+			zap.L().Sugar().Fatalf("Could not create database migration instance: %v", err)
+		}
+
+		var migrationVersion uint
+		var migrationVersionDirty bool
+		if migrationVersion, migrationVersionDirty, err = migrator.Version(); err != nil {
+			if errors.Is(err, migrate.ErrNilVersion) {
+				zap.L().Info("Database migration schema is uninitialized")
+			} else {
+				zap.L().Sugar().Fatalf("Could not retrieve database migration version: %v", err)
+			}
+		} else {
+			zap.L().Sugar().Infof("Previous database migration version is '%d' (dirty '%v')", migrationVersion, migrationVersionDirty)
+		}
+
+		zap.L().Info("Applying necessary database migration steps...")
+		if err = migrator.Up(); err != nil {
+			if errors.Is(err, migrate.ErrNoChange) {
+				zap.L().Info("No database schema changes detected")
+			} else {
+				zap.L().Sugar().Fatalf("Could not migrate database schema: %v", err)
+			}
+		}
+
+		zap.L().Info("Applied all necessary database migration steps successfully")
 	}
 
-	zap.L().Sugar().Infof("appConfig %+v", env.appConfig)
-	zap.L().Sugar().Infof("serverConfig %+v", env.serverConfig)
-	zap.L().Sugar().Infof("taskConfig %+v", env.taskConfig)
-	zap.L().Sugar().Infof("webhookConfig %+v", env.webhookConfig)
+	zap.L().Sugar().Infof("AppConfig %+v", env.appConfig)
+	zap.L().Sugar().Infof("WebConfig %+v", env.webConfig)
+	zap.L().Info("AuthConfig ***REDACTED***")
+	zap.L().Sugar().Infof("ServerConfig %+v", env.serverConfig)
+	zap.L().Sugar().Infof("TaskConfig %+v", env.taskConfig)
+	zap.L().Info("LockConfig ***REDACTED***")
+	zap.L().Sugar().Infof("WebhookConfig %+v", env.webhookConfig)
+	zap.L().Info("PrometheusConfig ***REDACTED***")
 
 	return env
 }
@@ -474,7 +511,8 @@ func bootstrapFromEnvironmentAndValidate() {
 	setEnvKeyDefault(envPrometheusSecureTokenEnabled, prometheusSecureTokenEnabledDefault)
 
 	// db
-	setEnvKeyDefault(envDbType, dbTypeSqlite)
+	setEnvKeyDefault(envDbType, dbTypePostgres)
+	setEnvKeyDefault(envDbMigrationEnabled, dbMigrationEnabledDefault)
 
 	if os.Getenv(envDbType) == dbTypePostgres {
 		setEnvKeyDefault(envDbPostgresHost, dbTypePostgresHostDefault)

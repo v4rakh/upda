@@ -52,21 +52,21 @@ const (
 	corsAllowCredentialsDefault = "true"
 	corsExposeHeadersDefault    = "*"
 
-	dbTypeSqlite   = "sqlite"
 	dbTypePostgres = "postgres"
 
 	envDbType                 = "DB_TYPE"
-	envDbSqliteFile           = "DB_SQLITE_FILE"
 	envDbPostgresHost         = "DB_POSTGRES_HOST"
 	envDbPostgresPort         = "DB_POSTGRES_PORT"
 	envDbPostgresName         = "DB_POSTGRES_NAME"
 	envDbPostgresTimeZone     = "DB_POSTGRES_TZ"
 	envDbPostgresUser         = "DB_POSTGRES_USER"
 	envDbPostgresPassword     = "DB_POSTGRES_PASSWORD"
-	dbTypeSqliteDbNameDefault = "upda.db"
 	dbTypePostgresHostDefault = "localhost"
 	dbTypePostgresPortDefault = "5432"
 	dbTypePostgresTZDefault   = "Europe/Berlin"
+
+	envDbMigrationEnabled     = "DB_MIGRATION_ENABLED"
+	dbMigrationEnabledDefault = "true"
 
 	envTaskPrometheusRefreshInterval = "TASK_PROMETHEUS_REFRESH_INTERVAL"
 	taskPrometheusRefreshDefault     = "60s"

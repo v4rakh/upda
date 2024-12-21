@@ -74,7 +74,7 @@ docker run --rm --name=upda-db \
   -e POSTGRES_USER=upda \
   -e POSTGRES_PASSWORD=upda \
   -e POSTGRES_DB=upda \
-  postgres:16-alpine
+  postgres:17-alpine
   
 # redis
 docker run --rm --name some-redis \
@@ -88,7 +88,7 @@ On Windows, you need a valid `gcc`, e.g., https://jmeubank.github.io/tdm-gcc/dow
 path.
 
 For any `go` command you run, ensure that your `PATH` has the `gcc` binary and that you add `CGO_ENABLED=1` as
-environment.
+environment if go commands fail.
 
 ### Using the `lockService` correctly
 
