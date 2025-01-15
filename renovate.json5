@@ -99,7 +99,8 @@
       ],
       "matchPackageNames": [
         "npm",
-        "node"
+        "node",
+        "pnpm"
       ],
       "matchDepTypes": [
         "engines"
