@@ -3,13 +3,14 @@ WEB_DIR = $(shell pwd)/server/web
 WEB_BUILD_DIR = $(shell pwd)/server/web/build
 WEB_NODE_DIR = $(shell pwd)/server/web/node_modules
 WEB_COVERAGE_DIR = $(shell pwd)/server/web/coverage
+WEB_CI_DIR = $(shell pwd)/server/web/ci/*.xml
 
 # cleanup steps
 clean: clean-server clean-web
 clean-server:
 	rm -rf ${BIN_DIR}
 clean-web:
-	rm -rf ${WEB_BUILD_DIR} ${WEB_NODE_DIR} ${WEB_COVERAGE_DIR}
+	rm -rf ${WEB_BUILD_DIR} ${WEB_NODE_DIR} ${WEB_COVERAGE_DIR} ${WEB_CI_DIR}
 
 # dependencies steps
 dependencies: dependencies-web dependencies-server
