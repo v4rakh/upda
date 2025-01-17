@@ -1,25 +1,22 @@
 # Deployment
 
 _upda_ is a server application which embeds a webinterface directly in its binary form. This makes it easy to deploy
-natively. In addition, a _upda_ docker image is provided to get started quickly.
+natively. In addition, a _upda_ docker image is provided.
 
-_upda-cli_ which is an optional commandline helper to quickly invoke webhooks or list tracked updates in
+_upda-cli_ which is an optional command-line helper to quickly invoke webhooks or list tracked updates in
 your is also embedded into the docker image, but can also be downloaded for your operating system.
 
 The following sections outline how to deploy _upda_ in a containerized environment and also natively.
 
+> You need to ensure to properly replace `$GENERATED_SECURE_SECRET_OF_SIZE_32_CHARS`, `$SECURE_RANDOM_DATABASE_PASSWORD`
+> and `$SECURE_ADMIN_PASSWORD` with secure randomly generated passwords.
+
 ## Container
 
-Use one of the provided `docker-compose` examples, edit to your needs. Then issue `docker compose up -d` command and
-`docker compose logs -f` to trace the log.
+The following outlines use of `docker-compose`, but plain docker or podman (use pod for connection to database and/or
+redis) work as well. Basic usage of those tools is not explained here. Please refer to other online sources.
 
-Default image user is `appuser` (`uid=2033`) and group is `appgroup` (`gid=2033`).
-
-The following examples are available
-
-### Postgres
-
-#### docker-compose
+The default image user is `appuser` (`uid=2033`) and group is `appgroup` (`gid=2033`).
 
 ```yaml
 networks:
@@ -42,11 +39,11 @@ services:
             - DB_POSTGRES_PORT=5432
             - DB_POSTGRES_NAME=upda
             - DB_POSTGRES_USER=upda
-            - DB_POSTGRES_PASSWORD=upda
+            - DB_POSTGRES_PASSWORD=$SECURE_RANDOM_DATABASE_PASSWORD
             - BASIC_AUTH_USER=admin
-            - BASIC_AUTH_PASSWORD=changeit
+            - BASIC_AUTH_PASSWORD=$SECURE_ADMIN_PASSWORD
             # generate 32 character long secret, e.g., with "openssl rand -hex 16"
-            - SECRET=generated-secure-secret-32-chars
+            - SECRET=$GENERATED_SECURE_SECRET_OF_SIZE_32_CHARS
         restart: unless-stopped
         networks:
             - internal
@@ -57,11 +54,11 @@ services:
 
     db:
         container_name: upda_db
-        image: postgres:17
+        image: docker.io/postgres:17
         restart: unless-stopped
         environment:
             - POSTGRES_USER=upda
-            - POSTGRES_PASSWORD=upda
+            - POSTGRES_PASSWORD=$SECURE_RANDOM_DATABASE_PASSWORD
             - POSTGRES_DB=upda
         networks:
             - internal
@@ -75,8 +72,7 @@ volumes:
 
 ## High availability
 
-For high availability, pick the [Postgres setup](#postgres) and add [REDIS](https://redis.io/) to support proper
-distributed locking.
+For high availability, add [REDIS](https://redis.io/) to support proper distributed locking.
 
 Make changes to your docker-compose deployment similar to the following:
 
@@ -137,11 +133,19 @@ server {
 
 ## Native
 
-Native deployment is also possible.
+Deploying _upda_ natively is also possible.
 
-Download the binary for your operating system. Next, use the binary or execute it locally.
+First, download the binary for your operating system, make it executable, e.g., with `chmod +x upda-server`, then
+place it into the directory you want, e.g., `/usr/local/bin`. Afterward, run the binary with `./upda-server`.
 
-See the provided systemd service example `upda.service` to deploy on a UNIX/Linux machine.
+For a native deployment, it's recommended to use a service orchestrator like systemd on UNIX/Linux machines. Here's an
+example file `upda.service` which you can put into `/etc/systemd/system` or alike, then reload available systemd
+services with `systemctl daemon-reload` to make it available.
+
+Make sure that your `/etc/upda.conf` has all necessary `DB_POSTGRES_*` environment variables set to configure the
+database connection.
+
+Afterward, start and enable it with `systemctl enable --now upda.service`.
 
 ```shell
 [Unit]

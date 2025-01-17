@@ -15,7 +15,7 @@ A Prometheus scrape configuration might look like the following if `PROMETHEUS_S
 scrape_configs:
   - job_name: 'upda'
     static_configs:
-      - targets: ['upda:8080']
+      - targets: ['<ip address of upda>:8080']
     bearer_token: 'VALUE_OF_PROMETHEUS_SECURE_TOKEN'
 ```
 
