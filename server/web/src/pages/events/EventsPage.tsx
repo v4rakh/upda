@@ -36,7 +36,7 @@ const EventsPage: FC = () => {
 		if (!events) {
 			fetchData(size, skip);
 		}
-	}, [trigger, result, events, fetchData, size, skip]);
+	}, [events, fetchData, size, skip]);
 
 	const removeEvent = useCallback(
 		(id: string) => {
@@ -74,7 +74,7 @@ const EventsPage: FC = () => {
 		<>
 			<AppBreadcrumb items={[{ label: t('title'), active: true, path: '' }]} />
 			<PageHeader
-				className={'pl-0'}
+				className="pl-0"
 				title={
 					<Typography.Title level={4} ellipsis>
 						{t('title')}
@@ -85,10 +85,10 @@ const EventsPage: FC = () => {
 				}
 				extra={
 					<Space>
-						<Tooltip title={t('reload_tooltip')} placement={'bottom'}>
+						<Tooltip title={t('reload_tooltip')} placement="bottom">
 							<Button
 								icon={<ReloadOutlined />}
-								type={'link'}
+								type="link"
 								onClick={invokeReload}
 								loading={result.isFetching}
 								disabled={result.isLoading || result.isFetching}
@@ -99,9 +99,7 @@ const EventsPage: FC = () => {
 			/>
 			{result.isLoading && <Skeleton loading={result.isLoading} active={result.isLoading} />}
 			{result.isError && <Result status="error" title={t('error_default_loading')} />}
-			{result.isSuccess && result.isUninitialized && events && events.length === 0 && (
-				<Result status={404} title={t('no_events')} />
-			)}
+			{result.isSuccess && events?.length === 0 && <Result status={404} title={t('no_events')} />}
 			{result.isSuccess && events && events.length > 0 && (
 				<Row justify="center" align="middle">
 					<Col xs={24} sm={16}>
@@ -110,7 +108,7 @@ const EventsPage: FC = () => {
 							pendingDot={
 								<Button
 									size="small"
-									type={'link'}
+									type="link"
 									onClick={onLoadMore}
 									icon={<DownOutlined />}
 									loading={result.isLoading || result.isFetching}

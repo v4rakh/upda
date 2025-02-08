@@ -64,7 +64,7 @@ const CreateSecret: FC = () => {
 				{
 					key: COLLAPSE_KEY,
 					label: (
-						<Button type={'link'} icon={<PlusOutlined />}>
+						<Button type="link" icon={<PlusOutlined />}>
 							{t('create')}
 						</Button>
 					),
@@ -91,7 +91,7 @@ const CreateSecret: FC = () => {
 								</Form.Item>
 								<Form.Item>
 									<Button
-										type={'primary'}
+										type="primary"
 										onClick={() => onSubmit()}
 										loading={isLoading}
 										disabled={isLoading}>

@@ -4,7 +4,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 
 ## [5.0.1] - UNRELEASED
 
-* ...
+* Switch to ghost button style for update cards
+* Dependency updates
 
 ## [5.0.0] - 2024/12/21
 

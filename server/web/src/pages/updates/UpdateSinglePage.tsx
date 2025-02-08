@@ -48,7 +48,7 @@ const UpdateSinglePage: FC = (): ReactNode => {
 				]}
 			/>
 			<PageHeader
-				className={'pl-0'}
+				className="pl-0"
 				title={
 					<Typography.Title level={4} ellipsis>
 						{t('title')}

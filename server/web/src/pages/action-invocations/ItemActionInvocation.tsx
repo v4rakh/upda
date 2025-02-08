@@ -60,10 +60,10 @@ const ItemActionInvocation: FC<ItemActionInvocationProps> = ({ e }): ReactNode =
 					status="error"
 					title={t('error_default_loading_action')}
 					extra={
-						<Tooltip title={t('reload_tooltip')} placement={'bottom'}>
+						<Tooltip title={t('reload_tooltip')} placement="bottom">
 							<Button
 								icon={<ReloadOutlined />}
-								type={'link'}
+								type="link"
 								onClick={invokeActionReload}
 								loading={isFetchingAction}
 								disabled={isFetchingAction}>
@@ -87,10 +87,10 @@ const ItemActionInvocation: FC<ItemActionInvocationProps> = ({ e }): ReactNode =
 					status="error"
 					title={t('error_default_loading_event')}
 					extra={
-						<Tooltip title={t('reload_tooltip')} placement={'bottom'}>
+						<Tooltip title={t('reload_tooltip')} placement="bottom">
 							<Button
 								icon={<ReloadOutlined />}
-								type={'link'}
+								type="link"
 								onClick={invokeEventReload}
 								loading={isFetchingEvent}
 								disabled={isFetchingEvent}>

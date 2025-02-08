@@ -10,7 +10,7 @@ import { WebhookResponse, WebhookType } from '../../types';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
-import { CheckOutlined, CloseOutlined, DeleteOutlined, DeleteTwoTone, FieldTimeOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, DeleteOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Popconfirm, Row, Space, Switch, Tag, Tooltip, Typography } from 'antd';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,7 +104,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 			cancelText={t('cancel')}
 			okButtonProps={{ icon: <DeleteOutlined />, type: 'primary', danger: true }}>
 			<Tooltip title={t('help_delete')} placement="bottom">
-				<Button key="del" icon={<DeleteTwoTone twoToneColor={'red'} />} type={'text'} danger />
+				<Button key="del" icon={<DeleteOutlined />} type="text" danger />
 			</Tooltip>
 		</Popconfirm>
 	);
@@ -124,7 +124,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 					<>
 						{entity.createdAt == entity.updatedAt && (
 							<Tooltip
-								placement={'bottom'}
+								placement="bottom"
 								title={t('created_at', {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,
@@ -138,7 +138,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 						)}
 						{entity.createdAt !== entity.updatedAt && (
 							<Tooltip
-								placement={'bottom'}
+								placement="bottom"
 								title={t('created_at_diff', {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,

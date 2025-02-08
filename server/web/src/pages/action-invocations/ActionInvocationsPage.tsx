@@ -28,6 +28,8 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
+const { Text, Title } = Typography;
+
 const DEFAULT_POLLING_INTERVAL = 5000;
 
 const ActionInvocationsPage = () => {
@@ -114,7 +116,7 @@ const ActionInvocationsPage = () => {
 				case ActionInvocationState.CREATED:
 					return (
 						<Tooltip title={t(`state_${state.toLowerCase()}_description`)}>
-							<Tag icon={<ClockCircleOutlined />} color={'gray'}>
+							<Tag icon={<ClockCircleOutlined />} color="gray">
 								{t(`state_${state.toLowerCase()}`)}
 							</Tag>
 						</Tooltip>
@@ -122,7 +124,7 @@ const ActionInvocationsPage = () => {
 				case ActionInvocationState.ERROR:
 					return (
 						<Tooltip title={t(`state_${state.toLowerCase()}_description`)}>
-							<Tag icon={<ExclamationCircleOutlined />} color={'red'}>
+							<Tag icon={<ExclamationCircleOutlined />} color="red">
 								{t(`state_${state.toLowerCase()}`)}
 							</Tag>
 						</Tooltip>
@@ -131,7 +133,7 @@ const ActionInvocationsPage = () => {
 				case ActionInvocationState.RUNNING:
 					return (
 						<Tooltip title={t(`state_${state.toLowerCase()}_description`)}>
-							<Tag icon={<LoadingOutlined />} color={'blue'}>
+							<Tag icon={<LoadingOutlined />} color="blue">
 								{t(`state_${state.toLowerCase()}`)}
 							</Tag>
 						</Tooltip>
@@ -139,7 +141,7 @@ const ActionInvocationsPage = () => {
 				case ActionInvocationState.SUCCESS:
 					return (
 						<Tooltip title={t(`state_${state.toLowerCase()}_description`)}>
-							<Tag icon={<CheckCircleOutlined />} color={'green'}>
+							<Tag icon={<CheckCircleOutlined />} color="green">
 								{t(`state_${state.toLowerCase()}`)}
 							</Tag>
 						</Tooltip>
@@ -193,19 +195,19 @@ const ActionInvocationsPage = () => {
 		<>
 			<AppBreadcrumb items={[{ label: t('title'), active: true, path: '' }]} />
 			<PageHeader
-				className={'pl-0'}
+				className="pl-0"
 				title={
-					<Typography.Title level={4} ellipsis>
+					<Title level={4} ellipsis>
 						{t('title')}
 						<Tooltip placement="bottom" title={parse(t('help'))}>
 							<Button icon={<QuestionCircleOutlined />} type="link" />
 						</Tooltip>
-					</Typography.Title>
+					</Title>
 				}
 				extra={
 					<Space>
 						<Space>
-							<Typography.Text>{t('auto_refresh')}</Typography.Text>
+							<Text>{t('auto_refresh')}</Text>
 							<Switch
 								checkedChildren={t('on')}
 								unCheckedChildren={t('off')}
@@ -213,10 +215,10 @@ const ActionInvocationsPage = () => {
 								value={pollingInterval > 0}
 							/>
 						</Space>
-						<Tooltip title={t('reload_tooltip')} placement={'bottom'}>
+						<Tooltip title={t('reload_tooltip')} placement="bottom">
 							<Button
 								icon={<ReloadOutlined />}
-								type={'link'}
+								type="link"
 								onClick={invokeReload}
 								loading={isFetching}
 								disabled={isFetching || isLoading}
@@ -243,7 +245,7 @@ const ActionInvocationsPage = () => {
 						expandedRowRender: (record) => <ItemActionInvocation e={record} />,
 						expandRowByClick: true
 					}}
-					rowKey={'id'}
+					rowKey="id"
 					columns={columns}
 					loading={isLoading}
 					dataSource={data.data.content}

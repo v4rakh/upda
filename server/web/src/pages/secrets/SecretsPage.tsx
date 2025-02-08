@@ -82,7 +82,7 @@ const SecretsPage: FC = () => {
 		<>
 			<AppBreadcrumb items={[{ label: t('title'), active: true, path: '' }]} />
 			<PageHeader
-				className={'pl-0'}
+				className="pl-0"
 				title={
 					<Typography.Title level={4} ellipsis>
 						{t('title')}
@@ -92,10 +92,10 @@ const SecretsPage: FC = () => {
 					</Typography.Title>
 				}
 				extra={
-					<Tooltip title={t('reload_tooltip')} placement={'bottom'}>
+					<Tooltip title={t('reload_tooltip')} placement="bottom">
 						<Button
 							icon={<ReloadOutlined />}
-							type={'link'}
+							type="link"
 							onClick={invokeReload}
 							loading={isFetching}
 							disabled={isFetching || isLoading}
@@ -111,7 +111,7 @@ const SecretsPage: FC = () => {
 				<Row justify="center" align="middle">
 					<Col xs={24} lg={24}>
 						<Table
-							rowKey={'id'}
+							rowKey="id"
 							columns={columns}
 							loading={isLoading}
 							dataSource={data.data.content}

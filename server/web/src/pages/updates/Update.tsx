@@ -9,13 +9,12 @@ import { getUpdateStateColor } from '../../utils/updateHelper';
 import { getPageFullPath } from '../../utils/urlHelper';
 import { apiNotification } from '../common/apiNotification';
 import {
-	CheckCircleTwoTone,
+	CheckCircleOutlined,
 	DeleteOutlined,
-	DeleteTwoTone,
 	FieldTimeOutlined,
-	InfoCircleTwoTone,
-	InteractionTwoTone,
-	StopTwoTone
+	InfoCircleOutlined,
+	InteractionOutlined,
+	StopOutlined
 } from '@ant-design/icons';
 import { Badge, Button, Card, Col, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
@@ -72,37 +71,37 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 
 	const buttons = [];
 	const ackAction = (
-		<Tooltip placement={'bottom'} title={t('help_approve')}>
+		<Tooltip placement="bottom" title={t('help_approve')}>
 			<Button
 				key="ack"
 				disabled={isModifyLoading || isDeleteLoading}
 				loading={isModifyLoading}
-				icon={<CheckCircleTwoTone twoToneColor={'green'} />}
-				type={'text'}
+				icon={<CheckCircleOutlined style={{ color: 'green' }} />}
+				type="text"
 				onClick={() => modifyUpdateState({ id: entity.id, body: { state: UpdateState.APPROVED } })}
 			/>
 		</Tooltip>
 	);
 	const ignoreAction = (
-		<Tooltip placement={'bottom'} title={t('help_ignore')}>
+		<Tooltip placement="bottom" title={t('help_ignore')}>
 			<Button
 				key="ignore"
 				disabled={isModifyLoading || isDeleteLoading}
 				loading={isModifyLoading}
-				icon={<StopTwoTone twoToneColor={'orange'} />}
-				type={'text'}
+				icon={<StopOutlined style={{ color: 'orange' }} />}
+				type="text"
 				onClick={() => modifyUpdateState({ id: entity.id, body: { state: UpdateState.IGNORED } })}
 			/>
 		</Tooltip>
 	);
 	const pendingAction = (
-		<Tooltip placement={'bottom'} title={t('help_pending')}>
+		<Tooltip placement="bottom" title={t('help_pending')}>
 			<Button
 				key="pending"
 				disabled={isModifyLoading || isDeleteLoading}
 				loading={isModifyLoading}
-				icon={<InteractionTwoTone twoToneColor={'blue'} />}
-				type={'text'}
+				icon={<InteractionOutlined style={{ color: 'blue' }} />}
+				type="text"
 				onClick={() => modifyUpdateState({ id: entity.id, body: { state: UpdateState.PENDING } })}
 			/>
 		</Tooltip>
@@ -135,8 +134,8 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 			<Tooltip title={t('help_delete')} placement="bottom">
 				<Button
 					key="del"
-					icon={<DeleteTwoTone twoToneColor={'red'} />}
-					type={'text'}
+					icon={<DeleteOutlined style={{ color: 'red' }} />}
+					type="text"
 					loading={isDeleteLoading}
 					danger
 				/>
@@ -144,11 +143,11 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 		</Popconfirm>
 	);
 	const detailsAction = (
-		<Tooltip placement={'bottom'} title={t('help_details')}>
+		<Tooltip placement="bottom" title={t('help_details')}>
 			<Button
 				key="details"
-				icon={<InfoCircleTwoTone twoToneColor={'blue'} />}
-				type={'text'}
+				icon={<InfoCircleOutlined style={{ color: 'blue' }} />}
+				type="text"
 				onClick={redirectToDetails}
 			/>
 		</Tooltip>
@@ -170,16 +169,16 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 								<Badge dot />
 							</Tooltip>
 						)}
-						<Typography.Text onClick={redirectToDetails} ellipsis={{ tooltip: entity.application }}>
-							{entity.application}
-						</Typography.Text>
+						<Button type="text" ghost onClick={redirectToDetails}>
+							<Text ellipsis={{ tooltip: entity.application }}>{entity.application}</Text>
+						</Button>
 					</Space>
 				}
 				extra={
 					<>
 						{entity.createdAt == entity.updatedAt && (
 							<Tooltip
-								placement={'bottom'}
+								placement="bottom"
 								title={t('created_at', {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,
@@ -193,7 +192,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 						)}
 						{entity.createdAt !== entity.updatedAt && (
 							<Tooltip
-								placement={'bottom'}
+								placement="bottom"
 								title={t('created_at_diff', {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,

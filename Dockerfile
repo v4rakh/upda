@@ -13,7 +13,7 @@ RUN apk --update upgrade && \
 
 WORKDIR /app
 COPY . .
-RUN npm install --global pnpm@^9 && \
+RUN npm install --global pnpm@^10 && \
     CC=gcc make ci
 
 #

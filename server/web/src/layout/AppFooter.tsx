@@ -1,15 +1,17 @@
 import { Layout, Space, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 
+const { Text } = Typography;
+
 const AppFooter = () => {
 	const [t] = useTranslation('version');
 	return (
 		<Layout.Footer style={{ textAlign: 'center' }}>
 			<Space>
-				<Typography.Text>&copy; {new Date().getFullYear()}</Typography.Text>
-				<Typography.Text>
+				<Text>&copy; {new Date().getFullYear()}</Text>
+				<Text>
 					{t('version')} {t('number')}
-				</Typography.Text>
+				</Text>
 			</Space>
 		</Layout.Footer>
 	);

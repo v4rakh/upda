@@ -1,6 +1,6 @@
 import { useTestActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
-import { PlayCircleTwoTone } from '@ant-design/icons';
+import { PlayCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,7 +63,7 @@ const TestAction: FC<TestActionProps> = ({ id }): ReactNode => {
 		<Button
 			loading={isLoading}
 			key="test"
-			icon={<PlayCircleTwoTone twoToneColor={'green'} />}
+			icon={<PlayCircleOutlined style={{ color: 'green' }} />}
 			type="text"
 			onClick={onClick}>
 			{t('test')}

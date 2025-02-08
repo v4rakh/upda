@@ -5,7 +5,7 @@ import { useLocaleProviderContext } from '../../providers/LocaleContextProvider'
 import { EventResponse } from '../../types/event';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { apiNotification } from '../common/apiNotification';
-import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Card, Popconfirm, Tooltip, Typography } from 'antd';
 import { FC, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -58,13 +58,7 @@ const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): ReactNode => {
 					cancelText={t('cancel')}
 					okButtonProps={{ icon: <DeleteOutlined />, type: 'primary', danger: true }}>
 					<Tooltip title={t('help_delete')} placement="bottom">
-						<Button
-							key="del"
-							size="small"
-							icon={<DeleteTwoTone twoToneColor={'red'} />}
-							type={'text'}
-							danger
-						/>
+						<Button key="del" size="small" icon={<DeleteOutlined />} type="text" danger />
 					</Tooltip>
 				</Popconfirm>
 			]}>

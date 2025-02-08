@@ -84,7 +84,7 @@ const CreateAction = (): ReactNode => {
 				{
 					key: COLLAPSE_KEY,
 					label: (
-						<Button type={'link'} icon={<PlusOutlined />}>
+						<Button type="link" icon={<PlusOutlined />}>
 							{t('create')}
 						</Button>
 					),
@@ -128,7 +128,7 @@ const CreateAction = (): ReactNode => {
 									label={t('enabled_label')}
 									tooltip={t('enabled_help')}
 									required={true}
-									name={'enabled'}
+									name="enabled"
 									valuePropName="checked">
 									<Switch
 										loading={isLoading}
@@ -138,7 +138,7 @@ const CreateAction = (): ReactNode => {
 								</Form.Item>
 								<Form.Item>
 									<Button
-										type={'primary'}
+										type="primary"
 										onClick={() => onSubmit()}
 										loading={isLoading}
 										disabled={isLoading}>

@@ -1,6 +1,6 @@
 import { useDeleteActionMutation } from '../../api/actionsApi';
 import { apiNotification } from '../common/apiNotification';
-import { DeleteOutlined, DeleteTwoTone } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
 import { FC, ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const DeleteAction: FC<DeleteActionProps> = ({ id }): ReactNode => {
 			cancelText={t('cancel')}
 			okButtonProps={{ icon: <DeleteOutlined />, type: 'primary', danger: true }}>
 			<Tooltip title={t('help_delete')} placement="right">
-				<Button loading={isLoading} key="del" icon={<DeleteTwoTone twoToneColor={'red'} />} type="text" danger>
+				<Button loading={isLoading} key="del" icon={<DeleteOutlined />} type="text" danger>
 					{t('delete')}
 				</Button>
 			</Tooltip>

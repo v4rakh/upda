@@ -112,12 +112,12 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 
 	const filterButton = filtersActive ? (
 		<Badge dot offset={[-10, 5]}>
-			<Button type={'link'} icon={<FilterOutlined />}>
+			<Button type="link" icon={<FilterOutlined />}>
 				{t('filters')}
 			</Button>
 		</Badge>
 	) : (
-		<Button type={'link'} icon={<FilterOutlined />}>
+		<Button type="link" icon={<FilterOutlined />}>
 			{t('filters')}
 		</Button>
 	);

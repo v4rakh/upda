@@ -24,6 +24,8 @@ export type PrimaryMenuProps = {
 	t: TFunction;
 };
 
+const { Text } = Typography;
+
 const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 	const navigate = useNavigate();
 	const isAuthenticated = useAuthenticatedSelector();
@@ -87,9 +89,9 @@ const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 				key: 'menu_logout',
 				icon: <LogoutOutlined />,
 				label: (
-					<Typography.Text strong ellipsis className={classes.username}>
+					<Text strong ellipsis className={classes.username}>
 						{username}
-					</Typography.Text>
+					</Text>
 				),
 				onClick: () => {
 					logout();

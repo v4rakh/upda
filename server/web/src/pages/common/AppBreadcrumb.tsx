@@ -11,6 +11,8 @@ export interface AppBreadcrumbProps {
 	showHome?: boolean;
 }
 
+const { Text } = Typography;
+
 const AppBreadcrumb: FC<AppBreadcrumbProps> = ({ items, showHome = true }) => {
 	const shownItems = [];
 
@@ -26,7 +28,7 @@ const AppBreadcrumb: FC<AppBreadcrumbProps> = ({ items, showHome = true }) => {
 
 	forEach(items, (s) => {
 		const active = <Link to={s.path}>{s.label}</Link>;
-		const inactive = <Typography.Text ellipsis>{s.label}</Typography.Text>;
+		const inactive = <Text ellipsis>{s.label}</Text>;
 
 		shownItems.push({ title: !s.active ? active : inactive });
 	});

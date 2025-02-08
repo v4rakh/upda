@@ -64,7 +64,7 @@ const CreateWebhook: FC = () => {
 				{
 					key: COLLAPSE_KEY,
 					label: (
-						<Button type={'link'} icon={<PlusOutlined />}>
+						<Button type="link" icon={<PlusOutlined />}>
 							{t('create')}
 						</Button>
 					),
@@ -100,12 +100,12 @@ const CreateWebhook: FC = () => {
 									/>
 								</Form.Item>
 
-								<Form.Item label={t('ignore_host')} name={'ignoreHost'} valuePropName="checked">
+								<Form.Item label={t('ignore_host')} name="ignoreHost" valuePropName="checked">
 									<Switch loading={isLoading} />
 								</Form.Item>
 								<Form.Item>
 									<Button
-										type={'primary'}
+										type="primary"
 										onClick={() => onSubmit()}
 										loading={isLoading}
 										disabled={isLoading}>

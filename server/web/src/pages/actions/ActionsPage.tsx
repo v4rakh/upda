@@ -25,6 +25,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
+const { Text, Title } = Typography;
+
 const DEFAULT_POLLING_INTERVAL = 5000;
 
 const ActionsPage = () => {
@@ -156,19 +158,19 @@ const ActionsPage = () => {
 		<>
 			<AppBreadcrumb items={[{ label: t('title'), active: true, path: '' }]} />
 			<PageHeader
-				className={'pl-0'}
+				className="pl-0"
 				title={
-					<Typography.Title level={4} ellipsis>
+					<Title level={4} ellipsis>
 						{t('title')}
 						<Tooltip placement="bottom" title={parse(t('help'))}>
 							<Button icon={<QuestionCircleOutlined />} type="link" />
 						</Tooltip>
-					</Typography.Title>
+					</Title>
 				}
 				extra={
 					<Space>
 						<Space>
-							<Typography.Text>{t('auto_refresh')}</Typography.Text>
+							<Text>{t('auto_refresh')}</Text>
 							<Switch
 								checkedChildren={t('on')}
 								unCheckedChildren={t('off')}
@@ -176,10 +178,10 @@ const ActionsPage = () => {
 								value={pollingInterval > 0}
 							/>
 						</Space>
-						<Tooltip title={t('reload_tooltip')} placement={'bottom'}>
+						<Tooltip title={t('reload_tooltip')} placement="bottom">
 							<Button
 								icon={<ReloadOutlined />}
-								type={'link'}
+								type="link"
 								onClick={invokeReload}
 								loading={isFetching}
 								disabled={isFetching || isLoading}
@@ -206,7 +208,7 @@ const ActionsPage = () => {
 					expandable={{
 						expandedRowRender: (record) => <ItemAction e={record} />
 					}}
-					rowKey={'id'}
+					rowKey="id"
 					columns={columns}
 					loading={isLoading}
 					dataSource={data.data.content}

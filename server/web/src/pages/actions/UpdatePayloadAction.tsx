@@ -14,6 +14,8 @@ export interface UpdatePayloadActionProps {
 	payload: ActionPayloadShoutrrr | undefined;
 }
 
+const { Text } = Typography;
+
 const COLLAPSE_KEY = 'update_type_and_payload';
 
 const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, payload }): ReactNode => {
@@ -55,7 +57,7 @@ const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, pa
 					label: (
 						<Space>
 							<SettingOutlined />
-							<Typography.Text>{t('update_type_and_payload')}</Typography.Text>
+							<Text>{t('update_type_and_payload')}</Text>
 						</Space>
 					),
 					children: (
