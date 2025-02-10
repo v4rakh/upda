@@ -17,6 +17,7 @@ const eslintOptions = {
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react(), viteTsconfigPaths(), svgrPlugin(), stylelint(stylelintOptions), eslint(eslintOptions)],
+	base: './',
 	server: {
 		open: false,
 		host: '127.0.0.1',
@@ -31,6 +32,7 @@ export default defineConfig({
 		environment: 'jsdom',
 		setupFiles: './src/setupTests.ts',
 		coverage: {
+			provider: 'v8',
 			reporter: ['text', 'html'],
 			exclude: ['node_modules/', 'src/setupTests.ts']
 		}

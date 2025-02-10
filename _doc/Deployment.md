@@ -1,22 +1,39 @@
 # Deployment
 
-_upda_ is a server application which embeds a webinterface directly in its binary form. This makes it easy to deploy
-natively. In addition, a _upda_ docker image is provided.
+_upda_ is a server application which embeds a web interface directly in its binary form (can be disabled). This makes it
+easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The _upda-cli_ which is an
+optional command-line helper to quickly invoke webhooks or list tracked updates in your is also embedded into the docker
+image, but can also be downloaded for your operating system.
 
-_upda-cli_ which is an optional command-line helper to quickly invoke webhooks or list tracked updates in
-your is also embedded into the docker image, but can also be downloaded for your operating system.
+Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup with on sub
+path of your existing domain), pick one of the below **deployment** options.
+
+Keep in mind that _upda_ does not support sub path deployments with the embedded web interface.
 
 The following sections outline how to deploy _upda_ in a containerized environment and also natively.
+
+## Container
+
+In addition to native binaries for your operating system, _upda_ is published as docker images:
+
+* (**recommended**) `upda`: This is the _"server"_ which includes the embedded web interface (can be disabled). The
+  default container
+  image user is `appuser` (`uid=2033`). The group is `appgroup` (`gid=2033`).
+* `upda-standalone-webinterface`: This is the standalone web interface to be used for reverse proxy sub path
+  deployments.
+
+The following outlines how to deploy using `docker-compose`. If you prefer using plain `docker` or `podman` commands,
+make sure to create necessary network (for podman use the _pod_ concept) and volume definitions. Please refer to online
+resources if you're not familiar how to translate the docker-compose examples to plain container engine commands.
 
 > You need to ensure to properly replace `$GENERATED_SECURE_SECRET_OF_SIZE_32_CHARS`, `$SECURE_RANDOM_DATABASE_PASSWORD`
 > and `$SECURE_ADMIN_PASSWORD` with secure randomly generated passwords.
 
-## Container
+By default, the following examples only make _upda_ listen on `localhost`/`127.0.0.1` which can be used with
+a [reverse proxy](#reverse-proxy) (**recommended**). For testing, you can also remove the local part in the port mapping
+directives and expose _upda_ directly (not recommended).
 
-The following outlines use of `docker-compose`, but plain docker or podman (use pod for connection to database and/or
-redis) work as well. Basic usage of those tools is not explained here. Please refer to other online sources.
-
-The default image user is `appuser` (`uid=2033`) and group is `appgroup` (`gid=2033`).
+### docker-compose: Deployment on a (sub)domain
 
 ```yaml
 networks:
@@ -31,8 +48,7 @@ services:
         container_name: upda_app
         image: git.myservermanager.com/varakh/upda:latest
         environment:
-            - WEB_API_URL=https://upda.domain.tld
-            - WEB_TITLE=upda
+            - EMBEDDED_WEB_INTERFACE_API_URL=https://upda.domain.tld/api/v1/
             - TZ=Europe/Berlin
             - DB_POSTGRES_TZ=Europe/Berlin
             - DB_POSTGRES_HOST=db
@@ -70,6 +86,41 @@ volumes:
         external: false
 ```
 
+### docker-compose: Deployment on a sub path
+
+Use the [deployment on a (sub)domain](#docker-compose-deployment-on-a-subdomain) as starting point and adapt your
+`docker-compose.yaml` file accordingly. Let's assume you like to deploy under the `/upda-app` base path.
+
+* Disable embedded web interface
+* Add another container for the standalone web interface
+
+```yaml
+# ... = other defined directives
+
+services:
+    app:
+        # ...
+        environment:
+            - EMBEDDED_WEB_INTERFACE_ENABLED=false
+            - SERVER_BASE_PATH=/upda-app/
+            # ...
+
+    webinterface:
+        container_name: upda_webinterface
+        image: git.myservermanager.com/varakh/upda-standalone-webinterface:latest
+        restart: unless-stopped
+        environment:
+            - NGINX_BASE_PATH=/upda-app/
+            - VITE_API_URL=https://domain.tld/upda-app/api/v1/
+        networks:
+            - internal
+        ports:
+            - "127.0.0.1:8081:80"
+```
+
+Next, look into the fitting [reverse proxy setup](#reverse-proxy) or decide if you
+need [high availability](#high-availability).
+
 ## High availability
 
 For high availability, add [REDIS](https://redis.io/) to support proper distributed locking.
@@ -77,15 +128,15 @@ For high availability, add [REDIS](https://redis.io/) to support proper distribu
 Make changes to your docker-compose deployment similar to the following:
 
 ```yaml
-    # the existing app service - add these changes to all instances, so they all use the same redis instance
-    # make sure that all of them can connect to the redis instance
-    # ...
+# ... = other defined directives
+services:
     app:
+        # ...
         environment:
             - LOCK_REDIS_ENABLED=true
             - LOCK_REDIS_URL=redis://redis:6379/0
+            # ...
 
-    # the new redis service            
     redis:
         container_name: upda_redis
         image: redis
@@ -98,22 +149,30 @@ Make changes to your docker-compose deployment similar to the following:
         ports:
             - "127.0.0.1:6379:6379"
 
-    volumes:
-        redis-data-vol:
-            external: false
+volumes:
+    redis-data-vol:
+        external: false
+    # ...
 ```
 
-In addition, you need a proper load balancer which routes incoming traffic to all of your instances.
-
-Furthermore, you can also decide to have the frontend in a high-availability setup.
+You need a proper load balancer which routes incoming traffic to all of your instances.
 
 ## Reverse proxy
 
-You may want to use a proxy in front of them on your host, e.g., nginx. Here's a configuration snippet which should do
-the work.
+> A reverse proxy setup to proxy _upda_ through a sub path, e.g., `https://domain.tld/upda-app`, is only possible if
+> the [embedded web interface is disabled and the standalone web interface](#docker-compose-deployment-on-a-sub-path) is
+> deployed in addition.
 
-The UI and API (backend/server) is reachable through the same domain, e.g., `https://upda.domain.tld`. In addition,
-Let's Encrypt is used for transport encryption.
+The following examples use `nginx` as reverse proxy and Let's Encrypt for transport encryption (https).
+
+You probably want to set the `gzip on;` directive.
+
+### (Sub)Domain
+
+Most likely, this is the default setup and used for the majority of deployments. _upda_ is deployed as a single
+container (excluding database) or [natively](#native-deployment) utilizing the embedded web interface.
+
+We assume your deployment works, and you like to make it available behind `https://upda.domain.tld`.
 
 ```shell
 server {
@@ -131,9 +190,55 @@ server {
 }
 ```
 
-## Native
+### Sub path
+
+We assume your deployment works, and you like to make it available behind `https://domain.tld/upda-app`.
+
+This requires to set the `SERVER_BASE_PATH=/upda-app/` for upda and for the web interface `NGINX_BASE_PATH=/upda-app/`.
+
+You can also combine
+
+```shell
+server {
+    # ... your other domain setup
+    
+    # forward matching requests to the main upda application 
+    location /upda-app/api {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # forward matching requests to the main upda application
+    # comment in if prometheus metrics exporter is disabled
+    location /upda-app/metrics {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # forward matching requests to upda standalone frontend
+    location /upda-app {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+## Native deployment
 
 Deploying _upda_ natively is also possible.
+
+> A reverse proxy setup to proxy _upda_ through a sub path, e.g., `https://domain.tld/upda`, is **not** possible when
+> deploying _upda_ natively. In addition, the _standalone_ web interface is **not** distributed natively. Use the
+> containerized setup if you need to deploy _upda_ behind a sub path!
 
 First, download the binary for your operating system, make it executable, e.g., with `chmod +x upda-server`, then
 place it into the directory you want, e.g., `/usr/local/bin`. Afterward, run the binary with `./upda-server`.

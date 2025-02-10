@@ -3,11 +3,13 @@ on:
     tags:
       - '*'
 env:
-  VERSION_MAJOR: 5
+  VERSION_MAJOR: 6
   VERSION_MINOR: 0
-  VERSION_PATCH: 1
-  IMAGE_TAG: varakh/upda
-  IMAGE_TAG_PRIVATE: git.myservermanager.com/varakh/upda
+  VERSION_PATCH: 0
+  IMAGE_TAG_SERVER: varakh/upda
+  IMAGE_TAG_SERVER_PRIVATE: git.myservermanager.com/varakh/upda
+  IMAGE_TAG_STANDALONE_WEB_INTERFACE: varakh/upda-standalone-webinterface
+  IMAGE_TAG_STANDALONE_WEB_INTERFACE_PRIVATE: git.myservermanager.com/varakh/upda-standalone-webinterface
   FORGEJO_URL: https://git.myservermanager.com
   FORGEJO_FQDN: git.myservermanager.com
   FORGEJO_REPO: varakh/upda
@@ -44,19 +46,34 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_KEY }}
-      - name: Build and push docker image
+      - name: "[SERVER] Build and push docker image"
         uses: docker/build-push-action@v4
         with:
+          context: .
           push: true
           tags: |
-            ${{ env.IMAGE_TAG_PRIVATE }}:${{ env.VERSION_MAJOR }}
-            ${{ env.IMAGE_TAG_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
-            ${{ env.IMAGE_TAG_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
-            ${{ env.IMAGE_TAG_PRIVATE }}:latest
-            ${{ env.IMAGE_TAG }}:${{ env.VERSION_MAJOR }}
-            ${{ env.IMAGE_TAG }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
-            ${{ env.IMAGE_TAG }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
-            ${{ env.IMAGE_TAG }}:latest
+            ${{ env.IMAGE_TAG_SERVER_PRIVATE }}:${{ env.VERSION_MAJOR }}
+            ${{ env.IMAGE_TAG_SERVER_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
+            ${{ env.IMAGE_TAG_SERVER_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+            ${{ env.IMAGE_TAG_SERVER_PRIVATE }}:latest
+            ${{ env.IMAGE_TAG_SERVER }}:${{ env.VERSION_MAJOR }}
+            ${{ env.IMAGE_TAG_SERVER }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
+            ${{ env.IMAGE_TAG_SERVER }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+            ${{ env.IMAGE_TAG_SERVER }}:latest
+      - name: "[STANDALONE_WEB_INTERFACE] Build and push docker image"
+        uses: docker/build-push-action@v4
+        with:
+          context: ./server/web/
+          push: true
+          tags: |
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE_PRIVATE }}:${{ env.VERSION_MAJOR }}
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE_PRIVATE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE_PRIVATE }}:latest
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE }}:${{ env.VERSION_MAJOR }}
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE }}:${{ env.VERSION_MAJOR }}.${{ env.VERSION_MINOR }}.${{ env.VERSION_PATCH }}
+            ${{ env.IMAGE_TAG_STANDALONE_WEB_INTERFACE }}:latest
       - name: Upload artifacts
         uses: actions/forgejo-release@v1
         with:

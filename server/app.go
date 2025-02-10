@@ -39,7 +39,7 @@ func Start() {
 
 	var err error
 
-	ps := newPrometheusService(router, env.prometheusConfig)
+	ps := newPrometheusService(router, env.prometheusConfig, env.serverConfig)
 
 	if env.prometheusConfig.enabled {
 		if err = ps.init(); err != nil {
@@ -108,22 +108,25 @@ func Start() {
 	router.NoRoute(middlewareGlobalNotFound())
 	router.NoMethod(middlewareGlobalMethodNotAllowed())
 
+	// embedded frontend
 	// in production mode, the frontend is embedded on / during compile time utilizing -tags prod
 	// if the prod tag is missing, development setup is used and a dummy frontend is shown on /
-	var targetPath string
-	if env.appConfig.isDevelopment {
-		targetPath = "web_dev"
-	} else {
-		targetPath = "web/build"
-	}
-	router.Use(ginstatic.Serve("/", ginstatic.EmbedFolder(embeddedFiles, targetPath)))
 
-	if !env.appConfig.isDevelopment {
-		embeddedFrontendGroup := router.Group("/")
-		embeddedFrontendGroup.GET("/conf/runtime-config.js", func(c *gin.Context) {
-			config := `
+	if env.embeddedWebInterfaceConfig.enabled {
+		var targetPath string
+		if env.appConfig.isDevelopment {
+			targetPath = "web_dev"
+		} else {
+			targetPath = "web/build"
+		}
+		router.Use(ginstatic.Serve(fmt.Sprintf("%s", env.serverConfig.basePath), ginstatic.EmbedFolder(embeddedFiles, targetPath)))
+
+		if !env.appConfig.isDevelopment {
+			embeddedFrontendGroup := router.Group(fmt.Sprintf("%s", env.serverConfig.basePath))
+			embeddedFrontendGroup.GET("/conf/runtime-config.js", func(c *gin.Context) {
+				config := `
 const runtime_config = Object.freeze({
-  VITE_API_URL: '%s/api/v1/',
+  VITE_API_URL: '%s',
   VITE_APP_TITLE: '%s'
 });
 
@@ -132,8 +135,9 @@ Object.defineProperty(window, 'runtime_config', {
     writable: false
 });
 	`
-			c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(config, env.webConfig.apiUrl, env.webConfig.title)))
-		})
+				c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(config, env.embeddedWebInterfaceConfig.apiUrl, env.embeddedWebInterfaceConfig.title)))
+			})
+		}
 	}
 
 	router.Use(cors.New(cors.Config{
@@ -144,7 +148,7 @@ Object.defineProperty(window, 'runtime_config', {
 		ExposeHeaders:    env.serverConfig.corsExposeHeaders,
 	}))
 
-	apiPublicGroup := router.Group("/api/v1")
+	apiPublicGroup := router.Group(fmt.Sprintf("%s/api/v1", env.serverConfig.basePath))
 	apiPublicGroup.GET("/health", hh.show)
 	apiPublicGroup.GET("/info", ih.show)
 
@@ -162,7 +166,7 @@ Object.defineProperty(window, 'runtime_config', {
 		zap.L().Fatal("No valid auth mode found")
 	}
 
-	apiAuthGroup := router.Group("/api/v1", authMethodHandler)
+	apiAuthGroup := router.Group(fmt.Sprintf("%sapi/v1", env.serverConfig.basePath), authMethodHandler)
 
 	apiAuthGroup.GET("/login", authH.login)
 

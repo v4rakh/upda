@@ -2,9 +2,18 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [5.0.1] - UNRELEASED
+## [6.0.0] - UNRELEASED
+
+> This is a major version upgrade. Though not incompatible, the environment configuration has breaking changes which
+> require **manual intervention** to adapt.
 
 * Switch to ghost button style for update cards
+* Switch default time zone (`TZ` and `DB_POSTGRES_TZ`) to `Etc/UTC`
+* Switch default `WEBHOOKS_TOKEN_LENGTH` from `16` to `30`
+* Allow to disable the embedded frontend with `EMBEDDED_WEB_INTERFACE_ENABLED=false` (defaults to `true`)
+* Rename `WEB_API_URL` configuration to `EMBEDDED_WEB_INTERFACE_API_URL` which requires the full API URL with trailing slash, e.g. `https://upda.domain.tld/api/v1/`
+* Rename `WEB_TITLE` configuration to `EMBEDDED_WEB_INTERFACE_TITLE`
+* Allow to set a base path with `SERVER_BASE_PATH` which defaults to `/`, all routes are prefixed with this base path (except embedded web interface if enabled)
 * Dependency updates
 
 ## [5.0.0] - 2024/12/21

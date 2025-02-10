@@ -35,14 +35,16 @@ type appConfig struct {
 	isDebug       bool
 }
 
-type webConfig struct {
-	title  string
-	apiUrl string
+type embeddedWebInterfaceConfig struct {
+	enabled bool
+	apiUrl  string
+	title   string
 }
 
 type serverConfig struct {
 	port                 int
 	listen               string
+	basePath             string
 	tlsEnabled           bool
 	tlsCertPath          string
 	tlsKeyPath           string
@@ -98,15 +100,15 @@ type prometheusConfig struct {
 }
 
 type Environment struct {
-	appConfig        *appConfig
-	webConfig        *webConfig
-	authConfig       *authConfig
-	serverConfig     *serverConfig
-	taskConfig       *taskConfig
-	lockConfig       *lockConfig
-	webhookConfig    *webhookConfig
-	prometheusConfig *prometheusConfig
-	db               *gorm.DB
+	appConfig                  *appConfig
+	embeddedWebInterfaceConfig *embeddedWebInterfaceConfig
+	authConfig                 *authConfig
+	serverConfig               *serverConfig
+	taskConfig                 *taskConfig
+	lockConfig                 *lockConfig
+	webhookConfig              *webhookConfig
+	prometheusConfig           *prometheusConfig
+	db                         *gorm.DB
 }
 
 func bootstrapEnvironment() *Environment {
@@ -191,21 +193,28 @@ func bootstrapEnvironment() *Environment {
 	bootstrapFromEnvironmentAndValidate()
 
 	// parse environment variables in actual configuration structs
-	// app config
+	// app prometheusConfig
 	ac := &appConfig{
 		timeZone:      os.Getenv(envTZ),
 		isDebug:       isDebug,
 		isDevelopment: isDevelopment,
 	}
 
-	// web config
-	var webC *webConfig
-	webC = &webConfig{
-		title:  os.Getenv(envWebTitle),
-		apiUrl: os.Getenv(envWebApiUrl),
+	// embedded web interface prometheusConfig
+	embeddedWebInterfaceEnabled := os.Getenv(envEmbeddedWebInterfaceEnabled) == "true"
+
+	if embeddedWebInterfaceEnabled {
+		failIfEnvKeyNotPresent(envEmbeddedWebInterfaceApiUrl)
 	}
 
-	// server config
+	var embeddedWebInterfaceC *embeddedWebInterfaceConfig
+	embeddedWebInterfaceC = &embeddedWebInterfaceConfig{
+		enabled: embeddedWebInterfaceEnabled,
+		apiUrl:  os.Getenv(envEmbeddedWebInterfaceApiUrl),
+		title:   os.Getenv(envEmbeddedWebInterfaceTitle),
+	}
+
+	// server prometheusConfig
 	var sc *serverConfig
 
 	var serverPort int
@@ -228,8 +237,9 @@ func bootstrapEnvironment() *Environment {
 
 	sc = &serverConfig{
 		port:                 serverPort,
-		timeout:              serverTimeout,
 		listen:               os.Getenv(envServerListen),
+		basePath:             os.Getenv(envServerBasePath),
+		timeout:              serverTimeout,
 		tlsEnabled:           serverTlsEnabled,
 		tlsCertPath:          os.Getenv(envServerTlsCertPath),
 		tlsKeyPath:           os.Getenv(envServerTlsKeyPath),
@@ -261,7 +271,7 @@ func bootstrapEnvironment() *Environment {
 		authC.basicAuthCredentials = parseBasicAuthCredentials(envBasicAuthCredentials)
 	}
 
-	// task config
+	// task prometheusConfig
 	var tc *taskConfig
 
 	updateCleanStaleInterval := parseDuration(envTaskUpdateCleanStaleInterval)
@@ -324,7 +334,11 @@ func bootstrapEnvironment() *Environment {
 		redisUrl:     os.Getenv(envLockRedisUrl),
 	}
 
-	webhookTokenLength := 32
+	if lc.redisEnabled {
+		failIfEnvKeyNotPresent(envLockRedisUrl)
+	}
+
+	webhookTokenLength := -1
 	if webhookTokenLength, err = strconv.Atoi(os.Getenv(envWebhooksTokenLength)); err != nil {
 		zap.L().Sugar().Fatalf("Invalid webhook token length. Reason: %v", err)
 	}
@@ -341,6 +355,10 @@ func bootstrapEnvironment() *Environment {
 		path:               os.Getenv(envPrometheusMetricsPath),
 		secureTokenEnabled: os.Getenv(envPrometheusSecureTokenEnabled) == "true",
 		secureToken:        os.Getenv(envPrometheusSecureToken),
+	}
+
+	if pc.enabled {
+		failIfEnvKeyNotPresent(envPrometheusMetricsPath)
 	}
 
 	if pc.enabled && pc.secureTokenEnabled {
@@ -408,14 +426,14 @@ func bootstrapEnvironment() *Environment {
 	}
 
 	env := &Environment{appConfig: ac,
-		webConfig:        webC,
-		authConfig:       authC,
-		serverConfig:     sc,
-		taskConfig:       tc,
-		lockConfig:       lc,
-		webhookConfig:    wc,
-		prometheusConfig: pc,
-		db:               db}
+		embeddedWebInterfaceConfig: embeddedWebInterfaceC,
+		authConfig:                 authC,
+		serverConfig:               sc,
+		taskConfig:                 tc,
+		lockConfig:                 lc,
+		webhookConfig:              wc,
+		prometheusConfig:           pc,
+		db:                         db}
 
 	migrationEnabled := os.Getenv(envDbMigrationEnabled) == "true"
 	if !migrationEnabled {
@@ -451,7 +469,7 @@ func bootstrapEnvironment() *Environment {
 	}
 
 	zap.L().Sugar().Infof("AppConfig %+v", env.appConfig)
-	zap.L().Sugar().Infof("WebConfig %+v", env.webConfig)
+	zap.L().Sugar().Infof("EmbeddedWebInterfaceConfig %+v", env.embeddedWebInterfaceConfig)
 	zap.L().Info("AuthConfig ***REDACTED***")
 	zap.L().Sugar().Infof("ServerConfig %+v", env.serverConfig)
 	zap.L().Sugar().Infof("TaskConfig %+v", env.taskConfig)
@@ -472,8 +490,8 @@ func bootstrapFromEnvironmentAndValidate() {
 	setEnvKeyDefault(envTZ, tzDefault)
 
 	// web
-	setEnvKeyDefault(envWebTitle, webTitleDefault)
-	setEnvKeyDefault(envWebApiUrl, webApiUrlDefault)
+	setEnvKeyDefault(envEmbeddedWebInterfaceEnabled, embeddedWebInterfaceEnabledDefault)
+	setEnvKeyDefault(envEmbeddedWebInterfaceTitle, embeddedWebInterfaceTitleDefault)
 
 	// webhook
 	setEnvKeyDefault(envWebhooksTokenLength, webhooksTokenLengthDefault)
@@ -523,6 +541,7 @@ func bootstrapFromEnvironmentAndValidate() {
 	// server
 	setEnvKeyDefault(envServerPort, serverPortDefault)
 	setEnvKeyDefault(envServerListen, serverListenDefault)
+	setEnvKeyDefault(envServerBasePath, serverBasePathDefault)
 	setEnvKeyDefault(envServerTlsEnabled, serverTlsEnabledDefault)
 	setEnvKeyDefault(envCorsAllowOrigins, corsAllowOriginsDefault)
 	setEnvKeyDefault(envCorsAllowMethods, corsAllowMethodsDefault)
@@ -545,7 +564,7 @@ func setEnvKeyDefault(key string, defaultValue string) {
 			zap.L().Sugar().Fatalf("Could not set default value for ENV variable '%s'", key)
 		}
 
-		zap.L().Sugar().Infof("Set '%s' to '%s'", key, defaultValue)
+		zap.L().Sugar().Infof("Setting default for '%s' to '%s'", key, defaultValue)
 	}
 }
 

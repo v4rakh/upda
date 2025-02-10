@@ -54,6 +54,7 @@ the `Makefile` (additional `rm -rf` cmd).
 Ensure to set the following environment variables for proper debug logs during development
 
 ```shell
+EMBEDDED_WEB_INTERFACE_ENABLED=false
 DEVELOPMENT=true
 LOGGING_ENCODING=console
 LOGGING_LEVEL=debug

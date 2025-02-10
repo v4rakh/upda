@@ -14,13 +14,13 @@ const (
 	envSecret = "SECRET"
 
 	envTZ     = "TZ"
-	tzDefault = "Europe/Berlin"
+	tzDefault = "Etc/UTC"
 
-	envWebApiUrl     = "WEB_API_URL"
-	webApiUrlDefault = "http://localhost"
-
-	envWebTitle     = "WEB_TITLE"
-	webTitleDefault = "upda"
+	envEmbeddedWebInterfaceEnabled     = "EMBEDDED_WEB_INTERFACE_ENABLED"
+	embeddedWebInterfaceEnabledDefault = "true"
+	envEmbeddedWebInterfaceApiUrl      = "EMBEDDED_WEB_INTERFACE_API_URL"
+	envEmbeddedWebInterfaceTitle       = "EMBEDDED_WEB_INTERFACE_TITLE"
+	embeddedWebInterfaceTitleDefault   = "upda"
 
 	envAuthMode              = "AUTH_MODE"
 	authModeDefault          = authModeBasicSingle
@@ -31,15 +31,18 @@ const (
 	envBasicAuthCredentials  = "BASIC_AUTH_CREDENTIALS"
 
 	envServerPort           = "SERVER_PORT"
+	serverPortDefault       = "8080"
 	envServerListen         = "SERVER_LISTEN"
+	serverListenDefault     = ""
+	envServerBasePath       = "SERVER_BASE_PATH"
+	serverBasePathDefault   = "/"
 	envServerTlsEnabled     = "SERVER_TLS_ENABLED"
+	serverTlsEnabledDefault = "false"
 	envServerTlsCertPath    = "SERVER_TLS_CERT_PATH"
 	envServerTlsKeyPath     = "SERVER_TLS_KEY_PATH"
-	envServerTimeout        = "SERVER_TIMEOUT"
-	serverListenDefault     = ""
-	serverPortDefault       = "8080"
-	serverTlsEnabledDefault = "false"
-	serverTimeoutDefault    = "1s"
+
+	envServerTimeout     = "SERVER_TIMEOUT"
+	serverTimeoutDefault = "1s"
 
 	envCorsAllowOrigins         = "CORS_ALLOW_ORIGINS"
 	envCorsAllowMethods         = "CORS_ALLOW_METHODS"
@@ -63,7 +66,7 @@ const (
 	envDbPostgresPassword     = "DB_POSTGRES_PASSWORD"
 	dbTypePostgresHostDefault = "localhost"
 	dbTypePostgresPortDefault = "5432"
-	dbTypePostgresTZDefault   = "Europe/Berlin"
+	dbTypePostgresTZDefault   = "Etc/UTC"
 
 	envDbMigrationEnabled     = "DB_MIGRATION_ENABLED"
 	dbMigrationEnabledDefault = "true"
@@ -72,7 +75,7 @@ const (
 	taskPrometheusRefreshDefault     = "60s"
 
 	envWebhooksTokenLength     = "WEBHOOKS_TOKEN_LENGTH"
-	webhooksTokenLengthDefault = "16"
+	webhooksTokenLengthDefault = "32"
 
 	envPrometheusEnabled                = "PROMETHEUS_ENABLED"
 	envPrometheusMetricsPath            = "PROMETHEUS_METRICS_PATH"

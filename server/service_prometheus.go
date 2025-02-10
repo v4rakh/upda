@@ -1,48 +1,51 @@
 package server
 
 import (
+	"fmt"
 	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
 )
 
 type prometheusService struct {
-	router     *gin.Engine
-	prometheus *ginprom.Prometheus
-	config     *prometheusConfig
+	router           *gin.Engine
+	prometheus       *ginprom.Prometheus
+	prometheusConfig *prometheusConfig
+	serverConfig     *serverConfig
 }
 
-func newPrometheusService(r *gin.Engine, c *prometheusConfig) *prometheusService {
+func newPrometheusService(r *gin.Engine, pc *prometheusConfig, sc *serverConfig) *prometheusService {
 	var p *ginprom.Prometheus
 
-	if c.enabled {
-		if c.secureTokenEnabled {
+	if pc.enabled {
+		path := fmt.Sprintf("%s%s", sc.basePath, pc.path)
+		if pc.secureTokenEnabled {
 			p = ginprom.New(
 				ginprom.Engine(r),
 				ginprom.Namespace(name),
 				ginprom.Subsystem(""),
-				ginprom.Path(c.path),
-				ginprom.Ignore(c.path),
-				ginprom.Token(c.secureToken),
+				ginprom.Path(path),
+				ginprom.Ignore(path),
+				ginprom.Token(pc.secureToken),
 			)
 		} else {
 			p = ginprom.New(
 				ginprom.Engine(r),
 				ginprom.Namespace(name),
 				ginprom.Subsystem(""),
-				ginprom.Ignore(c.path),
-				ginprom.Path(c.path),
+				ginprom.Ignore(path),
+				ginprom.Path(path),
 			)
 		}
 	}
 
 	return &prometheusService{
-		prometheus: p,
-		config:     c,
+		prometheus:       p,
+		prometheusConfig: pc,
 	}
 }
 
 func (s *prometheusService) init() error {
-	if !s.config.enabled {
+	if !s.prometheusConfig.enabled {
 		return nil
 	}
 
@@ -76,7 +79,7 @@ func (s *prometheusService) registerGaugeNoLabels(name string, help string) erro
 }
 
 func (s *prometheusService) registerGauge(name string, help string, labels []string) error {
-	if !s.config.enabled {
+	if !s.prometheusConfig.enabled {
 		return nil
 	}
 
@@ -94,7 +97,7 @@ func (s *prometheusService) registerCounterNoLabels(name string, help string) er
 }
 
 func (s *prometheusService) registerCounter(name string, help string, labels []string) error {
-	if !s.config.enabled {
+	if !s.prometheusConfig.enabled {
 		return nil
 	}
 
@@ -112,7 +115,7 @@ func (s *prometheusService) setGaugeNoLabels(name string, value float64) error {
 }
 
 func (s *prometheusService) setGauge(name string, labelValues []string, value float64) error {
-	if !s.config.enabled {
+	if !s.prometheusConfig.enabled {
 		return nil
 	}
 
@@ -132,7 +135,7 @@ func (s *prometheusService) increaseCounterNoLabels(name string) error {
 }
 
 func (s *prometheusService) increaseCounter(name string, labelValues []string) error {
-	if !s.config.enabled {
+	if !s.prometheusConfig.enabled {
 		return nil
 	}
 
