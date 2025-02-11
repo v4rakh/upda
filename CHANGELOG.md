@@ -7,6 +7,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 > This is a major version upgrade. Though not incompatible, the environment configuration has breaking changes which
 > require **manual intervention** to adapt.
 
+* Switch to text area for shoutrrr action URL and body form, but disallow line breaks 
 * Switch to ghost button style for update cards
 * Switch default time zone (`TZ` and `DB_POSTGRES_TZ`) to `Etc/UTC`
 * Switch default `WEBHOOKS_TOKEN_LENGTH` from `16` to `30`

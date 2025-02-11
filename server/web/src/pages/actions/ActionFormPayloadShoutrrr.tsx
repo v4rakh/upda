@@ -1,14 +1,25 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
-import { FC, ReactNode } from 'react';
+import { FC, KeyboardEvent, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface ActionFormShoutrrrProps {
 	isLoading: boolean;
 }
 
+const KEY_ENTER = 'Enter';
+
+const { TextArea } = Input;
+
 const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): ReactNode => {
 	const [t] = useTranslation('action_form_shoutrrrr');
+
+	// Prevents line breaks
+	const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
+		if (KEY_ENTER === e.key) {
+			e.preventDefault();
+		}
+	}, []);
 
 	return (
 		<>
@@ -43,12 +54,15 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): 
 										}
 									]}
 									noStyle>
-									<Input
+									<TextArea
+										autoSize={{ minRows: 1, maxRows: 5 }}
+										showCount
+										allowClear
+										onKeyDown={handleKeyDown}
 										disabled={isLoading}
 										placeholder={t('urls_placeholder')}
 										variant="filled"
 										style={{ width: '90%' }}
-										allowClear
 									/>
 								</Form.Item>
 								{!isLoading && fields.length > 1 ? (
@@ -77,11 +91,14 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): 
 					{ required: true, message: t('body_required') },
 					{ min: 1, message: t('body_size') }
 				]}>
-				<Input
+				<TextArea
+					autoSize={{ minRows: 1, maxRows: 5 }}
+					showCount
+					allowClear
+					onKeyDown={handleKeyDown}
 					placeholder={t('body_placeholder')}
 					disabled={isLoading}
 					variant="filled"
-					allowClear
 					style={{ width: '95%' }}
 				/>
 			</Form.Item>
