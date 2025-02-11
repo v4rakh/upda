@@ -2,10 +2,10 @@
 
 _upda_ is a server application which embeds a web interface directly in its binary form (can be disabled). This makes it
 easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The _upda-cli_ which is an
-optional command-line helper to quickly invoke webhooks or list tracked updates in your is also embedded into the docker
-image, but can also be downloaded for your operating system.
+optional command-line helper to quickly invoke webhooks or list tracked updates in your instance is also embedded into
+the docker image, but can also be downloaded for your operating system.
 
-Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup with on sub
+Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup on sub
 path of your existing domain), pick one of the below **deployment** options.
 
 Keep in mind that _upda_ does not support sub path deployments with the embedded web interface.
@@ -16,11 +16,10 @@ The following sections outline how to deploy _upda_ in a containerized environme
 
 In addition to native binaries for your operating system, _upda_ is published as docker images:
 
-* (**recommended**) `upda`: This is the _"server"_ which includes the embedded web interface (can be disabled). The
-  default container
-  image user is `appuser` (`uid=2033`). The group is `appgroup` (`gid=2033`).
+* `upda`: This is the _"server"_ which includes the embedded web interface (**recommended**, but can be disabled). The
+  default container image user is `appuser` (`uid=2033`). The group is `appgroup` (`gid=2033`).
 * `upda-standalone-webinterface`: This is the standalone web interface to be used for reverse proxy sub path
-  deployments.
+  deployments **only**.
 
 The following outlines how to deploy using `docker-compose`. If you prefer using plain `docker` or `podman` commands,
 make sure to create necessary network (for podman use the _pod_ concept) and volume definitions. Please refer to online
@@ -111,6 +110,7 @@ services:
         restart: unless-stopped
         environment:
             - NGINX_BASE_PATH=/upda-app/
+            - VITE_BASE_PATH=/upda-app/
             - VITE_API_URL=https://domain.tld/upda-app/api/v1/
         networks:
             - internal
@@ -194,7 +194,8 @@ server {
 
 We assume your deployment works, and you like to make it available behind `https://domain.tld/upda-app`.
 
-This requires to set the `SERVER_BASE_PATH=/upda-app/` for upda and for the web interface `NGINX_BASE_PATH=/upda-app/`.
+This requires to set the `SERVER_BASE_PATH=/upda-app/` for upda and for the web interface `NGINX_BASE_PATH=/upda-app/`
+and `VITE_BASE_PATH=/upda-app/`.
 
 You can also combine
 
@@ -247,8 +248,8 @@ For a native deployment, it's recommended to use a service orchestrator like sys
 example file `upda.service` which you can put into `/etc/systemd/system` or alike, then reload available systemd
 services with `systemctl daemon-reload` to make it available.
 
-Make sure that your `/etc/upda.conf` has all necessary `DB_POSTGRES_*` environment variables set to configure the
-database connection.
+Make sure that your `/etc/upda.conf` has all necessary environment variables, e.g. `DB_POSTGRES_*` and alike set to
+configure the database connection.
 
 Afterward, start and enable it with `systemctl enable --now upda.service`.
 

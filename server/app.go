@@ -128,6 +128,7 @@ func Start() {
 const runtime_config = Object.freeze({
   VITE_API_URL: '%s',
   VITE_APP_TITLE: '%s'
+  VITE_BASE_PATH: '/'
 });
 
 Object.defineProperty(window, 'runtime_config', {

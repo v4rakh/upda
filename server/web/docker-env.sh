@@ -47,4 +47,3 @@ echo "[INFO] $RUNTIME_FILE is ready"
 echo "[INFO] Starting web server..."
 echo ""
 exec "$@"
-

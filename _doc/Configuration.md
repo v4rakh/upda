@@ -79,14 +79,15 @@ reasonable defaults.
 | Depends               | `EMBEDDED_WEB_INTERFACE_API_URL`    | If embedded web interface enabled, full API URL including trailing slash, e.g. `https://upda.domain.tld/api/v1/`                                                                                              |                                                                                                                                      |
 |                       | `EMBEDDED_WEB_INTERFACE_TITLE`      | If embedded web interface enabled, determines web interface's page                                                                                                                                            | `upda`                                                                                                                               | 
 
-The standalone web interface has the following configuration values.
+The standalone web interface has the following configuration values (docker image only).
 
-| Variable          | Purpose                                 | Default/Description |
-|:------------------|:----------------------------------------|:--------------------|
-| `VITE_API_URL`    | The application's API URL               | Not set             |
-| `VITE_APP_TITLE`  | The application's title                 | `upda`              |
-| `NGINX_BASE_PATH` | The NGINX base path for the application | `/`                 |
-| `NGINX_PORT`      | The NGINX exposed port                  | `80`                |
+| Variable          | Purpose                                                                                             | Default/Description |
+|:------------------|:----------------------------------------------------------------------------------------------------|:--------------------|
+| `NGINX_BASE_PATH` | The NGINX base path for the application (align with `VITE_BASE_PATH`), must end with trailing slash | `/`                 |
+| `NGINX_PORT`      | The NGINX exposed port                                                                              | `80`                |
+| `VITE_API_URL`    | The application's API URL                                                                           | Not set             |
+| `VITE_APP_TITLE`  | The application's title                                                                             | `upda`              |
+| `VITE_BASE_PATH`  | The application's base path (align with `NGINX_BASE_PATH`), must end with trailing slash            | `/`                 |
 
 ## Database migration
 

@@ -5,6 +5,7 @@ declare global {
 }
 
 interface Configuration {
+	VITE_BASE_PATH: string;
 	VITE_API_URL: string;
 	VITE_APP_TITLE: string;
 }
