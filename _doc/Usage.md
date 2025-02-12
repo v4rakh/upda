@@ -1,6 +1,7 @@
 # Usage
 
-Getting started in _upda_ is easy after it has been [deployed](./Deployment.md) successfully and is reachable through your
+Getting started in _upda_ is easy after it has been [deployed](./Deployment.md) successfully and is reachable through
+your
 browser.
 
 ![img](./img/updates.png)
@@ -34,18 +35,19 @@ We just need to configure _upda_ as the receiving application in diun's configur
 
 ```yaml
 notif:
-  webhook:
-    endpoint: https://upda.domain.tld/api/v1/webhooks/ee03cd9e-04d0-4c7f-9866-efe219c2501e
-    method: POST
-    headers:
-      content-type: application/json
-      X-Webhook-Token: <the token from webhook creation in upda>
-    timeout: 10s
+    webhook:
+        endpoint: https://upda.domain.tld/api/v1/webhooks/ee03cd9e-04d0-4c7f-9866-efe219c2501e
+        method: POST
+        headers:
+            content-type: application/json
+            X-Webhook-Token: <the token from webhook creation in upda>
+        timeout: 10s
 ```
 
 Expected payload is derived from the _type_ of the webhook which has been created in _upda_.
 
-In addition, a webhook in _upda_ can be set to ignore the host. Please read more on that in the [Concepts](./Concepts.md)
+In addition, a webhook in _upda_ can be set to ignore the host. Please read more on that in
+the [Concepts](./Concepts.md)
 section.
 
 ## Actions
@@ -56,7 +58,7 @@ host, application, provider) fits the change which happend in _upda_.
 
 Actions have types. Different types require different payload to set them up. [shoutrrr](#shoutrrr) is supported as
 action type, which can send notifications to a variety of services like Gotify, Ntfy, Teams, OpsGenie and many more.
-It in turn also support invoking calls to an external URL. This means you can have a stream of events being triggered
+It also supports invoking calls to an external URL. This means that you can have a stream of events being triggered
 when an update arrives in _upda_.
 
 To create an Action, go to the Actions tab and click on _Create new action_. Enter the necessary information and
@@ -74,17 +76,20 @@ Supported events for Actions are the following:
 | `update_updated_version` | An update's version changed                                         |
 | `update_deleted`         | An update has been removed                                          |
 
-For privacy, an action's configuration supports upda's **secrets** vault, which means that before an action is
-triggered, any occurrence of `<SECRET>SECRET_KEY</SECRET>` is properly replaced by the value of the `SECRET_KEY` defined
-inside the vault.
+All actions support the usage of `<TAG NAME>KEY<TAG NAME>` in their action specific payload. In general, `<CONST>` tags
+are evaluated first, meaning that they can contain other tags as shortcuts.
 
-Secrets can be used in all payload for an Action, including shoutrrr's URL. To create a new secret, go to the _Secrets_
-tab and click on _Create new secret_.
+Available tags(`<TAG NAME>`) are
+
+* `<CONST>CONST_KEY</CONST>` which can be configured on the _Constants_ page,
+* `<SECRET>SECRET_KEY</SECRET>` which can be configured on the _Secrets_ page, and
+* `<VAR>VAR_KEY</VAR>` which are pre-defined variables regarding incoming or changed updates.
+
+As an example, create a new secret, go to the _Secrets_ tab and click on _Create new secret_.
 
 ![img](./img/secrets.png)
 
-In addition to secrets, upda provides **variables** which can be used with the `<VAR>VARIABLE_NAME</VAR>` syntax and any
-occurrence is replaced before invocation as well.
+Available **variables** which can be used with the `<VAR>VARIABLE_NAME</VAR>` syntax are:
 
 | Variable name            | Description                                       |
 |:-------------------------|:--------------------------------------------------|

@@ -4,6 +4,7 @@ enum AppPaths {
 	UPDATES = 'updates',
 	WEBHOOKS = 'webhooks',
 	SECRETS = 'secrets',
+	CONSTANTS = 'constants',
 	ACTIONS = 'actions',
 	ACTION_INVOCATIONS = 'action-invocations',
 	EVENTS = 'events'

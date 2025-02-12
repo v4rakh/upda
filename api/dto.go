@@ -30,6 +30,11 @@ type CreateSecretRequest struct {
 	Value string `json:"value" binding:"required,min=1"`
 }
 
+type CreateConstantRequest struct {
+	Key   string `json:"key" binding:"required,min=1"`
+	Value string `json:"value" binding:"required,min=1"`
+}
+
 type CreateActionRequest struct {
 	Label            string      `json:"label" binding:"required,min=1,max=255"`
 	Type             string      `json:"type" binding:"required,oneof=shoutrrr"`
@@ -42,6 +47,10 @@ type CreateActionRequest struct {
 }
 
 type ModifySecretValueRequest struct {
+	Value string `json:"value" binding:"required,min=1"`
+}
+
+type ModifyConstantValueRequest struct {
 	Value string `json:"value" binding:"required,min=1"`
 }
 
@@ -386,6 +395,42 @@ type SecretDataPageResponse struct {
 
 func NewSecretPageResponse(content []*SecretResponse) *SecretPageResponse {
 	e := new(SecretPageResponse)
+	e.Content = content
+	return e
+}
+
+type ConstantResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Key       string    `json:"key"`
+	Value     string    `json:"value,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type ConstantSingleResponse struct {
+	Data ConstantResponse `json:"data"`
+}
+
+func NewConstantSingleResponse(id uuid.UUID, key string, value string, createdAt time.Time, updatedAt time.Time) *ConstantSingleResponse {
+	e := new(ConstantSingleResponse)
+	e.Data.ID = id
+	e.Data.Key = key
+	e.Data.Value = value
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type ConstantPageResponse struct {
+	Content []*ConstantResponse `json:"content"`
+}
+
+type ConstantDataPageResponse struct {
+	Data *ConstantPageResponse `json:"data"`
+}
+
+func NewConstantPageResponse(content []*ConstantResponse) *ConstantPageResponse {
+	e := new(ConstantPageResponse)
 	e.Content = content
 	return e
 }

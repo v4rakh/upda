@@ -4,6 +4,7 @@ import AppPaths from '../constants/appPaths';
 import AppLayout from '../layout/AppLayout';
 import ActionInvocationsPage from '../pages/action-invocations/ActionInvocationsPage';
 import ActionsPage from '../pages/actions/ActionsPage';
+import ConstantsPage from '../pages/constants/ConstantsPage';
 import ErrorPage404 from '../pages/error-pages/ErrorPage404';
 import EventsPage from '../pages/events/EventsPage';
 import Home from '../pages/home/Home';
@@ -67,6 +68,14 @@ const AppRouter = () => {
 					element={
 						<RequireAuth>
 							<SecretsPage />
+						</RequireAuth>
+					}
+				/>
+				<Route
+					path={AppPaths.CONSTANTS}
+					element={
+						<RequireAuth>
+							<ConstantsPage />
 						</RequireAuth>
 					}
 				/>

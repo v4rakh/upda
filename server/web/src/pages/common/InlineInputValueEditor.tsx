@@ -2,7 +2,7 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Button, Input, Space } from 'antd';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
 import { Variant } from 'antd/es/config-provider';
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent, useCallback, useEffect, useState } from 'react';
 
 const { Compact } = Space;
 
@@ -19,11 +19,8 @@ export interface InlineInputValueEditorProps {
 	onSubmit: (val?: string) => void;
 }
 
-interface InlineInputValueEditorState {
-	currentValue?: string;
-	currentStatus: InputStatus;
-	submitDisabled: boolean;
-}
+const DEFAULT_VALIDATION_STATUS = '';
+const DEFAULT_SUBMIT_DISABLED = true;
 
 const InlineInputValueEditor: FC<InlineInputValueEditorProps> = ({
 	initialValue,
@@ -37,45 +34,49 @@ const InlineInputValueEditor: FC<InlineInputValueEditorProps> = ({
 	isSuccess,
 	onSubmit
 }) => {
-	const [state, setState] = useState<InlineInputValueEditorState>({
-		currentValue: initialValue,
-		currentStatus: '',
-		submitDisabled: true
-	});
+	const [submitDisabled, setSubmitDisabled] = useState(DEFAULT_SUBMIT_DISABLED);
+	const [value, setValue] = useState(initialValue);
+	const [validationStatus, setValidationStatus] = useState<InputStatus>(DEFAULT_VALIDATION_STATUS);
 
 	useEffect(() => {
 		if (isError || isSuccess) {
-			const resetValueError = resetOnError ? '' : state.currentValue;
-			const resetValueSuccess = resetOnSuccess ? '' : state.currentValue;
+			const resetValueError = resetOnError ? '' : value;
+			const resetValueSuccess = resetOnSuccess ? '' : value;
 
-			setState({
-				currentValue: isSuccess ? resetValueSuccess : resetValueError,
-				currentStatus: '',
-				submitDisabled: true
-			});
+			setValue(isSuccess ? resetValueSuccess : resetValueError);
+			setValidationStatus(DEFAULT_VALIDATION_STATUS);
+			setSubmitDisabled(DEFAULT_SUBMIT_DISABLED);
 		}
-	}, [setState, isError, isSuccess, resetOnError, state.currentValue, resetOnSuccess]);
+	}, [isError, isSuccess, resetOnError, resetOnSuccess, value]);
 
-	const onChange = (e: FormEvent<HTMLInputElement>) => {
-		const newVal = e.currentTarget.value;
-
-		const isBlank = newVal === '' || newVal == undefined;
-
-		let inputStatus = '' as InputStatus;
-		if (isBlank && !allowBlank) {
-			inputStatus = 'error';
+	useEffect(() => {
+		if (isLoading || initialValue === value || validationStatus === 'error') {
+			setSubmitDisabled(true);
+		} else {
+			setSubmitDisabled(false);
 		}
+	}, [initialValue, isLoading, validationStatus, value]);
 
-		setState({
-			currentValue: newVal,
-			currentStatus: inputStatus,
-			submitDisabled: isLoading || newVal === initialValue || inputStatus === 'error'
-		});
-	};
+	const onChange = useCallback(
+		(e: FormEvent<HTMLInputElement>) => {
+			const newVal = e.currentTarget.value;
+
+			const isBlank = newVal === '' || newVal == undefined;
+
+			let inputStatus = '' as InputStatus;
+			if (isBlank && !allowBlank) {
+				inputStatus = 'error';
+			}
+
+			setValue(newVal);
+			setValidationStatus(inputStatus);
+		},
+		[allowBlank]
+	);
 
 	const submit = () => {
-		if (!state.submitDisabled) {
-			onSubmit(state.currentValue);
+		if (!submitDisabled) {
+			onSubmit(value);
 		}
 	};
 
@@ -84,16 +85,15 @@ const InlineInputValueEditor: FC<InlineInputValueEditorProps> = ({
 			<Input
 				placeholder={placeholder}
 				variant={variant}
-				status={state.currentStatus}
-				defaultValue={state.currentValue}
-				value={state.currentValue}
+				status={validationStatus}
+				value={value}
 				onChange={onChange}
 				allowClear={allowBlank}
 				onPressEnter={submit}
 			/>
 			<Button
 				loading={isLoading}
-				disabled={state.submitDisabled}
+				disabled={submitDisabled}
 				type="primary"
 				onClick={submit}
 				icon={<CheckOutlined />}

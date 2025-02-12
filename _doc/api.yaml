@@ -17,6 +17,8 @@ tags:
     description: Events endpoints
   - name: secrets
     description: Secrets endpoints
+  - name: constants
+    description: Constants endpoints
   - name: actions
     description: Actions endpoints
   - name: action-invocations
@@ -1863,6 +1865,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Internal error
           content:
@@ -2044,6 +2052,269 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SecretSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /constants:
+    post:
+      tags:
+        - constants
+      security:
+        - basicAuth: [ ]
+      summary: Creates constant
+      description: Creates constant
+      operationId: createConstant
+      requestBody:
+        description: Creates a constant
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConstantRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstantSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - constants
+      security:
+        - basicAuth: [ ]
+      summary: Finds constants
+      description: Finds constants
+      operationId: findConstants
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstantPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/constants/{id}':
+    get:
+      tags:
+        - constants
+      security:
+        - basicAuth: [ ]
+      summary: Finds a constant by ID
+      description: Finds constant by ID
+      operationId: findConstantById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstantSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - constants
+      security:
+        - basicAuth: [ ]
+      summary: Deletes a constant by ID
+      description: 'Deletes a constant by ID'
+      operationId: deleteConstantById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/constants/{id}/value':
+    patch:
+      tags:
+        - constants
+      security:
+        - basicAuth: [ ]
+      summary: Modifies constant's value by ID
+      description: Modifies constant's value by ID
+      operationId: patchConstantValueById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies a constant
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyConstantValueRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstantSingleResponse'
         '400':
           description: Bad request
           content:
@@ -2584,7 +2855,37 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SecretResponse'
-
+    ConstantResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        key:
+          type: string
+        value:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    ConstantSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/ConstantResponse'
+    ConstantPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConstantResponse'
     # requests
     ModifyUpdateStateRequest:
       type: object
@@ -2768,7 +3069,24 @@ components:
           type: string
         value:
           type: string
+    CreateConstantRequest:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
     ModifySecretValueRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+    ModifyConstantValueRequest:
       type: object
       required:
         - value

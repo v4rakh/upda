@@ -8,6 +8,7 @@ export const apiNotification = {
 	error: (props: {
 		i18n: {
 			default: ReactNode;
+			conflict?: ReactNode;
 			badRequest?: ReactNode;
 			notFound?: ReactNode;
 			unAuthorized?: ReactNode;

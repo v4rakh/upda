@@ -4,6 +4,7 @@ export * from './info';
 export * from './update';
 export * from './webhook';
 export * from './secret';
+export * from './constant';
 export * from './actions';
 export * from './actionInvocations';
 export * from './common';

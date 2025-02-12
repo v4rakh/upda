@@ -49,7 +49,7 @@ func (h *secretHandler) create(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.upsert(req.Key, req.Value); err != nil {
+	if e, err = h.service.insert(req.Key, req.Value); err != nil {
 		_ = c.AbortWithError(errToHttpStatus(err), err)
 		return
 	}

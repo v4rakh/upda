@@ -52,6 +52,7 @@ func Start() {
 	webhookRepo := newWebhookDbRepo(env.db)
 	eventRepo := newEventDbRepo(env.db)
 	secretRepo := newSecretDbRepo(env.db)
+	constantRepo := newConstantDbRepo(env.db)
 	actionRepo := newActionDbRepo(env.db)
 	actionInvocationRepo := newActionInvocationDbRepo(env.db)
 
@@ -74,8 +75,9 @@ func Start() {
 	wis := newWebhookInvocationService(ws, us, env.webhookConfig)
 
 	ss := newSecretService(secretRepo)
+	cs := newConstantService(constantRepo)
 	as := newActionService(actionRepo, es)
-	ais := newActionInvocationService(actionInvocationRepo, as, es, ss)
+	ais := newActionInvocationService(actionInvocationRepo, as, es, ss, cs)
 
 	var ts *taskService
 
@@ -94,6 +96,7 @@ func Start() {
 	wih := newWebhookInvocationHandler(wis, ws)
 	eh := newEventHandler(es)
 	sh := newSecretHandler(ss)
+	ch := newConstantHandler(cs)
 	ah := newActionHandler(as)
 	aih := newActionInvocationHandler(as, ais)
 
@@ -192,6 +195,12 @@ Object.defineProperty(window, 'runtime_config', {
 	apiAuthGroup.POST("/secrets", middlewareEnforceJsonContentType(), sh.create)
 	apiAuthGroup.PATCH("/secrets/:id/value", middlewareEnforceJsonContentType(), sh.updateValue)
 	apiAuthGroup.DELETE("/secrets/:id", sh.delete)
+
+	apiAuthGroup.GET("/constants", ch.getAll)
+	apiAuthGroup.GET("/constants/:id", ch.get)
+	apiAuthGroup.POST("/constants", middlewareEnforceJsonContentType(), ch.create)
+	apiAuthGroup.PATCH("/constants/:id/value", middlewareEnforceJsonContentType(), ch.updateValue)
+	apiAuthGroup.DELETE("/constants/:id", ch.delete)
 
 	apiAuthGroup.GET("/actions", ah.paginate)
 	apiAuthGroup.POST("/actions", middlewareEnforceJsonContentType(), ah.create)

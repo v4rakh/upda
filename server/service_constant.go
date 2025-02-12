@@ -5,17 +5,17 @@ import (
 	"go.uber.org/zap"
 )
 
-type secretService struct {
-	repo secretRepository
+type constantService struct {
+	repo constantRepository
 }
 
-func newSecretService(r secretRepository) *secretService {
-	return &secretService{
+func newConstantService(r constantRepository) *constantService {
+	return &constantService{
 		repo: r,
 	}
 }
 
-func (s *secretService) get(id string) (*Secret, error) {
+func (s *constantService) get(id string) (*Constant, error) {
 	if id == "" {
 		return nil, errorValidationNotBlank
 	}
@@ -23,13 +23,13 @@ func (s *secretService) get(id string) (*Secret, error) {
 	return s.repo.findById(id)
 }
 
-func (s *secretService) getValueByKey(key string) (string, error) {
+func (s *constantService) getValueByKey(key string) (string, error) {
 	if key == "" {
 		return "", errorValidationNotBlank
 	}
 
 	var err error
-	var e *Secret
+	var e *Constant
 
 	if e, err = s.repo.findByKey(key); err != nil {
 		return "", err
@@ -38,16 +38,16 @@ func (s *secretService) getValueByKey(key string) (string, error) {
 	return e.Value, nil
 }
 
-func (s *secretService) getAll() ([]*Secret, error) {
+func (s *constantService) getAll() ([]*Constant, error) {
 	return s.repo.findAll()
 }
 
-func (s *secretService) insert(key string, value string) (*Secret, error) {
+func (s *constantService) insert(key string, value string) (*Constant, error) {
 	if key == "" || value == "" {
 		return nil, errorValidationNotBlank
 	}
 
-	var e *Secret
+	var e *Constant
 	var err error
 
 	e, err = s.repo.findByKey(key)
@@ -58,7 +58,7 @@ func (s *secretService) insert(key string, value string) (*Secret, error) {
 		if e, err = s.repo.create(key, value); err != nil {
 			return nil, err
 		}
-		zap.L().Sugar().Infof("Created secret '%s'", e.Key)
+		zap.L().Sugar().Infof("Created constant '%s'", e.Key)
 	} else {
 		return nil, errorResourceConflict
 	}
@@ -66,12 +66,12 @@ func (s *secretService) insert(key string, value string) (*Secret, error) {
 	return e, err
 }
 
-func (s *secretService) updateValue(id string, value string) (*Secret, error) {
+func (s *constantService) updateValue(id string, value string) (*Constant, error) {
 	if id == "" || value == "" {
 		return nil, errorValidationNotBlank
 	}
 
-	var e *Secret
+	var e *Constant
 	var err error
 
 	if e, err = s.get(id); err != nil {
@@ -82,11 +82,11 @@ func (s *secretService) updateValue(id string, value string) (*Secret, error) {
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified secret '%v'", id)
+	zap.L().Sugar().Infof("Modified constant '%v'", id)
 	return e, nil
 }
 
-func (s *secretService) delete(id string) error {
+func (s *constantService) delete(id string) error {
 	if id == "" {
 		return errorValidationNotBlank
 	}
@@ -100,6 +100,6 @@ func (s *secretService) delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted secret '%v'", id)
+	zap.L().Sugar().Infof("Deleted constant '%v'", id)
 	return nil
 }

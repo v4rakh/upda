@@ -16,6 +16,7 @@ var (
 
 	errorResourceNotFound     = newServiceError(notFound, errors.New("resource not found"))
 	errorResourceAccessDenied = newServiceError(forbidden, errors.New("resource access denied"))
+	errorResourceConflict     = newServiceError(conflict, errors.New("resource already exists"))
 
 	errorDatabaseRowsExpected = newServiceDatabaseError(errors.New("action failed, expected affected rows, but got none"))
 )

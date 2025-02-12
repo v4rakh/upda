@@ -8,6 +8,7 @@ import {
 	BarsOutlined,
 	BuildOutlined,
 	ClockCircleOutlined,
+	FolderOutlined,
 	LinkOutlined,
 	LockOutlined,
 	LogoutOutlined,
@@ -63,6 +64,12 @@ const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 				key: AppPaths.SECRETS,
 				icon: <LockOutlined />,
 				onClick: () => navigate(getPageFullPath(AppPaths.SECRETS))
+			},
+			isAuthenticated && {
+				label: t('constants'),
+				key: AppPaths.CONSTANTS,
+				icon: <FolderOutlined />,
+				onClick: () => navigate(getPageFullPath(AppPaths.CONSTANTS))
 			},
 			isAuthenticated && {
 				label: t('events'),

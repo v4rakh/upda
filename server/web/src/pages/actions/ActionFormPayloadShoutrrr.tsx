@@ -1,5 +1,6 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input } from 'antd';
+import { Alert, Button, Form, Input } from 'antd';
+import parse from 'html-react-parser';
 import { FC, KeyboardEvent, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -23,6 +24,7 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): 
 
 	return (
 		<>
+			<Alert showIcon type="info" style={{ marginBottom: '2vh' }} message={parse(t('global_help_banner'))} />
 			<Form.List
 				name="urls"
 				rules={[
@@ -95,7 +97,7 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): 
 					autoSize={{ minRows: 1, maxRows: 5 }}
 					showCount
 					allowClear
-					onKeyDown={handleKeyDown}
+					// onKeyDown={handleKeyDown}
 					placeholder={t('body_placeholder')}
 					disabled={isLoading}
 					variant="filled"

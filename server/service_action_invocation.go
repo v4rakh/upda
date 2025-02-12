@@ -11,18 +11,20 @@ import (
 )
 
 type actionInvocationService struct {
-	repo          ActionInvocationRepository
-	actionService *actionService
-	eventService  *eventService
-	secretService *secretService
+	repo            ActionInvocationRepository
+	actionService   *actionService
+	eventService    *eventService
+	secretService   *secretService
+	constantService *constantService
 }
 
-func newActionInvocationService(r ActionInvocationRepository, a *actionService, e *eventService, s *secretService) *actionInvocationService {
+func newActionInvocationService(r ActionInvocationRepository, a *actionService, e *eventService, s *secretService, c *constantService) *actionInvocationService {
 	return &actionInvocationService{
-		repo:          r,
-		actionService: a,
-		eventService:  e,
-		secretService: s,
+		repo:            r,
+		actionService:   a,
+		eventService:    e,
+		secretService:   s,
+		constantService: c,
 	}
 }
 
@@ -208,12 +210,14 @@ func (s *actionInvocationService) execute(action *Action, eventPayloadInfo *even
 			return newServiceError(general, err)
 		}
 
-		body := s.replaceVars(payload.Body, eventPayloadInfo)
+		body := s.replaceConstants(payload.Body)
+		body = s.replaceVars(body, eventPayloadInfo)
 		body = s.replaceSecrets(body)
 
 		for _, url := range payload.Urls {
-			url = s.replaceSecrets(url)
+			url = s.replaceConstants(url)
 			url = s.replaceVars(url, eventPayloadInfo)
+			url = s.replaceSecrets(url)
 			if err = shoutrrr.Send(url, body); err != nil {
 				return err
 			}
@@ -240,6 +244,28 @@ func (s *actionInvocationService) replaceSecrets(str string) string {
 		var val string
 		if val, err = s.secretService.getValueByKey(match[1]); err != nil {
 			zap.L().Sugar().Warnf("Could not inject secret '%s'. Reason: %s", match[1], err.Error())
+			continue
+		}
+		str = strings.ReplaceAll(str, match[0], val)
+	}
+
+	return str
+}
+
+func (s *actionInvocationService) replaceConstants(str string) string {
+	if str == "" {
+		return str
+	}
+
+	var matches [][]string
+
+	matches = util.ExtractBetween(str, "<CONST>", "</CONST>")
+	var err error
+
+	for _, match := range matches {
+		var val string
+		if val, err = s.constantService.getValueByKey(match[1]); err != nil {
+			zap.L().Sugar().Warnf("Could not inject constant '%s'. Reason: %s", match[1], err.Error())
 			continue
 		}
 		str = strings.ReplaceAll(str, match[0], val)

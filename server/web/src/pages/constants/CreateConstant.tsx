@@ -1,5 +1,5 @@
-import { useCreateSecretMutation } from '../../api/secretsApi';
-import { CreateSecretRequest } from '../../types';
+import { useCreateConstantMutation } from '../../api/constantsApi';
+import { CreateConstantRequest } from '../../types';
 import { apiNotification } from '../common/apiNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Collapse, Divider, Form, Input } from 'antd';
@@ -9,14 +9,14 @@ import { useTranslation } from 'react-i18next';
 
 const COLLAPSE_KEY = 'create';
 
-const CreateSecret: FC = () => {
-	const [t] = useTranslation('secret_create');
+const CreateConstant: FC = () => {
+	const [t] = useTranslation('constant_create');
 	const [form] = Form.useForm();
-	const [save, { data, isSuccess, isError, reset, error, isLoading }] = useCreateSecretMutation();
+	const [save, { data, isSuccess, isError, reset, error, isLoading }] = useCreateConstantMutation();
 	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
 
 	const onSubmit = useCallback(() => {
-		form.validateFields().then((values: CreateSecretRequest) => {
+		form.validateFields().then((values: CreateConstantRequest) => {
 			save(values);
 		});
 	}, [form, save]);
@@ -25,8 +25,8 @@ const CreateSecret: FC = () => {
 		if (isSuccess) {
 			apiNotification.simpleInfo({
 				title: t('created_title'),
-				message: parse(t('created_message', { value: data?.data.value })),
-				duration: 20
+				message: parse(t('created_message')),
+				duration: 5
 			});
 			reset();
 			form.resetFields();
@@ -88,7 +88,7 @@ const CreateSecret: FC = () => {
 										{ required: true, message: t('value_required') },
 										{ min: 1, message: t('value_size') }
 									]}>
-									<Input.Password variant="filled" allowClear placeholder={t('value_placeholder')} />
+									<Input variant="filled" allowClear placeholder={t('value_placeholder')} />
 								</Form.Item>
 								<Form.Item>
 									<Button
@@ -109,4 +109,4 @@ const CreateSecret: FC = () => {
 	);
 };
 
-export default CreateSecret;
+export default CreateConstant;

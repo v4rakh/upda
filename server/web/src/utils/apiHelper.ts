@@ -8,6 +8,7 @@ export const getApiErrorMessage = ({
 }: {
 	i18n: {
 		default: ReactNode;
+		conflict?: ReactNode;
 		badRequest?: ReactNode;
 		notFound?: ReactNode;
 		unAuthorized?: ReactNode;
@@ -17,7 +18,9 @@ export const getApiErrorMessage = ({
 }) => {
 	let message = i18n.default;
 	if ((error as FetchBaseQueryError)?.status) {
-		if (error.status === HttpStatusCode.STATUS_404 || error.originalStatus === HttpStatusCode.STATUS_404) {
+		if (error.status === HttpStatusCode.STATUS_409 || error.originalStatus === HttpStatusCode.STATUS_409) {
+			message = i18n.conflict || i18n.default;
+		} else if (error.status === HttpStatusCode.STATUS_404 || error.originalStatus === HttpStatusCode.STATUS_404) {
 			message = i18n.notFound || i18n.default;
 		} else if (error.status === HttpStatusCode.STATUS_401 && i18n.forbidden) {
 			message = i18n.forbidden;
