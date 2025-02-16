@@ -2,9 +2,9 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [6.0.1] - UNRELEASED
+## [6.0.1] - 2025/02/17
 
-* ...
+* Hotfix: Incorrect instruction to forward `VITE_APP_TITLE` inside embedded web interface
 
 ## [6.0.0] - 2025/02/16
 
@@ -108,6 +108,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[6.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/6.0.1
 
 [6.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/6.0.0
 
