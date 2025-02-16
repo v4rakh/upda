@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [6.0.2] - UNRELEASED
+
+* ...
+
 ## [6.0.1] - 2025/02/17
 
 * Hotfix: Incorrect instruction to forward `VITE_APP_TITLE` inside embedded web interface
