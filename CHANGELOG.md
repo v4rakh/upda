@@ -2,14 +2,14 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [6.0.0] - UNRELEASED
+## [6.0.0] - 2025/02/16
 
 > This is a major version upgrade. Though not incompatible, the environment configuration has breaking changes which
 > require **manual intervention** to adapt.
 
 * Add _constants_ which can be used similarly to `<SECRET>` and `<VAR>` in actions with `<CONST>`
 * Disallow _constants_ and _secrets_ with identical keys
-* Switch to text area for shoutrrr action URL and body form, but disallow line breaks 
+* Switch to text area for shoutrrr action URL and body form, but disallow line breaks
 * Switch to ghost button style for update cards
 * Switch default time zone (`TZ` and `DB_POSTGRES_TZ`) to `Etc/UTC`
 * Switch default `WEBHOOKS_TOKEN_LENGTH` from `16` to `30`
@@ -104,6 +104,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[6.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/6.0.0
 
 [5.0.0]: https://git.myservermanager.com/varakh/upda/releases/tag/5.0.0
 
