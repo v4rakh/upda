@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [6.0.1] - UNRELEASED
+
+* ...
+
 ## [6.0.0] - 2025/02/16
 
 > This is a major version upgrade. Though not incompatible, the environment configuration has breaking changes which

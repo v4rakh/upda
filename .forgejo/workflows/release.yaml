@@ -5,7 +5,7 @@ on:
 env:
   VERSION_MAJOR: 6
   VERSION_MINOR: 0
-  VERSION_PATCH: 0
+  VERSION_PATCH: 1
   IMAGE_TAG_SERVER: varakh/upda
   IMAGE_TAG_SERVER_PRIVATE: git.myservermanager.com/varakh/upda
   IMAGE_TAG_STANDALONE_WEB_INTERFACE: varakh/upda-standalone-webinterface
