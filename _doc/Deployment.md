@@ -110,7 +110,6 @@ services:
         restart: unless-stopped
         environment:
             - NGINX_BASE_PATH=/upda-app/
-            - VITE_BASE_PATH=/upda-app/
             - VITE_API_URL=https://domain.tld/upda-app/api/v1/
         networks:
             - internal
@@ -195,7 +194,7 @@ server {
 We assume your deployment works, and you like to make it available behind `https://domain.tld/upda-app`.
 
 This requires to set the `SERVER_BASE_PATH=/upda-app/` for upda and for the web interface `NGINX_BASE_PATH=/upda-app/`
-and `VITE_BASE_PATH=/upda-app/`.
+and maybe update `VITE_BASE_PATH` (depends on your routing, but likely default will do).
 
 You can also combine
 
