@@ -1,7 +1,7 @@
 import ActionSelectEvent from './ActionSelectEvent';
 import { useModifyMatchEventActionMutation } from '../../api/actionsApi';
 import { EventName } from '../../types/event';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +12,7 @@ export interface UpdateMatchEventActionProps {
 
 const UpdateMatchEventAction: FC<UpdateMatchEventActionProps> = ({ id, matchEvent }): ReactNode => {
 	const [t] = useTranslation('action_update_match_event');
+	const { apiError } = useNotification();
 
 	const [modify, { isLoading, isError, error }] = useModifyMatchEventActionMutation();
 
@@ -28,7 +29,7 @@ const UpdateMatchEventAction: FC<UpdateMatchEventActionProps> = ({ id, matchEven
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_value'),
 					unAuthorized: t('error_unauthorized_update_value'),
@@ -38,7 +39,7 @@ const UpdateMatchEventAction: FC<UpdateMatchEventActionProps> = ({ id, matchEven
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	return <ActionSelectEvent loading={isLoading} onChange={onChange} name={matchEvent} />;
 };

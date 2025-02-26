@@ -1,5 +1,5 @@
 import { useModifyEnabledActionMutation } from '../../api/actionsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Switch } from 'antd';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
@@ -12,12 +12,13 @@ export interface UpdateEnabledActionProps {
 
 const UpdateEnabledAction: FC<UpdateEnabledActionProps> = ({ id, enabled }): ReactNode => {
 	const [t] = useTranslation('action_update_enabled');
+	const { apiError } = useNotification();
 
 	const [modify, { isLoading, isError, error }] = useModifyEnabledActionMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_value'),
 					unAuthorized: t('error_unauthorized_update_value'),
@@ -27,7 +28,7 @@ const UpdateEnabledAction: FC<UpdateEnabledActionProps> = ({ id, enabled }): Rea
 				error: isError
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	const onEnabledChange = useCallback(
 		(checked: boolean) => {

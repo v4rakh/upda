@@ -232,6 +232,20 @@ server {
 }
 ```
 
+### `robots.txt`
+
+By default, _upda_ does not serve a `robots.txt`. If you like to have it served, you can use the following snippet in
+your reverse proxy.
+
+Remember to adapt to your liking before.
+
+```shell
+location = /robots.txt {
+  add_header Content-Type text/plain;
+  return 200 "User-agent: *\nDisallow:\n";
+}
+```
+
 ## Native deployment
 
 Deploying _upda_ natively is also possible.

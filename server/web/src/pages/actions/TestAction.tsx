@@ -1,5 +1,5 @@
 import { useTestActionMutation } from '../../api/actionsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
@@ -11,6 +11,7 @@ export interface TestActionProps {
 
 const TestAction: FC<TestActionProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('action_test');
+	const { simpleError, simpleInfo, apiError } = useNotification();
 
 	const [test, { data, isLoading, isSuccess, isError, error }] = useTestActionMutation();
 
@@ -30,23 +31,23 @@ const TestAction: FC<TestActionProps> = ({ id }): ReactNode => {
 	useEffect(() => {
 		if (isSuccess) {
 			if (data.data.success) {
-				apiNotification.simpleInfo({
+				simpleInfo({
 					title: t('tested_title_success'),
 					message: t('tested_message_success'),
 					duration: 5
 				});
 			} else {
-				apiNotification.simpleError({
+				simpleError({
 					title: t('tested_title_error'),
 					message: t('tested_message_error', { reason: data?.data.message })
 				});
 			}
 		}
-	}, [data?.data.message, data?.data.success, isSuccess, t]);
+	}, [data?.data.message, data?.data.success, isSuccess, t, simpleError, simpleInfo]);
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable'),
 					unAuthorized: t('error_unauthorized'),
@@ -57,7 +58,7 @@ const TestAction: FC<TestActionProps> = ({ id }): ReactNode => {
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	return (
 		<Button

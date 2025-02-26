@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 const App = () => {
 	useEffect(() => {
 		if (isDevelopment()) {
-			document.title = getConfiguration().VITE_APP_TITLE;
+			document.title = getConfiguration().VITE_TITLE;
 		}
 	}, []);
 

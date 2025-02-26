@@ -5,9 +5,11 @@ declare global {
 }
 
 interface Configuration {
-	VITE_BASE_PATH: string;
 	VITE_API_URL: string;
-	VITE_APP_TITLE: string;
+	VITE_BASE_PATH: string;
+	VITE_TITLE: string;
+	VITE_ENABLE_DARK_THEME: number;
+	VITE_ENABLE_FOOTER: number;
 }
 
 /**

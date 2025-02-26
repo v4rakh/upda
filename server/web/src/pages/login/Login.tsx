@@ -3,8 +3,8 @@ import AppPaths from '../../constants/appPaths';
 import { updateAuth } from '../../slices/authSlice';
 import { useAppDispatch } from '../../store';
 import { LoginRequest } from '../../types';
+import { useNotification } from '../../use/useNotification';
 import { getPageFullPath } from '../../utils/urlHelper';
-import { apiNotification } from '../common/apiNotification';
 import AppBreadcrumb from '../common/AppBreadcrumb';
 import { Button, Card, Flex, Form, Input, Space } from 'antd';
 import { useCallback, useEffect } from 'react';
@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router';
 
 const Login = () => {
 	const [t] = useTranslation('login');
+	const { apiError } = useNotification();
+
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
@@ -21,7 +23,7 @@ const Login = () => {
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					unAuthorized: t('unauthorized'),
 					default: t('default_message')
@@ -29,7 +31,7 @@ const Login = () => {
 				error: error
 			});
 		}
-	}, [error, isError, t]);
+	}, [apiError, error, isError, t]);
 
 	useEffect(() => {
 		if (isSuccess) {

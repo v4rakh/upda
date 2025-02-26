@@ -2,7 +2,7 @@ import ActionFormPayloadSwitch from './ActionFormPayloadSwitch';
 import ActionFormType from './ActionFormType';
 import { useModifyTypeAndPayloadActionMutation } from '../../api/actionsApi';
 import { ActionPayloadShoutrrr, ActionType } from '../../types';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { SettingOutlined } from '@ant-design/icons';
 import { Button, Collapse, Form, Space, Typography } from 'antd';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
@@ -20,6 +20,7 @@ const COLLAPSE_KEY = 'update_type_and_payload';
 
 const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, payload }): ReactNode => {
 	const [t] = useTranslation('action_update_payload');
+	const { apiError } = useNotification();
 	const [form] = Form.useForm();
 	const typeValue = Form.useWatch('type', form);
 
@@ -27,7 +28,7 @@ const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, pa
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_value'),
 					unAuthorized: t('error_unauthorized_update_value'),
@@ -37,7 +38,7 @@ const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, pa
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	const onSubmit = useCallback(
 		(values: ActionPayloadShoutrrr & { type: ActionType }) => {

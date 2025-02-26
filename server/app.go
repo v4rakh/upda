@@ -129,9 +129,11 @@ func Start() {
 			embeddedFrontendGroup.GET("/conf/runtime-config.js", func(c *gin.Context) {
 				config := `
 const runtime_config = Object.freeze({
+  VITE_BASE_PATH: '/',
   VITE_API_URL: '%s',
-  VITE_APP_TITLE: '%s',
-  VITE_BASE_PATH: '/'
+  VITE_TITLE: '%s',
+  VITE_ENABLE_DARK_THEME: %d,
+  VITE_ENABLE_FOOTER: %d
 });
 
 Object.defineProperty(window, 'runtime_config', {
@@ -139,7 +141,16 @@ Object.defineProperty(window, 'runtime_config', {
     writable: false
 });
 	`
-				c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(config, env.embeddedWebInterfaceConfig.apiUrl, env.embeddedWebInterfaceConfig.title)))
+				webDarkThemeEnabled := 0
+				if env.embeddedWebInterfaceConfig.darkThemeEnabled {
+					webDarkThemeEnabled = 1
+				}
+				webEnableFooter := 0
+				if env.embeddedWebInterfaceConfig.footerEnabled {
+					webEnableFooter = 1
+				}
+
+				c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(config, env.embeddedWebInterfaceConfig.apiUrl, env.embeddedWebInterfaceConfig.title, webDarkThemeEnabled, webEnableFooter)))
 			})
 		}
 	}

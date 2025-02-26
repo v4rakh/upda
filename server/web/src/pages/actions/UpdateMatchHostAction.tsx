@@ -1,5 +1,5 @@
 import { useModifyMatchHostActionMutation } from '../../api/actionsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,12 +11,13 @@ export interface UpdateMatchHostActionProps {
 
 const UpdateMatchHostAction: FC<UpdateMatchHostActionProps> = ({ id, matchHost }): ReactNode => {
 	const [t] = useTranslation('action_update_match_host');
+	const { apiError } = useNotification();
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyMatchHostActionMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_value'),
 					unAuthorized: t('error_unauthorized_update_value'),
@@ -26,7 +27,7 @@ const UpdateMatchHostAction: FC<UpdateMatchHostActionProps> = ({ id, matchHost }
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	const onSubmit = useCallback(
 		(value?: string) => {

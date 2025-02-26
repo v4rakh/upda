@@ -1,5 +1,5 @@
 import { useDeleteConstantMutation } from '../../api/constantsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
 import { FC, ReactNode, useEffect } from 'react';
@@ -11,12 +11,13 @@ export interface DeleteConstantProps {
 
 const DeleteConstant: FC<DeleteConstantProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('constant_delete');
+	const { apiError } = useNotification();
 
 	const [deleteConstant, { isLoading, isError, error }] = useDeleteConstantMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_delete'),
 					unAuthorized: t('error_unauthorized_delete'),
@@ -26,7 +27,7 @@ const DeleteConstant: FC<DeleteConstantProps> = ({ id }): ReactNode => {
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	return (
 		<Popconfirm

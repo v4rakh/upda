@@ -36,9 +36,11 @@ type appConfig struct {
 }
 
 type embeddedWebInterfaceConfig struct {
-	enabled bool
-	apiUrl  string
-	title   string
+	enabled          bool
+	apiUrl           string
+	title            string
+	darkThemeEnabled bool
+	footerEnabled    bool
 }
 
 type serverConfig struct {
@@ -209,9 +211,11 @@ func bootstrapEnvironment() *Environment {
 
 	var embeddedWebInterfaceC *embeddedWebInterfaceConfig
 	embeddedWebInterfaceC = &embeddedWebInterfaceConfig{
-		enabled: embeddedWebInterfaceEnabled,
-		apiUrl:  os.Getenv(envEmbeddedWebInterfaceApiUrl),
-		title:   os.Getenv(envEmbeddedWebInterfaceTitle),
+		enabled:          embeddedWebInterfaceEnabled,
+		apiUrl:           os.Getenv(envEmbeddedWebInterfaceApiUrl),
+		title:            os.Getenv(envEmbeddedWebInterfaceTitle),
+		darkThemeEnabled: os.Getenv(envEmbeddedWebInterfaceDarkThemeEnabled) == "true",
+		footerEnabled:    os.Getenv(envEmbeddedWebInterfaceFooter) == "true",
 	}
 
 	// server prometheusConfig
@@ -492,6 +496,8 @@ func bootstrapFromEnvironmentAndValidate() {
 	// web
 	setEnvKeyDefault(envEmbeddedWebInterfaceEnabled, embeddedWebInterfaceEnabledDefault)
 	setEnvKeyDefault(envEmbeddedWebInterfaceTitle, embeddedWebInterfaceTitleDefault)
+	setEnvKeyDefault(envEmbeddedWebInterfaceDarkThemeEnabled, embeddedWebInterfaceDarkThemeEnabledDefault)
+	setEnvKeyDefault(envEmbeddedWebInterfaceFooter, embeddedWebInterfaceFooterEnabledDefault)
 
 	// webhook
 	setEnvKeyDefault(envWebhooksTokenLength, webhooksTokenLengthDefault)

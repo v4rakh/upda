@@ -6,7 +6,7 @@ Frontend for _upda_.
 
 * During development: `.env.development`
 * Production derives the values from their main GoLang application, some environment variables are coupled with their
-  backend one, some are exposed via `WEB_*`, but internally mapped to `VITE_` in the `app.go` file
+  backend one, some are exposed via `EMBEDDED_WEB_INTERFACE_*`, but internally mapped to `VITE_` in the `app.go` file
 
 ## Development & contribution
 

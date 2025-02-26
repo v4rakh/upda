@@ -4,10 +4,10 @@ import AppPaths from '../../constants/appPaths';
 import DateTimeStyle from '../../constants/dateTimeStyle';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { UpdateResponse, UpdateState } from '../../types';
+import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { getUpdateStateColor } from '../../utils/updateHelper';
 import { getPageFullPath } from '../../utils/urlHelper';
-import { apiNotification } from '../common/apiNotification';
 import {
 	CheckCircleOutlined,
 	DeleteOutlined,
@@ -29,6 +29,7 @@ export interface UpdateProps {
 
 const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 	const [t] = useTranslation('update');
+	const { apiError } = useNotification();
 	const { locale } = useLocaleProviderContext();
 	const navigate = useNavigate();
 
@@ -43,7 +44,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 
 	useEffect(() => {
 		if (isErrorDelete) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_delete'),
 					unAuthorized: t('error_unauthorized_delete'),
@@ -53,11 +54,11 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 				error: deleteError
 			});
 		}
-	}, [isErrorDelete, deleteError, t]);
+	}, [isErrorDelete, deleteError, t, apiError]);
 
 	useEffect(() => {
 		if (isErrorModify) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_modify_state'),
 					unAuthorized: t('error_unauthorized_modify_state'),
@@ -67,7 +68,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 				error: modifyError
 			});
 		}
-	}, [isErrorModify, modifyError, t]);
+	}, [apiError, isErrorModify, modifyError, t]);
 
 	const buttons = [];
 	const ackAction = (
@@ -169,7 +170,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 								<Badge dot />
 							</Tooltip>
 						)}
-						<Button type="text" ghost onClick={redirectToDetails}>
+						<Button type="text" onClick={redirectToDetails}>
 							<Text ellipsis={{ tooltip: entity.application }}>{entity.application}</Text>
 						</Button>
 					</Space>

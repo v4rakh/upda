@@ -127,7 +127,6 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIcon={() => <></>}
 			expandIconPosition="end"
 			bordered={false}
 			ghost
@@ -136,6 +135,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 			items={[
 				{
 					key: COLLAPSE_KEY,
+					showArrow: false,
 					label: filterButton,
 					children: (
 						<>

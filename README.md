@@ -8,7 +8,7 @@ Other repositories are mirrors and pull requests, issues, and planning are manag
 
 Contributions are very welcome!
 
-See [official documentation](./_doc/Home.md).
+See **[official documentation](./_doc/Home.md)**.
 
 ## Development & contribution
 
@@ -36,18 +36,6 @@ There's also a [embedded frontend](#embedded-frontend).
 * Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
 
 Be aware that some are false positives and actually required.
-
-## Embedded Frontend
-
-_upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
-embedded into the GoLang binary itself.
-
-For _development_, no other steps are required. Simply follow the [frontend instructions](./server/web/README.md) and
-start the frontend separately.
-
-If you like to have a look on the _production_ experience, the frontend needs to be build first and you need to build
-the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
-the `Makefile` (additional `rm -rf` cmd).
 
 ### Getting started
 
@@ -82,8 +70,19 @@ docker run --rm --name some-redis \
   -p 6379:6379 \
   redis redis-server --save 60 1 --loglevel warning
 ```
+### Embedded Frontend
 
-#### Windows hints
+_upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
+embedded into the GoLang binary itself.
+
+For _development_, no other steps are required. Simply follow the [frontend instructions](./server/web/README.md) and
+start the frontend separately.
+
+If you like to have a look on the _production_ experience, the frontend needs to be build first and you need to build
+the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
+the `Makefile` (additional `rm -rf` cmd).
+
+### Windows hints
 
 On Windows, you need a valid `gcc`, e.g., https://jmeubank.github.io/tdm-gcc/download/ and add the `\bin` folder to your
 path.

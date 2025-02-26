@@ -1,5 +1,5 @@
 import { useModifyValueSecretMutation } from '../../api/secretsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
 import { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,12 +11,13 @@ export interface UpdateValueSecretProps {
 
 const UpdateValueSecret: FC<UpdateValueSecretProps> = ({ id, entityValue }): ReactNode => {
 	const [t] = useTranslation('secret_update_value');
+	const { apiError } = useNotification();
 
 	const [modify, { isLoading, isError, isSuccess, error }] = useModifyValueSecretMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_value'),
 					unAuthorized: t('error_unauthorized_update_value'),
@@ -26,7 +27,7 @@ const UpdateValueSecret: FC<UpdateValueSecretProps> = ({ id, entityValue }): Rea
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	const submitValueChange = useCallback(
 		(value?: string) => {

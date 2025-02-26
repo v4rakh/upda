@@ -1,5 +1,5 @@
 import { useDeleteSecretMutation } from '../../api/secretsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
 import { FC, ReactNode, useEffect } from 'react';
@@ -11,12 +11,13 @@ export interface DeleteSecretProps {
 
 const DeleteSecret: FC<DeleteSecretProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('secret_delete');
+	const { apiError } = useNotification();
 
 	const [deleteSecret, { isLoading, isError, error }] = useDeleteSecretMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_delete'),
 					unAuthorized: t('error_unauthorized_delete'),
@@ -26,7 +27,7 @@ const DeleteSecret: FC<DeleteSecretProps> = ({ id }): ReactNode => {
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	return (
 		<Popconfirm

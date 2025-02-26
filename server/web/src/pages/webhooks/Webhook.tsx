@@ -7,8 +7,8 @@ import DateTimeStyle from '../../constants/dateTimeStyle';
 import getConfiguration from '../../getConfiguration';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { WebhookResponse, WebhookType } from '../../types';
+import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
-import { apiNotification } from '../common/apiNotification';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
 import { CheckOutlined, CloseOutlined, DeleteOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Popconfirm, Row, Space, Switch, Tag, Tooltip, Typography } from 'antd';
@@ -23,6 +23,7 @@ export interface WebhookProps {
 
 const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 	const [t] = useTranslation('webhook');
+	const { apiError } = useNotification();
 	const { locale } = useLocaleProviderContext();
 
 	const [deleteWebhook, { isLoading: isDeleteLoading, isError: isErrorDelete, error: deleteError }] =
@@ -38,7 +39,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 
 	useEffect(() => {
 		if (isErrorDelete) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_delete'),
 					unAuthorized: t('error_unauthorized_delete'),
@@ -48,11 +49,11 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 				error: deleteError
 			});
 		}
-	}, [isErrorDelete, deleteError, t]);
+	}, [isErrorDelete, deleteError, t, apiError]);
 
 	useEffect(() => {
 		if (isErrorLabel) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_label'),
 					unAuthorized: t('error_unauthorized_update_label'),
@@ -62,11 +63,11 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 				error: labelError
 			});
 		}
-	}, [isErrorLabel, labelError, t]);
+	}, [apiError, isErrorLabel, labelError, t]);
 
 	useEffect(() => {
 		if (isErrorIgnoreHost) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_update_ignore_host'),
 					unAuthorized: t('error_unauthorized_update_ignore_host'),
@@ -76,7 +77,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 				error: ignoreHostError
 			});
 		}
-	}, [isErrorIgnoreHost, ignoreHostError, t]);
+	}, [isErrorIgnoreHost, ignoreHostError, t, apiError]);
 
 	const onIgnoreHostChange = useCallback(
 		(checked: boolean) => {

@@ -2,13 +2,15 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [6.0.2] - UNRELEASED
+## [6.1.0] - UNRELEASED
 
-* ...
+* Add `EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED` to enforce dark mode (defaults to `0`)
+* Add `EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED` to show page footer (defaults to `1`)
+* Remove default `robots.txt`, add this manually in your reverse proxy if you like to have it served
 
 ## [6.0.1] - 2025/02/17
 
-* Hotfix: Incorrect instruction to forward `VITE_APP_TITLE` inside embedded web interface
+* Hotfix: Incorrect instruction to forward `VITE_TITLE` inside embedded web interface
 
 ## [6.0.0] - 2025/02/16
 

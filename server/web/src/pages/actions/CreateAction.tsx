@@ -3,7 +3,7 @@ import ActionFormType from './ActionFormType';
 import ActionSelectEvent from './ActionSelectEvent';
 import { useCreateActionMutation } from '../../api/actionsApi';
 import { ActionPayloadShoutrrr, ActionType } from '../../types';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Collapse, Divider, Form, Input, Switch } from 'antd';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ const COLLAPSE_KEY = 'edit_type_payload';
 
 const CreateAction = (): ReactNode => {
 	const [t] = useTranslation('action_create');
+	const { apiError } = useNotification();
 	const [form] = Form.useForm();
 	const type = Form.useWatch('type', form);
 	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
@@ -29,7 +30,7 @@ const CreateAction = (): ReactNode => {
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable'),
 					unAuthorized: t('error_unauthorized'),
@@ -40,7 +41,7 @@ const CreateAction = (): ReactNode => {
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	const onSubmit = useCallback(() => {
 		form.validateFields().then(
@@ -74,7 +75,6 @@ const CreateAction = (): ReactNode => {
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIcon={() => <></>}
 			expandIconPosition="end"
 			bordered={false}
 			ghost
@@ -83,6 +83,7 @@ const CreateAction = (): ReactNode => {
 			items={[
 				{
 					key: COLLAPSE_KEY,
+					showArrow: false,
 					label: (
 						<Button type="link" icon={<PlusOutlined />}>
 							{t('create')}

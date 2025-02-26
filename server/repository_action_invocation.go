@@ -172,7 +172,7 @@ func (r *actionInvocationDbRepo) paginate(page int, pageSize int, orderBy string
 	if orderBy != "" && order != "" {
 		res = r.db.Order(orderBy + " " + order).Offset(offset).Limit(pageSize).Find(&e)
 	} else {
-		res = r.db.Offset(offset).Limit(pageSize).Find(&e)
+		res = r.db.Order("created_at desc").Offset(offset).Limit(pageSize).Find(&e)
 	}
 
 	if res.Error != nil {

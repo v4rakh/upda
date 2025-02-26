@@ -1,5 +1,5 @@
 import { useDeleteActionMutation } from '../../api/actionsApi';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
 import { FC, ReactNode, useEffect } from 'react';
@@ -11,12 +11,13 @@ export interface DeleteActionProps {
 
 const DeleteAction: FC<DeleteActionProps> = ({ id }): ReactNode => {
 	const [t] = useTranslation('action_delete');
+	const { apiError } = useNotification();
 
 	const [deleteAction, { isLoading, isError, error }] = useDeleteActionMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_delete'),
 					unAuthorized: t('error_unauthorized_delete'),
@@ -26,7 +27,7 @@ const DeleteAction: FC<DeleteActionProps> = ({ id }): ReactNode => {
 				error: error
 			});
 		}
-	}, [isError, error, t]);
+	}, [isError, error, t, apiError]);
 
 	return (
 		<Popconfirm

@@ -1,6 +1,6 @@
 import { useCreateWebhookMutation } from '../../api/webhooksApi';
 import { CreateWebhookRequest, WebhookType } from '../../types';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Collapse, Divider, Form, Input, Select, Switch } from 'antd';
 import parse from 'html-react-parser';
@@ -11,6 +11,7 @@ const COLLAPSE_KEY = 'create';
 
 const CreateWebhook: FC = () => {
 	const [t] = useTranslation('webhook_create');
+	const { apiError, simpleInfo } = useNotification();
 	const [form] = Form.useForm();
 	const [save, { data, isSuccess, isError, reset, error, isLoading }] = useCreateWebhookMutation();
 	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
@@ -23,7 +24,7 @@ const CreateWebhook: FC = () => {
 
 	useEffect(() => {
 		if (isSuccess) {
-			apiNotification.simpleInfo({
+			simpleInfo({
 				title: t('created_title'),
 				message: parse(t('created_message', { token: data?.data.token })),
 				duration: 60
@@ -32,11 +33,11 @@ const CreateWebhook: FC = () => {
 			form.resetFields();
 			setCollapseActiveKeys([]);
 		}
-	}, [isSuccess, data, t, reset, form]);
+	}, [isSuccess, data, t, reset, form, simpleInfo]);
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable'),
 					unAuthorized: t('error_unauthorized'),
@@ -47,14 +48,13 @@ const CreateWebhook: FC = () => {
 				error
 			});
 		}
-	}, [error, isError, t]);
+	}, [error, isError, t, apiError]);
 
 	return (
 		<Collapse
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIcon={() => <></>}
 			expandIconPosition="end"
 			bordered={false}
 			ghost
@@ -63,6 +63,7 @@ const CreateWebhook: FC = () => {
 			items={[
 				{
 					key: COLLAPSE_KEY,
+					showArrow: false,
 					label: (
 						<Button type="link" icon={<PlusOutlined />}>
 							{t('create')}

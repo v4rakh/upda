@@ -1,6 +1,6 @@
 import { useCreateConstantMutation } from '../../api/constantsApi';
 import { CreateConstantRequest } from '../../types';
-import { apiNotification } from '../common/apiNotification';
+import { useNotification } from '../../use/useNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Collapse, Divider, Form, Input } from 'antd';
 import parse from 'html-react-parser';
@@ -11,6 +11,7 @@ const COLLAPSE_KEY = 'create';
 
 const CreateConstant: FC = () => {
 	const [t] = useTranslation('constant_create');
+	const { apiError, simpleInfo } = useNotification();
 	const [form] = Form.useForm();
 	const [save, { data, isSuccess, isError, reset, error, isLoading }] = useCreateConstantMutation();
 	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
@@ -23,7 +24,7 @@ const CreateConstant: FC = () => {
 
 	useEffect(() => {
 		if (isSuccess) {
-			apiNotification.simpleInfo({
+			simpleInfo({
 				title: t('created_title'),
 				message: parse(t('created_message')),
 				duration: 5
@@ -32,11 +33,11 @@ const CreateConstant: FC = () => {
 			form.resetFields();
 			setCollapseActiveKeys([]);
 		}
-	}, [isSuccess, data, t, reset, form]);
+	}, [isSuccess, data, t, reset, form, simpleInfo]);
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					conflict: t('error_conflict'),
 					notFound: t('error_unable'),
@@ -48,14 +49,13 @@ const CreateConstant: FC = () => {
 				error
 			});
 		}
-	}, [error, isSuccess, isError, t]);
+	}, [error, isSuccess, isError, t, apiError]);
 
 	return (
 		<Collapse
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIcon={() => <></>}
 			expandIconPosition="end"
 			bordered={false}
 			ghost
@@ -64,6 +64,7 @@ const CreateConstant: FC = () => {
 			items={[
 				{
 					key: COLLAPSE_KEY,
+					showArrow: false,
 					label: (
 						<Button type="link" icon={<PlusOutlined />}>
 							{t('create')}

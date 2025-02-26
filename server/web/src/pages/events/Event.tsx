@@ -3,8 +3,8 @@ import { useDeleteEventMutation } from '../../api/eventsApi';
 import DateTimeStyle from '../../constants/dateTimeStyle';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { EventResponse } from '../../types/event';
+import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
-import { apiNotification } from '../common/apiNotification';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Card, Popconfirm, Tooltip, Typography } from 'antd';
 import { FC, ReactNode, useEffect } from 'react';
@@ -19,13 +19,14 @@ export interface EventProps {
 
 const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): ReactNode => {
 	const [t] = useTranslation('event');
+	const { apiError } = useNotification();
 	const { locale } = useLocaleProviderContext();
 
 	const [deleteEvent, { isSuccess, isLoading, isError, error }] = useDeleteEventMutation();
 
 	useEffect(() => {
 		if (isError) {
-			apiNotification.error({
+			apiError({
 				i18n: {
 					notFound: t('error_unable_delete'),
 					unAuthorized: t('error_unauthorized_delete'),
@@ -39,7 +40,7 @@ const Event: FC<EventProps> = ({ entity, onDeleteSuccess }): ReactNode => {
 		if (isSuccess && onDeleteSuccess) {
 			onDeleteSuccess();
 		}
-	}, [isError, error, isSuccess, onDeleteSuccess, t]);
+	}, [isError, error, isSuccess, onDeleteSuccess, t, apiError]);
 
 	return (
 		<Card

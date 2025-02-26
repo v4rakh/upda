@@ -18,9 +18,17 @@ const (
 
 	envEmbeddedWebInterfaceEnabled     = "EMBEDDED_WEB_INTERFACE_ENABLED"
 	embeddedWebInterfaceEnabledDefault = "true"
-	envEmbeddedWebInterfaceApiUrl      = "EMBEDDED_WEB_INTERFACE_API_URL"
-	envEmbeddedWebInterfaceTitle       = "EMBEDDED_WEB_INTERFACE_TITLE"
-	embeddedWebInterfaceTitleDefault   = "upda"
+
+	envEmbeddedWebInterfaceApiUrl = "EMBEDDED_WEB_INTERFACE_API_URL"
+
+	envEmbeddedWebInterfaceTitle     = "EMBEDDED_WEB_INTERFACE_TITLE"
+	embeddedWebInterfaceTitleDefault = "upda"
+
+	envEmbeddedWebInterfaceDarkThemeEnabled     = "EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED"
+	embeddedWebInterfaceDarkThemeEnabledDefault = "false"
+
+	envEmbeddedWebInterfaceFooter            = "EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED"
+	embeddedWebInterfaceFooterEnabledDefault = "true"
 
 	envAuthMode              = "AUTH_MODE"
 	authModeDefault          = authModeBasicSingle
