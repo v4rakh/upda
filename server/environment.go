@@ -5,7 +5,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
-	"git.myservermanager.com/varakh/upda/util"
+	"git.myservermanager.com/varakh/upda/commons"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database"
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -153,7 +153,7 @@ func bootstrapEnvironment() *Environment {
 	if loggingDirectory != "" {
 		logFile := filepath.Join(loggingDirectory, loggingFileNameDefault)
 
-		if err = util.CreateFileWithParent(logFile); err != nil {
+		if err = commons.CreateFileWithParent(logFile); err != nil {
 			log.Fatalf("Log file '%s' cannot be created: %v", loggingDirectory, err)
 		}
 

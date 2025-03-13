@@ -84,27 +84,20 @@ func (r *updateDbRepo) create(application string, provider string, host string, 
 		return nil, errorValidationNotBlank
 	}
 
-	var e *Update
-	unmarshalledMetadata := JSONMap{}
-
-	if metadata != nil {
-		marshalledMetadata, err := json.Marshal(metadata)
-		if err != nil {
-			return nil, err
-		}
-		err = unmarshalledMetadata.UnmarshalJSON(marshalledMetadata)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	e = &Update{
+	e := &Update{
 		Application: application,
 		Provider:    provider,
 		Host:        host,
 		Version:     version,
 		State:       api.UpdateStatePending.Value(),
-		Metadata:    unmarshalledMetadata,
+	}
+
+	if metadata != nil {
+		b, err := json.Marshal(metadata)
+		if err != nil {
+			return nil, err
+		}
+		e.Metadata = b
 	}
 
 	var res *gorm.DB
@@ -155,21 +148,15 @@ func (r *updateDbRepo) update(id string, version string, metadata interface{}) (
 		return nil, err
 	}
 
-	unmarshalledMetadata := JSONMap{}
-
 	if metadata != nil {
-		marshalledMetadata, err := json.Marshal(metadata)
-		if err != nil {
+		var b []byte
+		if b, err = json.Marshal(metadata); err != nil {
 			return nil, err
 		}
-		err = unmarshalledMetadata.UnmarshalJSON(marshalledMetadata)
-		if err != nil {
-			return nil, err
-		}
+		e.Metadata = b
 	}
 
 	e.Version = version
-	e.Metadata = unmarshalledMetadata
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {

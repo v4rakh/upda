@@ -78,16 +78,11 @@ func (r *actionDbRepo) create(label string, t api.ActionType, matchEvent *string
 	}
 
 	if payload != nil {
-		unmarshalledPayload := JSONMap{}
-		marshalledMetadata, err := json.Marshal(payload)
+		bytes, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
-		err = unmarshalledPayload.UnmarshalJSON(marshalledMetadata)
-		if err != nil {
-			return nil, err
-		}
-		e.Payload = unmarshalledPayload
+		e.Payload = bytes
 	}
 
 	var res *gorm.DB
@@ -266,17 +261,13 @@ func (r *actionDbRepo) updateTypeAndPayload(id string, t api.ActionType, payload
 		return nil, err
 	}
 
-	unmarshalledPayload := JSONMap{}
-	marshalledMetadata, err := json.Marshal(payload)
-	if err != nil {
-		return nil, err
-	}
-	err = unmarshalledPayload.UnmarshalJSON(marshalledMetadata)
-	if err != nil {
-		return nil, err
-	}
-	e.Payload = unmarshalledPayload
 	e.Type = t.Value()
+
+	var b []byte
+	if b, err = json.Marshal(payload); err != nil {
+		return nil, err
+	}
+	e.Payload = b
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {

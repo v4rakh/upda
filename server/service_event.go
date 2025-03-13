@@ -3,7 +3,7 @@ package server
 import (
 	"errors"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/util"
+	"git.myservermanager.com/varakh/upda/commons"
 	"go.uber.org/zap"
 	"time"
 )
@@ -200,31 +200,31 @@ func (s *eventService) extractPayloadInfo(event *Event) (*eventPayloadInformatio
 	switch event.Name {
 	case api.EventNameUpdateCreated.Value():
 		var p api.EventPayloadUpdateCreatedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateCreatedDto](bytes); err != nil {
+		if p, err = commons.UnmarshalGenericJSON[api.EventPayloadUpdateCreatedDto](bytes); err != nil {
 			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateDeleted.Value():
 		var p api.EventPayloadUpdateDeletedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateDeletedDto](bytes); err != nil {
+		if p, err = commons.UnmarshalGenericJSON[api.EventPayloadUpdateDeletedDto](bytes); err != nil {
 			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdatedState.Value():
 		var p api.EventPayloadUpdateUpdatedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+		if p, err = commons.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdatedVersion.Value():
 		var p api.EventPayloadUpdateUpdatedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+		if p, err = commons.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
 	case api.EventNameUpdateUpdated.Value():
 		var p api.EventPayloadUpdateUpdatedDto
-		if p, err = util.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
+		if p, err = commons.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, newServiceError(general, err)
 		}
 		return &eventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil

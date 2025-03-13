@@ -1,4 +1,4 @@
-package util
+package encryption
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -26,11 +26,11 @@ func TestEncodeAndDecode(t *testing.T) {
 
 	s := "my to be encoded value"
 
-	encoded, err := ConvertToBase64([]byte(s))
+	encoded, err := convertToBase64([]byte(s))
 	a.Nil(err)
 	a.NotEmpty(encoded)
 
-	decoded, err := ConvertFromBase64(encoded)
+	decoded, err := convertFromBase64(encoded)
 	a.Nil(err)
 	a.Equal(s, string(decoded))
 

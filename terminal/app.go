@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/commons"
-	"git.myservermanager.com/varakh/upda/util"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -15,9 +14,9 @@ import (
 )
 
 const (
-	name    = "upda-cli"
-	desc    = "a commandline helper for upda"
+	name    = commons.Name
 	version = commons.Version
+	desc    = "a commandline helper for upda"
 
 	envServerUrl    = "UPDA_SERVER_URL"
 	envUser         = "UPDA_USER"
@@ -195,7 +194,7 @@ func webhookCreate(cCtx *cli.Context) error {
 		t = api.WebhookTypeGeneric.Value()
 	}
 
-	if !util.FindInSlice(validTypes, t) {
+	if !commons.FindInSlice(validTypes, t) {
 		return cli.Exit(errors.New(fmt.Sprintf("type must be one of %v", validTypes)), 1)
 	}
 

@@ -1,8 +1,9 @@
 package server
 
 import (
-	"git.myservermanager.com/varakh/upda/util"
+	"git.myservermanager.com/varakh/upda/encryption"
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"os"
 	"time"
@@ -15,15 +16,15 @@ func (u *Update) BeforeCreate(tx *gorm.DB) (err error) {
 
 // Update entity holding information for updates
 type Update struct {
-	ID          uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
-	Application string    `gorm:"uniqueIndex:idx_a_p_h;not null"`
-	Provider    string    `gorm:"uniqueIndex:idx_a_p_h;not null"`
-	Host        string    `gorm:"uniqueIndex:idx_a_p_h;not null"`
-	Version     string    `gorm:"not null"`
-	State       string    `gorm:"not null"`
-	Metadata    JSONMap   `gorm:"jsonb"`
-	CreatedAt   time.Time `gorm:"time;autoCreateTime;not null"`
-	UpdatedAt   time.Time `gorm:"time;autoUpdateTime;not null"`
+	ID          uuid.UUID      `gorm:"type:uuid;primary_key;unique;not null"`
+	Application string         `gorm:"uniqueIndex:idx_a_p_h;not null"`
+	Provider    string         `gorm:"uniqueIndex:idx_a_p_h;not null"`
+	Host        string         `gorm:"uniqueIndex:idx_a_p_h;not null"`
+	Version     string         `gorm:"not null"`
+	State       string         `gorm:"not null"`
+	Metadata    datatypes.JSON `gorm:"jsonb"`
+	CreatedAt   time.Time      `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt   time.Time      `gorm:"time;autoUpdateTime;not null"`
 }
 
 // BeforeCreate encrypts webhook token before storing to database
@@ -31,7 +32,7 @@ func (wh *Webhook) BeforeCreate(tx *gorm.DB) (err error) {
 	var er error
 	var encryptedToken string
 
-	if encryptedToken, er = util.EncryptAndEncode(wh.Token, os.Getenv(envSecret)); er != nil {
+	if encryptedToken, er = encryption.EncryptAndEncode(wh.Token, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -45,7 +46,7 @@ func (wh *Webhook) BeforeUpdate(tx *gorm.DB) (err error) {
 	var er error
 	var encryptedValue string
 
-	if encryptedValue, er = util.EncryptAndEncode(wh.Token, os.Getenv(envSecret)); er != nil {
+	if encryptedValue, er = encryption.EncryptAndEncode(wh.Token, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -57,7 +58,7 @@ func (wh *Webhook) BeforeUpdate(tx *gorm.DB) (err error) {
 func (wh *Webhook) AfterSave(tx *gorm.DB) (err error) {
 	var er error
 	var decrypted string
-	if decrypted, er = util.DecryptAndDecode(wh.Token, os.Getenv(envSecret)); er != nil {
+	if decrypted, er = encryption.DecryptAndDecode(wh.Token, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -69,7 +70,7 @@ func (wh *Webhook) AfterSave(tx *gorm.DB) (err error) {
 func (wh *Webhook) AfterFind(tx *gorm.DB) (err error) {
 	var er error
 	var decrypted string
-	if decrypted, er = util.DecryptAndDecode(wh.Token, os.Getenv(envSecret)); er != nil {
+	if decrypted, er = encryption.DecryptAndDecode(wh.Token, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -95,12 +96,12 @@ func (e *Event) BeforeCreate(tx *gorm.DB) (err error) {
 
 // Event entity holding information for events
 type Event struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
-	Name      string    `gorm:"not null"`
-	State     string    `gorm:"not null"`
-	Payload   JSONMap   `gorm:"jsonb"`
-	CreatedAt time.Time `gorm:"time;autoCreateTime;not null"`
-	UpdatedAt time.Time `gorm:"time;autoUpdateTime;not null"`
+	ID        uuid.UUID      `gorm:"type:uuid;primary_key;unique;not null"`
+	Name      string         `gorm:"not null"`
+	State     string         `gorm:"not null"`
+	Payload   datatypes.JSON `gorm:"jsonb"`
+	CreatedAt time.Time      `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt time.Time      `gorm:"time;autoUpdateTime;not null"`
 }
 
 // BeforeCreate encrypts secret value before storing to database
@@ -108,7 +109,7 @@ func (e *Secret) BeforeCreate(tx *gorm.DB) (err error) {
 	var er error
 	var encryptedValue string
 
-	if encryptedValue, er = util.EncryptAndEncode(e.Value, os.Getenv(envSecret)); er != nil {
+	if encryptedValue, er = encryption.EncryptAndEncode(e.Value, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -122,7 +123,7 @@ func (e *Secret) BeforeUpdate(tx *gorm.DB) (err error) {
 	var er error
 	var encryptedValue string
 
-	if encryptedValue, er = util.EncryptAndEncode(e.Value, os.Getenv(envSecret)); er != nil {
+	if encryptedValue, er = encryption.EncryptAndEncode(e.Value, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -134,7 +135,7 @@ func (e *Secret) BeforeUpdate(tx *gorm.DB) (err error) {
 func (e *Secret) AfterSave(tx *gorm.DB) (err error) {
 	var er error
 	var decrypted string
-	if decrypted, er = util.DecryptAndDecode(e.Value, os.Getenv(envSecret)); er != nil {
+	if decrypted, er = encryption.DecryptAndDecode(e.Value, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -146,7 +147,7 @@ func (e *Secret) AfterSave(tx *gorm.DB) (err error) {
 func (e *Secret) AfterFind(tx *gorm.DB) (err error) {
 	var er error
 	var decrypted string
-	if decrypted, er = util.DecryptAndDecode(e.Value, os.Getenv(envSecret)); er != nil {
+	if decrypted, er = encryption.DecryptAndDecode(e.Value, os.Getenv(envSecret)); er != nil {
 		return er
 	}
 
@@ -170,17 +171,17 @@ func (e *Action) BeforeCreate(tx *gorm.DB) (err error) {
 
 // Action entity holding information for actions
 type Action struct {
-	ID               uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
-	Label            string    `gorm:"not null"`
-	Type             string    `gorm:"not null"`
-	MatchEvent       *string   `gorm:""`
-	MatchApplication *string   `gorm:""`
-	MatchProvider    *string   `gorm:""`
-	MatchHost        *string   `gorm:""`
-	Payload          JSONMap   `gorm:"jsonb"`
-	Enabled          bool      `gorm:"not null"`
-	CreatedAt        time.Time `gorm:"time;autoCreateTime;not null"`
-	UpdatedAt        time.Time `gorm:"time;autoUpdateTime;not null"`
+	ID               uuid.UUID      `gorm:"type:uuid;primary_key;unique;not null"`
+	Label            string         `gorm:"not null"`
+	Type             string         `gorm:"not null"`
+	MatchEvent       *string        `gorm:""`
+	MatchApplication *string        `gorm:""`
+	MatchProvider    *string        `gorm:""`
+	MatchHost        *string        `gorm:""`
+	Payload          datatypes.JSON `gorm:"jsonb"`
+	Enabled          bool           `gorm:"not null"`
+	CreatedAt        time.Time      `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt        time.Time      `gorm:"time;autoUpdateTime;not null"`
 }
 
 func (e *ActionInvocation) BeforeCreate(tx *gorm.DB) (err error) {

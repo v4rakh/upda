@@ -52,24 +52,20 @@ func (r *eventDbRepo) create(name api.EventName, state api.EventState, payload i
 		return nil, errorValidationNotBlank
 	}
 
+	var err error
 	var e *Event
-	unmarshalledPayload := JSONMap{}
-
-	if payload != nil {
-		marshalledMetadata, err := json.Marshal(payload)
-		if err != nil {
-			return nil, err
-		}
-		err = unmarshalledPayload.UnmarshalJSON(marshalledMetadata)
-		if err != nil {
-			return nil, err
-		}
+	e = &Event{
+		Name:  name.Value(),
+		State: state.Value(),
 	}
 
-	e = &Event{
-		Name:    name.Value(),
-		State:   state.Value(),
-		Payload: unmarshalledPayload,
+	if payload != nil {
+		var bytes []byte
+		if bytes, err = json.Marshal(payload); err != nil {
+			return nil, err
+		}
+
+		e.Payload = bytes
 	}
 
 	var res *gorm.DB

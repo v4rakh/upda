@@ -16,9 +16,5 @@ func newInfoHandler(a *appConfig) *infoHandler {
 }
 
 func (h *infoHandler) show(c *gin.Context) {
-	c.JSON(http.StatusOK, api.DataResponse{Data: gin.H{
-		"name":     name,
-		"Version":  commons.Version,
-		"timeZone": h.appConfig.timeZone,
-	}})
+	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewInfoResponse(commons.Name, commons.Version, h.appConfig.timeZone)))
 }

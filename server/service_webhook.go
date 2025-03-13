@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/util"
+	"git.myservermanager.com/varakh/upda/commons"
 	"go.uber.org/zap"
 )
 
@@ -41,7 +41,7 @@ func (s *webhookService) create(label string, t api.WebhookType, ignoreHost bool
 	var err error
 	var token string
 
-	if token, err = util.GenerateSecureRandomString(s.webhookConfig.tokenLength); err != nil {
+	if token, err = commons.GenerateSecureRandomString(s.webhookConfig.tokenLength); err != nil {
 		return nil, newServiceError(general, fmt.Errorf("token generation failed: %w", err))
 	}
 

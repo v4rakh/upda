@@ -1,4 +1,4 @@
-package util
+package commons
 
 import (
 	"crypto/rand"
@@ -8,8 +8,8 @@ import (
 	"math/big"
 )
 
-// AssertAvailablePRNG Assert that a cryptographically secure PRNG is available. Panic otherwise.
-func AssertAvailablePRNG() {
+// assertAvailablePRNG Assert that a cryptographically secure PRNG is available. Panic otherwise.
+func assertAvailablePRNG() {
 	buf := make([]byte, 1)
 
 	_, err := io.ReadFull(rand.Reader, buf)
@@ -18,11 +18,11 @@ func AssertAvailablePRNG() {
 	}
 }
 
-// GenerateRandomBytes returns securely generated random bytes.
+// generateRandomBytes returns securely generated random bytes.
 // It will return an error if the system's secure random
 // number generator fails to function correctly, in which
 // case the caller should not continue.
-func GenerateRandomBytes(n int) ([]byte, error) {
+func generateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	// Note that err == nil only if we read len(b) bytes.
@@ -38,6 +38,8 @@ func GenerateRandomBytes(n int) ([]byte, error) {
 // number generator fails to function correctly, in which
 // case the caller should not continue.
 func GenerateSecureRandomString(n int) (string, error) {
+	assertAvailablePRNG()
+
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 	ret := make([]byte, n)
 	for i := 0; i < n; i++ {
@@ -57,6 +59,8 @@ func GenerateSecureRandomString(n int) (string, error) {
 // number generator fails to function correctly, in which
 // case the caller should not continue.
 func GenerateSecureRandomStringURLSafe(n int) (string, error) {
-	b, err := GenerateRandomBytes(n)
+	assertAvailablePRNG()
+
+	b, err := generateRandomBytes(n)
 	return base64.URLEncoding.EncodeToString(b), err
 }

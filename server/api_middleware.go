@@ -11,7 +11,7 @@ import (
 
 func middlewareAppName() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(api.HeaderAppName, name)
+		c.Header(api.HeaderAppName, commons.Name)
 		c.Next()
 	}
 }

@@ -14,7 +14,5 @@ func newHealthHandler() *healthHandler {
 }
 
 func (h *healthHandler) show(c *gin.Context) {
-	c.JSON(http.StatusOK, api.DataResponse{Data: gin.H{
-		"healthy": true,
-	}})
+	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewHealthResponse(true)))
 }

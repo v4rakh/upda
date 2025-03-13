@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"git.myservermanager.com/varakh/upda/commons"
 	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +22,7 @@ func newPrometheusService(r *gin.Engine, pc *prometheusConfig, sc *serverConfig)
 		if pc.secureTokenEnabled {
 			p = ginprom.New(
 				ginprom.Engine(r),
-				ginprom.Namespace(name),
+				ginprom.Namespace(commons.Name),
 				ginprom.Subsystem(""),
 				ginprom.Path(path),
 				ginprom.Ignore(path),
@@ -30,7 +31,7 @@ func newPrometheusService(r *gin.Engine, pc *prometheusConfig, sc *serverConfig)
 		} else {
 			p = ginprom.New(
 				ginprom.Engine(r),
-				ginprom.Namespace(name),
+				ginprom.Namespace(commons.Name),
 				ginprom.Subsystem(""),
 				ginprom.Ignore(path),
 				ginprom.Path(path),

@@ -189,6 +189,30 @@ func NewErrorResponseWithStatusAndMessage(status string, message string) *ErrorR
 	return e
 }
 
+type HealthResponse struct {
+	Healthy bool `json:"healthy"`
+}
+
+func NewHealthResponse(b bool) *HealthResponse {
+	r := new(HealthResponse)
+	r.Healthy = b
+	return r
+}
+
+type InfoResponse struct {
+	Version  string `json:"version"`
+	Name     string `json:"name"`
+	TimeZone string `json:"timeZone"`
+}
+
+func NewInfoResponse(name string, version string, tz string) *InfoResponse {
+	r := new(InfoResponse)
+	r.Name = name
+	r.Version = version
+	r.TimeZone = tz
+	return r
+}
+
 type UpdateResponse struct {
 	ID          uuid.UUID   `json:"id"`
 	Application string      `json:"application"`

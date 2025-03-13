@@ -1,4 +1,4 @@
-package util
+package locker
 
 import (
 	"sync"

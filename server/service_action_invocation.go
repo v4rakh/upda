@@ -3,7 +3,7 @@ package server
 import (
 	"errors"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/util"
+	"git.myservermanager.com/varakh/upda/commons"
 	"github.com/containrrr/shoutrrr"
 	"go.uber.org/zap"
 	"strings"
@@ -206,7 +206,7 @@ func (s *actionInvocationService) execute(action *Action, eventPayloadInfo *even
 	switch action.Type {
 	case api.ActionTypeShoutrrr.Value():
 		var payload actionPayloadShoutrrrDto
-		if payload, err = util.UnmarshalGenericJSON[actionPayloadShoutrrrDto](bytes); err != nil {
+		if payload, err = commons.UnmarshalGenericJSON[actionPayloadShoutrrrDto](bytes); err != nil {
 			return newServiceError(general, err)
 		}
 
@@ -237,7 +237,7 @@ func (s *actionInvocationService) replaceSecrets(str string) string {
 
 	var matches [][]string
 
-	matches = util.ExtractBetween(str, "<SECRET>", "</SECRET>")
+	matches = commons.ExtractBetween(str, "<SECRET>", "</SECRET>")
 	var err error
 
 	for _, match := range matches {
@@ -259,7 +259,7 @@ func (s *actionInvocationService) replaceConstants(str string) string {
 
 	var matches [][]string
 
-	matches = util.ExtractBetween(str, "<CONST>", "</CONST>")
+	matches = commons.ExtractBetween(str, "<CONST>", "</CONST>")
 	var err error
 
 	for _, match := range matches {

@@ -3,13 +3,13 @@ package server
 import (
 	"context"
 	"errors"
-	"git.myservermanager.com/varakh/upda/util"
+	"git.myservermanager.com/varakh/upda/locker"
 	"go.uber.org/zap"
 	"time"
 )
 
 type lockMemService struct {
-	registry *util.InMemoryLockRegistry
+	registry *locker.InMemoryLockRegistry
 }
 
 var (
@@ -18,7 +18,7 @@ var (
 
 func newLockMemService() lockService {
 	zap.L().Info("Initializing in-memory locking service")
-	return &lockMemService{registry: util.NewInMemoryLockRegistry()}
+	return &lockMemService{registry: locker.NewInMemoryLockRegistry()}
 }
 
 // lock locks a given resource without any options (default expiration)
@@ -61,7 +61,7 @@ func (s *lockMemService) lockWithOptions(ctx context.Context, resource string, o
 var _ appLock = (*inMemoryLock)(nil)
 
 type inMemoryLock struct {
-	registry *util.InMemoryLockRegistry
+	registry *locker.InMemoryLockRegistry
 	resource string
 }
 

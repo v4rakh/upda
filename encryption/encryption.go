@@ -1,4 +1,4 @@
-package util
+package encryption
 
 import (
 	"crypto/aes"
@@ -9,16 +9,21 @@ import (
 	"fmt"
 )
 
-func ConvertToBase64(input []byte) (string, error) {
+var (
+	ErrNilInput   = errors.New("cannot convert to base64 with nil input")
+	ErrBlankInput = errors.New("cannot convert from base64 with blank input")
+)
+
+func convertToBase64(input []byte) (string, error) {
 	if input == nil {
-		return "", errors.New("cannot convert to base64 with nil input")
+		return "", ErrNilInput
 	}
 	return base64.URLEncoding.EncodeToString(input), nil
 }
 
-func ConvertFromBase64(input string) ([]byte, error) {
+func convertFromBase64(input string) ([]byte, error) {
 	if input == "" {
-		return nil, errors.New("cannot convert from base64 with blank input")
+		return nil, ErrBlankInput
 	}
 	return base64.URLEncoding.DecodeString(input)
 }
@@ -45,7 +50,7 @@ func EncryptAndEncode(input string, secretKey string) (string, error) {
 	ciphertext := gcm.Seal(nonce, nonce, []byte(input), nil)
 
 	var encoded string
-	if encoded, err = ConvertToBase64(ciphertext); err != nil {
+	if encoded, err = convertToBase64(ciphertext); err != nil {
 		return "", fmt.Errorf("cannot encode encrypted input: %w", err)
 	}
 
@@ -56,7 +61,7 @@ func EncryptAndEncode(input string, secretKey string) (string, error) {
 func DecryptAndDecode(base64Encoded string, secretKey string) (string, error) {
 	var decoded []byte
 	var err error
-	if decoded, err = ConvertFromBase64(base64Encoded); err != nil {
+	if decoded, err = convertFromBase64(base64Encoded); err != nil {
 		return "", fmt.Errorf("cannot decode encoded input: %w", err)
 	}
 
