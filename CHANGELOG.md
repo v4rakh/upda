@@ -9,6 +9,7 @@ Changes adhere to [semantic versioning](https://semver.org).
 * Remove default `robots.txt`, add this manually in your reverse proxy if you like to have it served
 * Dependency updates
 * Code cleanup and refactor
+* Don't prefix all prometheus metrics from `ginprom`, only custom metrics do have `upda_` prefix
 
 ## [6.0.1] - 2025/02/17
 

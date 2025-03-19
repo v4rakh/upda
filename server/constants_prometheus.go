@@ -1,24 +1,24 @@
 package server
 
 const (
-	metricUpdatesTotal     = "updates_all"
+	metricUpdatesTotal     = "upda_updates_all"
 	metricUpdatesTotalHelp = "amount of all updates"
 
-	metricUpdatesPending     = "updates_pending"
+	metricUpdatesPending     = "upda_updates_pending"
 	metricUpdatesPendingHelp = "amount of all updates in pending state"
 
-	metricUpdatesIgnored     = "updates_ignored"
+	metricUpdatesIgnored     = "upda_updates_ignored"
 	metricUpdatesIgnoredHelp = "amount of all updates in ignored state"
 
-	metricUpdatesApproved     = "updates_approved"
+	metricUpdatesApproved     = "upda_updates_approved"
 	metricUpdatesApprovedHelp = "amount of all updates in approved state"
 
-	metricWebhooks     = "webhooks"
+	metricWebhooks     = "upda_webhooks"
 	metricWebhooksHelp = "amount of all webhooks"
 
-	metricEvents     = "events"
+	metricEvents     = "upda_events"
 	metricEventsHelp = "amount of all events"
 
-	metricActions     = "actions"
+	metricActions     = "upda_actions"
 	metricActionsHelp = "amount of all actions"
 )
