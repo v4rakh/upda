@@ -2,6 +2,10 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
+## [6.1.1] - UNRELEASED
+
+* ...
+
 ## [6.1.0] - 2025/03/19
 
 * Add `EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED` to enforce dark mode (defaults to `0`)

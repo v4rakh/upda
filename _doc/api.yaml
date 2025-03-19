@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: upda
   description: API specification
-  version: 6.1.0
+  version: 6.1.1
 externalDocs:
   description: Find out more about the project
   url: https://git.myservermanager.com/varakh/upda
