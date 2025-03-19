@@ -2,7 +2,7 @@
 
 Changes adhere to [semantic versioning](https://semver.org).
 
-## [6.1.0] - UNRELEASED
+## [6.1.0] - 2025/03/19
 
 * Add `EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED` to enforce dark mode (defaults to `0`)
 * Add `EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED` to show page footer (defaults to `1`)
@@ -117,6 +117,8 @@ Changes adhere to [semantic versioning](https://semver.org).
 ## [1.0.0] - 2023/12/21
 
 * Initial release
+
+[6.1.0]: https://git.myservermanager.com/varakh/upda/releases/tag/6.1.0
 
 [6.0.1]: https://git.myservermanager.com/varakh/upda/releases/tag/6.0.1
 
