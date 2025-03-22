@@ -1,33 +1,41 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "prConcurrentLimit": 0,
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "all",
+  "rangeStrategy": "bump",
+  "automerge": false,
+  "branchPrefix": "renovate/",
+  "separateMajorMinor": true,
+  "separateMultipleMajor": false,
+  "separateMultipleMinor": false,
+  "separateMinorPatch": true,
+  "baseBranches": [
+    "master"
+  ],
   "extends": [
     "config:recommended",
     ":rebaseStalePrs",
     ":ignoreUnstable",
     "group:monorepos",
-    "group:recommended"
-  ],
-  "prConcurrentLimit": 0,
-  "osvVulnerabilityAlerts": true,
-  "dependencyDashboardOSVVulnerabilitySummary": "all",
-  "rangeStrategy": "bump",
-  "baseBranches": [
-    "master"
-  ],
-  "schedule": [
-    "monthly"
+    "group:recommended",
+    "packages:eslint",
+    "packages:stylelint",
+    "packages:tslint",
+    "schedule:nonOfficeHours",
+    "local>msm/renovate-presets//presets/docker-ignore.json",
+    "local>msm/renovate-presets//presets/frontend-ignore-manager.json",
+    "local>msm/renovate-presets//presets/frontend-major-group.json",
+    "local>msm/renovate-presets//presets/frontend-minor-group-automerge.json",
+    "local>msm/renovate-presets//presets/frontend-patch-group-automerge.json",
+    "local>msm/renovate-presets//presets/frontend-recommended.json",
+    "local>msm/renovate-presets//presets/github-actions-ignore.json",
+    "local>msm/renovate-presets//presets/go-ignore-manager.json",
+    "local>msm/renovate-presets//presets/go-major-group.json",
+    "local>msm/renovate-presets//presets/go-minor-group-automerge.json",
+    "local>msm/renovate-presets//presets/go-patch-group-automerge.json"
   ],
   "packageRules": [
-    // global: do not upgrade internally used development tools (docker-compose)
-    {
-      "matchManagers": [
-        "dockerfile",
-        "docker-compose"
-      ],
-      "enabled": false
-    },
-    // go
-    // go: group certain dependencies together
     {
       "matchManagers": [
         "gomod"
@@ -36,126 +44,6 @@
         "github.com/go-co-op/gocron"
       ],
       "groupName": "gocron"
-    },
-    // go: package all major upgrades into one PR
-    {
-      "matchManagers": [
-        "gomod"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "groupName": "GoLang: all major dependencies",
-      "groupSlug": "golang-all-major-deps"
-    },
-    // go: package all minor upgrades into one PR
-    {
-      "matchManagers": [
-        "gomod"
-      ],
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "groupName": "GoLang: all minor dependencies",
-      "groupSlug": "golang-all-minor-deps"
-    },
-    // go: package all patch upgrades into one PR
-    {
-      "matchManagers": [
-        "gomod"
-      ],
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "groupName": "GoLang: all patch dependencies",
-      "groupSlug": "golang-all-patch-deps"
-    },
-    // node
-    // node: group certain dependencies together
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchPackageNames": [
-        "@types/react"
-      ],
-      "matchPackagePrefixes": [
-        "react"
-      ]
-    },
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchPackageNames": [
-        "prettier",
-        "standard"
-      ]
-    },
-    // node: do not upgrade node itself
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchPackageNames": [
-        "npm",
-        "node",
-        "pnpm"
-      ],
-      "matchDepTypes": [
-        "engines"
-      ],
-      "enabled": false
-    },
-    // node: do not upgrade node itself
-    {
-      "matchPackageNames": [
-        "node"
-      ],
-      "enabled": false
-    },
-    // node:: ignore @types/node major and minor (manual upgrade with pipeline required)
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchPackageNames": [
-        "@types/node"
-      ],
-      "enabled": false
-    },
-    // node: package all major upgrades into one PR
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchUpdateTypes": [
-        "major"
-      ],
-      "groupName": "Node: all major dependencies",
-      "groupSlug": "node-all-major-deps"
-    },
-    // node: package all minor upgrades into one PR
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchUpdateTypes": [
-        "minor"
-      ],
-      "groupName": "Node: all minor dependencies",
-      "groupSlug": "node-all-minor-deps"
-    },
-    // node: package all patch upgrades into one PR
-    {
-      "matchManagers": [
-        "npm"
-      ],
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "groupName": "Node: all patch dependencies",
-      "groupSlug": "node-all-patch-deps"
     }
   ]
 }
