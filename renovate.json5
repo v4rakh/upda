@@ -44,10 +44,10 @@
       "matchManagers": [
         "gomod"
       ],
-      "matchPackagePrefixes": [
-        "github.com/go-co-op/gocron"
-      ],
-      "groupName": "gocron"
+      "groupName": "gocron",
+      "matchPackageNames": [
+        "github.com/go-co-op/gocron{/,}**"
+      ]
     }
   ]
 }
