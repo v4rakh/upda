@@ -44,7 +44,7 @@
     "linkify-html": "^4.2.0",
     "linkifyjs": "^4.2.0",
     "lodash": "^4.17.21",
-    "moment-timezone": "^0.5.47",
+    "moment-timezone": "^0.5.48",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.1",
