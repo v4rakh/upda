@@ -1,9 +1,8 @@
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types: [ opened, synchronize, reopened ]
 jobs:
-  build:
+  mr:
     runs-on: docker
     container:
       image: git.myservermanager.com/msm/executor-ubuntu-build-essential:latest

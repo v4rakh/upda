@@ -443,8 +443,8 @@
     "version": "Version"
   },
   "version": {
-    "number": "6.1.0",
-    "version": "Version"
+    "unknown": "unknown",
+    "version": "Version {{version}}"
   },
   "webhook": {
     "cancel": "Cancel",

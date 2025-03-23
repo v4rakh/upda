@@ -1,0 +1,22 @@
+inputs:
+  version:
+    description: "version to use"
+    required: true
+    type: string
+  token:
+    description: "forgejo token to use to publish"
+    required: true
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Upload artifacts
+      uses: actions/forgejo-release@v1
+      with:
+        url: https://git.myservermanager.com
+        repo: varakh/upda
+        token: ${{ inputs.token }}
+        tag: ${{ inputs.version }}
+        direction: upload
+        release-dir: bin
+        release-notes: "Release of version '${{ inputs.version }}'. Look into the CHANGELOG.md file for a complete list of changes."

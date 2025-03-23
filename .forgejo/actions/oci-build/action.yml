@@ -1,0 +1,19 @@
+runs:
+  using: "composite"
+  steps:
+    - name: "[SERVER] Build and push image"
+      uses: docker/build-push-action@v4
+      with:
+        push: false
+        context: .
+        build-args: |
+          VERSION=${{ github.sha }}
+        tags: |
+          varakh/upda:${{ github.sha }}
+    - name: "[STANDALONE_WEB_INTERFACE] Build and push image"
+      uses: docker/build-push-action@v4
+      with:
+        push: false
+        context: ./server/web/
+        tags: |
+          varakh/upda-standalone-webinterface:${{ github.sha }}

@@ -70,6 +70,7 @@ docker run --rm --name some-redis \
   -p 6379:6379 \
   redis redis-server --save 60 1 --loglevel warning
 ```
+
 ### Embedded Frontend
 
 _upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
@@ -118,25 +119,53 @@ defer func(lock appLock) {
 time.Sleep(20 * time.Second)
 ```
 
-### Release
+### Git workflow
 
-Releases are handled by the SCM platform and pipeline. Creating a **new git tag**, creates a new release in the SCM
-platform, uploads produced artifacts to that release and publishes docker images automatically.
-**Before** doing so, please ensure that the **commit on `master`** has the **correct version settings** and has been
-built successfully:
+The main branch is `master`. It's protected and only eligible users can push to it. Merge requests to protected branches
+are safe-guarded: they need review or at least a successful pipeline run to be merged.
 
-* Adapt `commons/constants.go` and change `Version` to the correct version number
-* Adapt `server/web/package.json` and change `version` to the correct version number
-* Adapt `CHANGELOG.md` to reflect changes and ensure a date is properly set in the header, also add a reference link
-  in footer (link to scm git tag source)
-* Adapt `api.yaml`: `version` attribute must reflect the to be released version
-* Adapt `env: VERSION_*` in `.forgejo/workflows/release.yaml`
+- Merge request branches should start with `feat/`, `fix/`, or `chore/`
+- Merge requests should be squashed and the source branch should be deleted
+- Merge request commits should have a meaningful commit message
+- Merge request titles should have a meaningful title which is taken as commit message once merged
+    - should be prefixed with `feat: ...`, `fix(...): ...`, where the contents inside the bracket should be _one word_
+      which topic/component is touched
+    - should reflect a breaking change by adding a `!` before the colon, e.g., `fix(deps)!: ...`
+    - should include more verbose information in the body of the git commit message (merge request description)
 
-After the release has been created, ensure to change the following settings for the _next development cycle_:
+```
+feat(security)!: add OpenID Connect authentication
 
-* Adapt `commons/constants.go` and change `Version` to the _next_ version number
-* Adapt `server/web/package.json` and change `version` to the _next_ version number
-* Adapt `CHANGELOG.md` and add an _UNRELEASED_ section
-* Adapt `api.yaml`: `version` attribute must reflect the _next_ version number
-* Adapt `env: VERSION_*` in `.forgejo/workflows/release.yaml` to _next_ version number
+- This adds a new authentication mode called oidc
+- This new mode is the default, which might break existing installations
+```
 
+- Merge requests should contain an entry inside the `CHANGELOG.md` with a date to provide more information if needed
+- Merge requests should contain documentation changes, so that code and documentation stays in sync
+
+### Pipeline workflow
+
+Pipeline runs
+
+* on merge request change (open, new push, ...)
+* on protected branches
+
+This means you need to create a merge request to trigger a pipeline run. Without merge request, no build is triggered,
+thus your code cannot be merged.
+
+### Release preparation & workflow
+
+Releases are done by triggering the "release" pipeline workflow **manually** on `master`.
+
+This application uses _rolling_ releases, which means that a release resets the `latest` tag and in addition adds a date
+as git tag when it was published. The latest tag is automatically replaced to newer git commits once release pipeline
+finished.
+
+There's no additional preparation needed. `master` is always the latest working state and should be in "release-able"
+state any time.
+
+### Dependency updates
+
+Dependency updates are handled by Renovate using the `renovate.json5` file. The base branch is `master`.
+
+Major updates undergo manual review.

@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	name    = commons.Name
-	version = commons.Version
-	desc    = "a commandline helper for upda"
+	name = commons.Name
+	desc = "a commandline helper for upda"
 
 	envServerUrl    = "UPDA_SERVER_URL"
 	envUser         = "UPDA_USER"
@@ -111,7 +110,7 @@ func Start() {
 	app := &cli.App{
 		Name:                 name,
 		Usage:                desc,
-		Version:              version,
+		Version:              commons.Version,
 		EnableBashCompletion: true,
 		Commands: []*cli.Command{
 			{

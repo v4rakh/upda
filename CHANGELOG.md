@@ -1,10 +1,20 @@
 # CHANGELOG
 
-Changes adhere to [semantic versioning](https://semver.org).
+## Rolling
 
-## [6.1.1] - UNRELEASED
+### 2025-03-23
 
-* ...
+* By default, _upda_ now uses a rolling release workflow to ease maintenance and improve automation for more frequent
+  releases
+    * The version shown in the web interface and in the `/api/v1/info` endpoint is now the git commit hash
+    * (Prominent) Changes are documented just with an entry in this `CHANGELOG` file, but not attached to a specific
+      version
+    * Backwards compatibility is kept. Only exception to that is if an entry here states otherwise, using **!BREAKING**
+      as indication
+    * Publishing changes as follows
+        * The `latest` docker tag is attached on release
+        * Git and docker tags with date format `YYYY.MM.DD` are added indicating the date when it has been released and
+          to allow pinning the version you deploy
 
 ## [6.1.0] - 2025/03/19
 

@@ -1,6 +1,9 @@
 package commons
 
 const (
-	Name    = "upda"
-	Version = "6.1.1"
+	Name = "upda"
+)
+
+var (
+	Version string
 )

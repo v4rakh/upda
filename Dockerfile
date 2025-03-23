@@ -1,10 +1,12 @@
 #
 # Build image
 #
-FROM alpine:3.21 AS builder
+FROM --platform=linux/amd64 alpine:3.21 AS builder
 LABEL maintainer="Varakh <varakh@varakh.de>"
+ARG VERSION="rolling-oci"
 
 RUN apk --update upgrade && \
+    apk add git && \
     apk add go gcc make && \
     apk add nodejs npm && \
     # See https://stackoverflow.com/questions/34729748/installed-go-binary-not-found-in-path-on-alpine-linux-docker
@@ -14,7 +16,7 @@ RUN apk --update upgrade && \
 WORKDIR /app
 COPY . .
 RUN npm install --global pnpm@^10 && \
-    CC=gcc make ci
+    VERSION=${VERSION} CC=gcc make ci-oci
 
 #
 # Actual image
