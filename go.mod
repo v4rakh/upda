@@ -1,6 +1,6 @@
 module git.myservermanager.com/varakh/upda
 
-go 1.23.6
+go 1.23.0
 
 require (
 	github.com/Depado/ginprom v1.8.1

@@ -35,6 +35,10 @@
     "local>msm/renovate-presets//presets/go-minor-group-automerge.json",
     "local>msm/renovate-presets//presets/go-patch-group-automerge.json"
   ],
+  "postUpdateOptions": [
+    "gomodTidy",
+    "gomodTidyE"
+  ],
   "packageRules": [
     {
       "matchManagers": [
