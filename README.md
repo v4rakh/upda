@@ -6,7 +6,7 @@ The main git repository is hosted at
 _[https://git.myservermanager.com/varakh/upda](https://git.myservermanager.com/varakh/upda)_.
 Other repositories are mirrors and pull requests, issues, and planning are managed there.
 
-Contributions are very welcome!
+Contributions are very welcome, please see [Development & contribution](#development--contribution).
 
 See **[official documentation](./_doc/Home.md)**.
 
