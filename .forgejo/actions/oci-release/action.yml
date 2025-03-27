@@ -15,14 +15,6 @@ inputs:
     description: "password for internal registry"
     type: string
     required: true
-  dockerHubUser:
-    description: "docker hub user for registry"
-    type: string
-    required: true
-  dockerHubPass:
-    description: "docker hub password for registry"
-    type: string
-    required: true
 
 runs:
   using: "composite"
@@ -34,34 +26,26 @@ runs:
         username: ${{ inputs.registryUser }}
         password: ${{ inputs.registryPass }}
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ inputs.dockerHubUser }}
-        password: ${{ inputs.dockerHubPass }}
-
-    - name: "[SERVER] Build and push image"
+    - name: OCI - [SERVER] build and push
       uses: docker/build-push-action@v4
       with:
         push: true
         context: .
+        no-cache: true
         build-args: |
           VERSION=${{ github.sha }}
         tags: |
-          varakh/upda:latest
-          varakh/upda:${{ inputs.version }}
           git.myservermanager.com/varakh/upda:latest
           git.myservermanager.com/varakh/upda:${{ inputs.version }}
 
-    - name: "[STANDALONE_WEB_INTERFACE] Build and push image"
+    - name: "OCI - [STANDALONE_WEB_INTERFACE] build and push
       uses: docker/build-push-action@v4
       with:
         push: true
         context: ./server/web/
+        no-cache: true
         build-args: |
           VERSION=${{ github.sha }}
         tags: |
-          varakh/upda-standalone-webinterface:latest
-          varakh/upda-standalone-webinterface:${{ inputs.version }}
           git.myservermanager.com/varakh/upda-standalone-webinterface:latest
           git.myservermanager.com/varakh/upda-standalone-webinterface:${{ inputs.version }}

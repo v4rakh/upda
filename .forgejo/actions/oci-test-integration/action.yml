@@ -1,0 +1,22 @@
+inputs:
+  image:
+    description: "image to run tests against"
+    required: true
+    type: string
+  cleanImage:
+    description: "clean image after test run"
+    required: false
+    default: true
+    type: boolean
+runs:
+  using: "composite"
+  steps:
+    - name: OCI - integration test
+      shell: bash
+      run: |
+        make image="${{ inputs.image }}" test-server-integration
+    - name: OCI - Cleanup
+      if: ${{ inputs.cleanImage }}
+      shell: bash
+      run: |
+        docker image rm ${{ inputs.image }}

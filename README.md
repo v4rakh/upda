@@ -119,6 +119,17 @@ defer func(lock appLock) {
 time.Sleep(20 * time.Second)
 ```
 
+### Tests
+
+There are multiple test targets defined in the `Makefile`
+
+- Go: Unit tests are executed with `-race`.
+- Go: Integration tests require an argument `image=...`, a built OCI image reference of _upda_, to work.
+- Web: Executed together with Go unit tests.
+
+If you're running on rootless docker or podman, set `DOCKER_HOST=unix:///run/user/1000/podman/podman.sock` (adapt for
+docker).
+
 ### Git workflow
 
 The main branch is `master`. It's protected and only eligible users can push to it. Merge requests to protected branches

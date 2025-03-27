@@ -5,8 +5,8 @@
   "author": "varakh@varakh.de",
   "type": "module",
   "engines": {
-    "node": "^22",
-    "npm": "^10",
+    "node": ">=20",
+    "npm": ">=10",
     "pnpm": ">=9"
   },
   "scripts": {
@@ -15,8 +15,7 @@
     "serve": "vite preview",
     "test": "vitest watch",
     "test:no-watch": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:ci": "vitest run --coverage --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
     "format": "prettier --write ./src/**/*.{ts,tsx,less}",
     "format:check": "prettier --check ./src/**/*.{ts,tsx,less}",
     "lint": "eslint \"./src/**/*.{tsx,ts}\"",

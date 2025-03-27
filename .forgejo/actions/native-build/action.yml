@@ -1,8 +1,7 @@
 runs:
   using: "composite"
   steps:
-    - name: Test native build
+    - name: Native - build, test
       shell: bash
       run: |
-        npm install --global pnpm@^10
         VERSION=${{ github.sha }} make ci

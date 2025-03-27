@@ -12,6 +12,7 @@ LDFLAGS := -X 'git.myservermanager.com/varakh/upda/commons.Version=$(VERSION)'
 clean: clean-server clean-web
 clean-server:
 	rm -rf ${BIN_DIR}
+	go clean -testcache
 clean-web:
 	rm -rf ${WEB_BUILD_DIR} ${WEB_NODE_DIR} ${WEB_COVERAGE_DIR} ${WEB_CI_DIR}
 
@@ -30,11 +31,13 @@ checkstyle-web:
 	cd ${WEB_DIR}; pnpm run checkstyle
 
 # test steps
-test: test-web test-server
-test-server:
-	go test -race ./...
-test-web:
-	cd ${WEB_DIR}; pnpm run test:ci
+test-unit: test-web-unit test-server-unit
+test-server-unit:
+	CGO_ENABLED=1 go test -race ./...
+test-server-integration:
+	IMAGE=$(image) go test -tags=integration ./...
+test-web-unit:
+	cd ${WEB_DIR}; pnpm run test:coverage
 
 # build steps
 
@@ -84,7 +87,7 @@ build-web:
 clean-ci: clean
 dependencies-ci: dependencies
 checkstyle-ci: checkstyle
-test-ci: test
+test-ci: test-unit
 build-server-ci: build-server-all
 build-cli-ci: build-cli-all
 build-web-ci: build-web
