@@ -1338,7 +1338,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"matchApplication\": \"upda-cli\"\n}",
+              "raw": "{\n    \"matchApplication\": \"upda\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1394,7 +1394,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"matchProvider\": \"upda-cli\"\n}",
+              "raw": "{\n    \"matchProvider\": \"upda\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

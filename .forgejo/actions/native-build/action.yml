@@ -4,4 +4,4 @@ runs:
     - name: Native - build, test
       shell: bash
       run: |
-        VERSION=${{ github.sha }} make ci
+        VERSION=${{ github.sha }} make clean dependencies test-unit build

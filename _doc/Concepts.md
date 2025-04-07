@@ -3,7 +3,8 @@
 The following section goes into a deeper look into upda's internals.
 
 1. Create a webhook in upda.
-2. Use the webhook's URL in a 3rd party application to start tracking an update or use `upda-cli` to report an update.
+2. Use the webhook's URL in a 3rd party application to start tracking an update or use `upda` to report an update via
+   command-line.
 3. Enjoy visualization and state management of tracked updates in one place.
 4. Optionally, define _Actions_ for tracked updates as they arrive
 

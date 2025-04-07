@@ -2,6 +2,12 @@
 
 ## Rolling
 
+### 2025-04-07
+
+* _upda_ is only built as one binary instead of separating between cli helper and server, start server with `upda server serve` or see `upda help`
+* Rename `--server-url` to `--url` for cli helper
+* Added `direnv` with `dotenv` to ease getting started on development
+
 ### 2025-03-23
 
 * By default, _upda_ now uses a rolling release workflow to ease maintenance and improve automation for more frequent
@@ -41,9 +47,11 @@
 * Switch default time zone (`TZ` and `DB_POSTGRES_TZ`) to `Etc/UTC`
 * Switch default `WEBHOOKS_TOKEN_LENGTH` from `16` to `30`
 * Allow to disable the embedded frontend with `EMBEDDED_WEB_INTERFACE_ENABLED=false` (defaults to `true`)
-* Rename `WEB_API_URL` configuration to `EMBEDDED_WEB_INTERFACE_API_URL` which requires the full API URL with trailing slash, e.g. `https://upda.domain.tld/api/v1/`
+* Rename `WEB_API_URL` configuration to `EMBEDDED_WEB_INTERFACE_API_URL` which requires the full API URL with trailing
+  slash, e.g. `https://upda.domain.tld/api/v1/`
 * Rename `WEB_TITLE` configuration to `EMBEDDED_WEB_INTERFACE_TITLE`
-* Allow to set a base path with `SERVER_BASE_PATH` which defaults to `/`, all routes are prefixed with this base path (except embedded web interface if enabled)
+* Allow to set a base path with `SERVER_BASE_PATH` which defaults to `/`, all routes are prefixed with this base path (
+  except embedded web interface if enabled)
 * Dependency updates
 
 ## [5.0.0] - 2024/12/21

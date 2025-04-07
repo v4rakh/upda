@@ -1,8 +1,8 @@
 # Deployment
 
 _upda_ is a server application which embeds a web interface directly in its binary form (can be disabled). This makes it
-easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The _upda-cli_ which is an
-optional command-line helper to quickly invoke webhooks or list tracked updates in your instance is also embedded into
+easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The `upda` binary is a
+command-line helper to quickly invoke webhooks or list tracked updates in your instance is also embedded into
 the docker image, but can also be downloaded for your operating system.
 
 Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup on sub
@@ -254,8 +254,8 @@ Deploying _upda_ natively is also possible.
 > deploying _upda_ natively. In addition, the _standalone_ web interface is **not** distributed natively. Use the
 > containerized setup if you need to deploy _upda_ behind a sub path!
 
-First, download the binary for your operating system, make it executable, e.g., with `chmod +x upda-server`, then
-place it into the directory you want, e.g., `/usr/local/bin`. Afterward, run the binary with `./upda-server`.
+First, download the binary for your operating system, make it executable, e.g., with `chmod +x upda`, then
+place it into the directory you want, e.g., `/usr/local/bin`. Afterward, run the binary with `./upda server serve`.
 
 For a native deployment, it's recommended to use a service orchestrator like systemd on UNIX/Linux machines. Here's an
 example file `upda.service` which you can put into `/etc/systemd/system` or alike, then reload available systemd
@@ -279,8 +279,8 @@ DynamicUser=yes
 # All environment variables for upda can be put into this file
 # upda picks them up (on each restart)
 EnvironmentFile=/etc/upda.conf
-# Requires upda' binary to be installed at this location, e.g., via package manager or copying it over manually
-ExecStart=/usr/local/bin/upda-server
+# Requires upda binary to be installed at this location, e.g., via package manager or copying it over manually
+ExecStart=/usr/local/bin/upda server serve
 ```
 
 For a full set of available configuration, look into the [Configuration](./Configuration.md) section. Furthermore,

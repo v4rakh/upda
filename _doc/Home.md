@@ -10,12 +10,12 @@ Managing various application or OCI container image updates can be a tedious tas
 
 _upda_ manages a list of updates with attributes attached to it. For new updates to arrive, _upda_ needs to be called
 via a webhook call (created within _upda_) from other applications, such as a bash script, an
-application like [duin](https://crazymax.dev/diun/) or simply by using the `upda-cli`.
+application like [duin](https://crazymax.dev/diun/) or simply by using the `upda` binary command-line.
 
 Please head over to the [Usage](./Usage.md) section for a quick _Getting Started_ once you've [deployed](./Deployment.md)
 _upda_.
 
-The code is hosted here: [upda and CLI application including frontend](https://git.myservermanager.com/varakh/upda).
+The code is hosted here: [upda application including frontend](https://git.myservermanager.com/varakh/upda).
 
 ## Features
 
@@ -43,5 +43,5 @@ _upda_ is designed to be simple. Only supported authorization mechanism is basic
 
 _upda_ is **NOT** a scraper to watch docker registries or GitHub releases, it simply tracks and consolidates updates
 from different sources, but you need to feed in these information on your own, e.g., via Webhooks. If you like to watch
-GitHub releases, write a scraper and use `upda-cli` to report back to _upda_.
+GitHub releases, write a scraper and use the binary `upda` to report back to _upda_.
 

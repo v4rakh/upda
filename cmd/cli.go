@@ -1,4 +1,4 @@
-package terminal
+package main
 
 import (
 	"context"
@@ -9,22 +9,18 @@ import (
 	"git.myservermanager.com/varakh/upda/commons"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v3"
-	"log"
 	"os"
 	"text/tabwriter"
 )
 
 const (
-	name = commons.Name
-	desc = "a commandline helper for upda"
-
 	envServerUrl    = "UPDA_SERVER_URL"
 	envUser         = "UPDA_USER"
 	envPassword     = "UPDA_PASSWORD"
 	envWebhookId    = "UPDA_WEBHOOK_ID"
 	envWebhookToken = "UPDA_WEBHOOK_TOKEN"
 
-	flagServerUrl      = "server-url"
+	flagUrl            = "url"
 	flagUser           = "user"
 	flagPass           = "pass"
 	flagWebhookId      = "webhook-id"
@@ -37,16 +33,16 @@ const (
 	updatesUrlPath  = "/api/v1/updates"
 )
 
-func Start() {
-	var raw bool
-	var serverUrl string
-	var user string
-	var password string
-	var webhookId string
-	var webhookToken string
-	var updatePageSize int64
+var (
+	raw            bool
+	serverUrl      string
+	user           string
+	password       string
+	webhookId      string
+	webhookToken   string
+	updatePageSize int64
 
-	rawFlag := &cli.BoolFlag{
+	rawFlag = &cli.BoolFlag{
 		Name:        flagRaw,
 		Usage:       "on success raw JSON data from response is returned",
 		Aliases:     []string{"r"},
@@ -54,15 +50,15 @@ func Start() {
 		Destination: &raw,
 	}
 
-	serverUrlFlag := &cli.StringFlag{
-		Name:        flagServerUrl,
+	serverUrlFlag = &cli.StringFlag{
+		Name:        flagUrl,
 		Usage:       "the server url (FQDN without context path)",
 		Required:    true,
 		Aliases:     []string{"s"},
 		Sources:     cli.EnvVars(envServerUrl),
 		Destination: &serverUrl,
 	}
-	userFlag := &cli.StringFlag{
+	userFlag = &cli.StringFlag{
 		Name:        flagUser,
 		Usage:       "user",
 		Required:    true,
@@ -70,7 +66,7 @@ func Start() {
 		Sources:     cli.EnvVars(envUser),
 		Destination: &user,
 	}
-	passwordFlag := &cli.StringFlag{
+	passwordFlag = &cli.StringFlag{
 		Name:        flagPass,
 		Usage:       "password",
 		Required:    true,
@@ -78,7 +74,7 @@ func Start() {
 		Sources:     cli.EnvVars(envPassword),
 		Destination: &password,
 	}
-	webhookIdFlag := &cli.StringFlag{
+	webhookIdFlag = &cli.StringFlag{
 		Name:        flagWebhookId,
 		Usage:       "webhook id",
 		Required:    true,
@@ -86,7 +82,7 @@ func Start() {
 		Sources:     cli.EnvVars(envWebhookId),
 		Destination: &webhookId,
 	}
-	webhookTokenFlag := &cli.StringFlag{
+	webhookTokenFlag = &cli.StringFlag{
 		Name:        flagWebhookToken,
 		Usage:       "webhook token",
 		Required:    true,
@@ -94,7 +90,7 @@ func Start() {
 		Sources:     cli.EnvVars(envWebhookToken),
 		Destination: &webhookToken,
 	}
-	updatePageSizeFlag := &cli.IntFlag{
+	updatePageSizeFlag = &cli.IntFlag{
 		Name:        flagUpdatePageSize,
 		Usage:       "update show page size",
 		Value:       10000,
@@ -102,79 +98,10 @@ func Start() {
 		Aliases:     []string{"ps"},
 		Destination: &updatePageSize,
 	}
-
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:    "version",
-		Aliases: []string{"v"},
-		Usage:   "show version",
-	}
-	app := &cli.Command{
-		Name:    name,
-		Usage:   desc,
-		Version: commons.Version,
-		Commands: []*cli.Command{
-			{
-				Name:    "webhook",
-				Aliases: []string{"w"},
-				Usage:   "Options for webhook",
-				Commands: []*cli.Command{
-					{
-						Name:    "create",
-						Usage:   "Creates a webhook",
-						Aliases: []string{"c"},
-						Flags: []cli.Flag{
-							serverUrlFlag,
-							userFlag,
-							passwordFlag,
-							rawFlag,
-						},
-						ArgsUsage: "<label> [<type (generic|diun, default: generic)>] [<ignore-host (true|false, default: false)>]",
-						Action:    webhookCreate,
-					},
-					{
-						Name:    "send",
-						Usage:   "Sends data to a webhook",
-						Aliases: []string{"s"},
-						Flags: []cli.Flag{
-							serverUrlFlag,
-							webhookIdFlag,
-							webhookTokenFlag,
-						},
-						ArgsUsage: "<json payload>",
-						Action:    webhookSend,
-					},
-				},
-			},
-			{
-				Name:    "update",
-				Aliases: []string{"u"},
-				Usage:   "Options for update",
-				Commands: []*cli.Command{
-					{
-						Name:    "show",
-						Usage:   "Shows updates",
-						Aliases: []string{"s"},
-						Flags: []cli.Flag{
-							serverUrlFlag,
-							userFlag,
-							passwordFlag,
-							updatePageSizeFlag,
-							rawFlag,
-						},
-						Action: updateShow,
-					},
-				},
-			},
-		},
-	}
-
-	if err := app.Run(context.Background(), os.Args); err != nil {
-		log.Fatal(err)
-	}
-}
+)
 
 func webhookCreate(_ context.Context, cmd *cli.Command) error {
-	if err := failIfFlagsNotPresent(cmd, []string{flagServerUrl, flagUser, flagPass}); err != nil {
+	if err := failIfFlagsNotPresent(cmd, []string{flagUrl, flagUser, flagPass}); err != nil {
 		return cli.Exit(err, 1)
 	}
 	if !cmd.Args().Present() {
@@ -208,7 +135,7 @@ func webhookCreate(_ context.Context, cmd *cli.Command) error {
 
 	var successRes api.WebhookSingleResponse
 	var errorRes api.ErrorResponse
-	url := cmd.String(flagServerUrl) + webhooksUrlPath
+	url := cmd.String(flagUrl) + webhooksUrlPath
 	client := resty.New()
 	client.SetDisableWarn(true)
 	res, err := client.R().
@@ -240,7 +167,7 @@ func webhookCreate(_ context.Context, cmd *cli.Command) error {
 }
 
 func webhookSend(_ context.Context, cmd *cli.Command) error {
-	if err := failIfFlagsNotPresent(cmd, []string{flagServerUrl, flagWebhookId, flagWebhookToken}); err != nil {
+	if err := failIfFlagsNotPresent(cmd, []string{flagUrl, flagWebhookId, flagWebhookToken}); err != nil {
 		return cli.Exit(err, 1)
 	}
 
@@ -257,7 +184,7 @@ func webhookSend(_ context.Context, cmd *cli.Command) error {
 	}
 
 	var errorRes api.ErrorResponse
-	url := cmd.String(flagServerUrl) + webhooksUrlPath + "/" + cmd.String(flagWebhookId)
+	url := cmd.String(flagUrl) + webhooksUrlPath + "/" + cmd.String(flagWebhookId)
 	client := resty.New()
 	client.SetDisableWarn(true)
 	res, err := client.R().
@@ -278,13 +205,13 @@ func webhookSend(_ context.Context, cmd *cli.Command) error {
 }
 
 func updateShow(_ context.Context, cmd *cli.Command) error {
-	if err := failIfFlagsNotPresent(cmd, []string{flagServerUrl, flagUser, flagPass}); err != nil {
+	if err := failIfFlagsNotPresent(cmd, []string{flagUrl, flagUser, flagPass}); err != nil {
 		return cli.Exit(err, 1)
 	}
 
 	var successRes api.UpdateDataPageResponse
 	var errorRes api.ErrorResponse
-	url := cmd.String(flagServerUrl) + updatesUrlPath + fmt.Sprintf("?pageSize=%d", cmd.Int(flagUpdatePageSize))
+	url := cmd.String(flagUrl) + updatesUrlPath + fmt.Sprintf("?pageSize=%d", cmd.Int(flagUpdatePageSize))
 	client := resty.New()
 	client.SetDisableWarn(true)
 	res, err := client.R().

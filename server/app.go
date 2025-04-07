@@ -8,18 +8,23 @@ import (
 	ginstatic "github.com/gin-contrib/static"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	_ "go.uber.org/automaxprocs"
+	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 )
 
-func Start() {
+func Start(c context.Context) {
 	// configuration init
 	env := bootstrapEnvironment()
+
+	// adhere to GOMAXPROCS, but silence default output
+	_, _ = maxprocs.Set(maxprocs.Logger(nil))
+	zap.L().Sugar().Debugf("GOMAXPROCS '%d'", runtime.GOMAXPROCS(0))
 
 	// set gin mode derived
 	if env.appConfig.isDevelopment {
@@ -258,7 +263,7 @@ Object.defineProperty(window, 'runtime_config', {
 	zap.L().Info("Shutting down...")
 	ts.stop()
 
-	ctx, cancel := context.WithTimeout(context.Background(), env.serverConfig.timeout)
+	ctx, cancel := context.WithTimeout(c, env.serverConfig.timeout)
 	defer cancel()
 	if err = srv.Shutdown(ctx); err != nil {
 		zap.L().Sugar().Fatalf("Shutdown failed, exited directly: %v", err)

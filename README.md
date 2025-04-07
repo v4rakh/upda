@@ -12,7 +12,11 @@ See **[official documentation](./_doc/Home.md)**.
 
 ## Development & contribution
 
-There's also a [embedded frontend](#embedded-frontend).
+There's also an [embedded frontend](#embedded-frontend).
+
+See [getting started](#getting-started) for setting up the development environment.
+
+### Guidelines
 
 * Pay attention to `make checkstyle` (uses `go vet ./...`); pipeline fails if issues are detected.
 * Each entity has its own repository
@@ -39,6 +43,16 @@ Be aware that some are false positives and actually required.
 
 ### Getting started
 
+Please see the `Makefile` for all available commands.
+
+You can also use [direnv](https://github.com/direnv/direnv) to load the environment variables from `.env` file. Copy
+`.env.example` to `.env` and adjust the values accordingly.
+
+When you change directory into the project, the environment variables are automatically loaded after you've allowed
+`direnv` with `direnv allow`.
+
+#### Pre-requisites
+
 Ensure to set the following environment variables for proper debug logs during development
 
 ```shell
@@ -49,15 +63,14 @@ LOGGING_LEVEL=debug
 ```
 
 1. Run `make clean dependencies` to fetch dependencies
-2. Start `git.myservermanager.com/varakh/upda/cmd/server` (or `cli`) as Go application and ensure to have _required_
-   environment variables set
+2. Start `git.myservermanager.com/varakh/upda/cmd/*`
 
-If you like to test with PSQL and/or REDIS for task locking, here are some useful docker commands to have containers
+If you like to test with Postgres and/or REDIS for task locking, here are some useful docker commands to have containers
 up and running quickly. Set necessary environment variables properly.
 
 ```shell
 # postgres
-docker run --rm --name=upda-db \
+docker run --name=upda-db \
   -p 5432:5432 \
   --restart=unless-stopped \
   -e POSTGRES_USER=upda \
@@ -66,7 +79,7 @@ docker run --rm --name=upda-db \
   postgres:17-alpine
   
 # redis
-docker run --rm --name some-redis \
+docker run --name some-redis \
   -p 6379:6379 \
   redis redis-server --save 60 1 --loglevel warning
 ```
@@ -79,7 +92,7 @@ embedded into the GoLang binary itself.
 For _development_, no other steps are required. Simply follow the [frontend instructions](./server/web/README.md) and
 start the frontend separately.
 
-If you like to have a look on the _production_ experience, the frontend needs to be build first and you need to build
+If you like to have a look on the _production_ experience, the frontend needs to be build first, and you need to build
 the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
 the `Makefile` (additional `rm -rf` cmd).
 
@@ -89,7 +102,7 @@ On Windows, you need a valid `gcc`, e.g., https://jmeubank.github.io/tdm-gcc/dow
 path.
 
 For any `go` command you run, ensure that your `PATH` has the `gcc` binary and that you add `CGO_ENABLED=1` as
-environment if go commands fail.
+environment if `go` commands fail.
 
 ### Using the `lockService` correctly
 
@@ -123,7 +136,7 @@ time.Sleep(20 * time.Second)
 
 There are multiple test targets defined in the `Makefile`
 
-- Go: Unit tests are executed with `-race`.
+- Go: Unit tests.
 - Go: Integration tests require an argument `image=...`, a built OCI image reference of _upda_, to work.
 - Web: Executed together with Go unit tests.
 

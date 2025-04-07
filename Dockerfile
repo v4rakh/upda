@@ -16,7 +16,7 @@ RUN apk --update upgrade && \
 WORKDIR /app
 COPY . .
 RUN npm install --global pnpm@^10 && \
-    VERSION=${VERSION} CC=gcc make ci-oci
+    VERSION=${VERSION} CC=gcc make clean dependencies build-web build-server-linux-amd64
 
 #
 # Actual image
@@ -41,11 +41,10 @@ RUN apk --update upgrade && \
     addgroup -S ${GROUP} -g ${GID} && \
     adduser -S ${USER} -G ${GROUP} -u ${UID}
 
-COPY --from=builder /app/bin/upda-cli-linux-amd64 /usr/bin/upda-cli
-COPY --from=builder /app/bin/upda-server-linux-amd64 /usr/bin/upda-server
+COPY --from=builder /app/bin/upda-linux-amd64 /usr/bin/upda
 
 USER ${USER}
 
 ENV SERVER_PORT=8080
 EXPOSE ${SERVER_PORT}
-CMD ["/usr/bin/upda-server"]
+CMD ["/usr/bin/upda", "server", "serve"]
