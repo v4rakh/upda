@@ -7,7 +7,7 @@ require (
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/docker/go-connections v0.5.0
 	github.com/gin-contrib/cors v1.7.5
-	github.com/gin-contrib/static v1.1.4
+	github.com/gin-contrib/static v1.1.5
 	github.com/gin-contrib/zap v1.1.5
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.0.1

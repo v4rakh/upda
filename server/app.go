@@ -123,7 +123,11 @@ func Start(c context.Context) {
 		} else {
 			targetPath = "web/build"
 		}
-		router.Use(ginstatic.Serve(fmt.Sprintf("%s", env.serverConfig.basePath), ginstatic.EmbedFolder(embeddedFiles, targetPath)))
+		var embeddedFolder ginstatic.ServeFileSystem
+		if embeddedFolder, err = ginstatic.EmbedFolder(embeddedFiles, targetPath); err != nil {
+			zap.L().Sugar().Fatalf("Cannot serve embedded folder: %s", err.Error())
+		}
+		router.Use(ginstatic.Serve(fmt.Sprintf("%s", env.serverConfig.basePath), embeddedFolder))
 
 		if !env.appConfig.isDevelopment {
 			embeddedFrontendGroup := router.Group(fmt.Sprintf("%s", env.serverConfig.basePath))
