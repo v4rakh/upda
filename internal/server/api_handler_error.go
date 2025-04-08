@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/commons"
+	"git.myservermanager.com/varakh/upda/internal/commons"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"

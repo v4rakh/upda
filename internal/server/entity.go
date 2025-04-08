@@ -1,7 +1,7 @@
 package server
 
 import (
-	"git.myservermanager.com/varakh/upda/encryption"
+	"git.myservermanager.com/varakh/upda/internal/encryption"
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"

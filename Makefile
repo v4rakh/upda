@@ -1,5 +1,5 @@
 VERSION ?= rolling
-LDFLAGS := -X 'git.myservermanager.com/varakh/upda/commons.Version=$(VERSION)'
+LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/commons.Version=$(VERSION)'
 
 GO ?= GO111MODULE=on CGO_ENABLED=0 go
 GOOS ?= $(shell $(GO) version | cut -d' ' -f4 | cut -d'/' -f1)
@@ -12,11 +12,11 @@ export GO111MODULE=on
 PNPM ?= pnpm
 
 BIN_DIR = $(shell pwd)/bin
-WEB_DIR = $(shell pwd)/server/web
-WEB_BUILD_DIR = $(shell pwd)/server/web/build
-WEB_NODE_DIR = $(shell pwd)/server/web/node_modules
-WEB_COVERAGE_DIR = $(shell pwd)/server/web/coverage
-WEB_CI_DIR = $(shell pwd)/server/web/ci/*.xml
+WEB_DIR = $(shell pwd)/internal/server/web
+WEB_BUILD_DIR = $(shell pwd)/internal/server/web/build
+WEB_NODE_DIR = $(shell pwd)/internal/server/web/node_modules
+WEB_COVERAGE_DIR = $(shell pwd)/internal/server/web/coverage
+WEB_CI_DIR = $(shell pwd)/internal/server/web/ci/*.xml
 
 clean: clean-server clean-web
 clean-server:

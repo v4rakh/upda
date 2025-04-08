@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/commons"
+	"git.myservermanager.com/varakh/upda/internal/commons"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v3"
 	"os"

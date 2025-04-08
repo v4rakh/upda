@@ -17,7 +17,7 @@ runs:
       uses: docker/build-push-action@v4
       with:
         push: false
-        context: ./server/web/
+        context: ./internal/server/web/
         load: true
         no-cache: true
         tags: |

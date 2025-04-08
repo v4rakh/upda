@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"errors"
-	"git.myservermanager.com/varakh/upda/locker"
+	"git.myservermanager.com/varakh/upda/internal/locker"
 	"go.uber.org/zap"
 	"time"
 )

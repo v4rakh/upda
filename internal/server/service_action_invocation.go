@@ -3,7 +3,7 @@ package server
 import (
 	"errors"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/commons"
+	"git.myservermanager.com/varakh/upda/internal/commons"
 	"github.com/containrrr/shoutrrr"
 	"go.uber.org/zap"
 	"strings"

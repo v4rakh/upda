@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"git.myservermanager.com/varakh/upda/server"
+	"git.myservermanager.com/varakh/upda/internal/server"
 	"github.com/urfave/cli/v3"
 )
 

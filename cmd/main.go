@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"git.myservermanager.com/varakh/upda/commons"
+	"git.myservermanager.com/varakh/upda/internal/commons"
 	"github.com/urfave/cli/v3"
 	"log"
 	"os"

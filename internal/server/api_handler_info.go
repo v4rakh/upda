@@ -2,7 +2,7 @@ package server
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/commons"
+	"git.myservermanager.com/varakh/upda/internal/commons"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

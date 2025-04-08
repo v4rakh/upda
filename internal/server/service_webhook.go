@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/commons"
+	"git.myservermanager.com/varakh/upda/internal/commons"
 	"go.uber.org/zap"
 )
 

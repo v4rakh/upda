@@ -42,7 +42,7 @@ runs:
       uses: docker/build-push-action@v4
       with:
         push: true
-        context: ./server/web/
+        context: ./internal/server/web/
         no-cache: true
         build-args: |
           VERSION=${{ github.sha }}
