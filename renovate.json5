@@ -3,7 +3,7 @@
   "prConcurrentLimit": 0,
   "osvVulnerabilityAlerts": true,
   "dependencyDashboardOSVVulnerabilitySummary": "all",
-  "rangeStrategy": "bump",
+  "rangeStrategy": "pin",
   "automerge": false,
   "branchPrefix": "renovate/",
   "separateMajorMinor": true,
