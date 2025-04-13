@@ -31,6 +31,7 @@ runs:
       with:
         push: true
         context: .
+        load: false
         no-cache: true
         build-args: |
           VERSION=${{ github.sha }}
@@ -43,6 +44,7 @@ runs:
       with:
         push: true
         context: ./internal/server/web/
+        load: false
         no-cache: true
         build-args: |
           VERSION=${{ github.sha }}

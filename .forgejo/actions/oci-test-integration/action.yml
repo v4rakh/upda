@@ -5,8 +5,7 @@ inputs:
     type: string
   cleanImage:
     description: "clean image after test run"
-    required: false
-    default: true
+    required: true
     type: boolean
 runs:
   using: "composite"
