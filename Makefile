@@ -1,12 +1,12 @@
 VERSION ?= rolling
-LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/commons.Version=$(VERSION)'
+LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/server/constant.AppVersion=$(VERSION)'
 
 GO ?= GO111MODULE=on CGO_ENABLED=0 go
-GO_TEST ?= go
+GO_TEST ?= CGO_ENABLED=1 go
 GOOS ?= $(shell $(GO) version | cut -d' ' -f4 | cut -d'/' -f1)
 GOARCH ?= $(shell $(GO) version | cut -d' ' -f4 | cut -d'/' -f2)
 
-CMD_GO_FILES ?= $($(GO) list -f '{{join .GoFiles " "}}') ./cmd
+CMD_GO_FILES ?= ./cmd/upda/main.go
 
 export GO111MODULE=on
 

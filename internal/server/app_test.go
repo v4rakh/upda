@@ -7,7 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/internal/commons"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
+	"git.myservermanager.com/varakh/upda/internal/str"
 	"github.com/docker/go-connections/nat"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -100,9 +101,9 @@ func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainer
 	appPortMapped := fmt.Sprintf(natPortFormat, appPort)
 	appNatPort := nat.Port(appPortMapped)
 
-	adminUser, _ := commons.GenerateSecureRandomString(8)
-	adminPass, _ := commons.GenerateSecureRandomString(8)
-	secret, _ := commons.GenerateSecureRandomString(32)
+	adminUser, _ := str.GenerateSecureRandomString(8)
+	adminPass, _ := str.GenerateSecureRandomString(8)
+	secret, _ := str.GenerateSecureRandomString(32)
 
 	appContainerReq := testcontainers.ContainerRequest{
 		Image:          image,
@@ -165,7 +166,11 @@ func TestRequestInfoEndpoint(t *testing.T) {
 	}()
 
 	resp, err := http.Get(appURL + "/api/v1/info")
-	defer resp.Body.Close()
+	defer func(b io.ReadCloser) {
+		if bodyCloseErr := b.Close(); bodyCloseErr != nil {
+			t.Fatalf("cannot close body %v", bodyCloseErr)
+		}
+	}(resp.Body)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -181,7 +186,7 @@ func TestRequestInfoEndpoint(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.Equal(t, commons.Name, i.Name)
+	assert.Equal(t, constant.AppName, i.Name)
 	assert.NotEmpty(t, i.TimeZone)
 	assert.NotEmpty(t, i.Version)
 }

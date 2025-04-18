@@ -20,7 +20,7 @@ See [getting started](#getting-started) for setting up the development environme
 
 * Pay attention to `make checkstyle` (uses `go vet ./...`); pipeline fails if issues are detected.
 * Each entity has its own repository
-* Each entity is only used in repository and service (otherwise, mapping happens)
+* Each entity is only used in repository and service (otherwise, mapping happens, latest at controller level)
 * Presenter layer is constructed from the entity, e.g., in REST responses and mapped
 * No entity is directly returned in any REST response
 * All log calls should be handled by `zap.L()`
@@ -63,7 +63,7 @@ LOGGING_LEVEL=debug
 ```
 
 1. Run `make clean dependencies` to fetch dependencies
-2. Start `git.myservermanager.com/varakh/upda/cmd/*`
+2. Start `git.myservermanager.com/varakh/upda/cmd/main.go`
 
 If you like to test with Postgres and/or REDIS for task locking, here are some useful docker commands to have containers
 up and running quickly. Set necessary environment variables properly.
