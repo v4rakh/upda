@@ -2,6 +2,7 @@ VERSION ?= rolling
 LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/commons.Version=$(VERSION)'
 
 GO ?= GO111MODULE=on CGO_ENABLED=0 go
+GO_TEST ?= go
 GOOS ?= $(shell $(GO) version | cut -d' ' -f4 | cut -d'/' -f1)
 GOARCH ?= $(shell $(GO) version | cut -d' ' -f4 | cut -d'/' -f2)
 
@@ -44,9 +45,9 @@ checkstyle-web:
 
 test-unit: test-web-unit test-server-unit
 test-server-unit:
-	@$(GO) test ./...
+	@$(GO_TEST) test -race -shuffle on ./...
 test-server-integration:
-	@IMAGE=$(image) $(GO) test -tags=integration ./...
+	@IMAGE=$(image) $(GO_TEST) test -tags=integration ./...
 test-web-unit:
 	@cd ${WEB_DIR}; $(PNPM) run test:coverage
 
