@@ -101,7 +101,7 @@ type prometheusConfig struct {
 	secureToken        string
 }
 
-type Environment struct {
+type environment struct {
 	appConfig                  *appConfig
 	embeddedWebInterfaceConfig *embeddedWebInterfaceConfig
 	authConfig                 *authConfig
@@ -113,7 +113,7 @@ type Environment struct {
 	db                         *gorm.DB
 }
 
-func bootstrapEnvironment() *Environment {
+func bootstrapEnvironment() *environment {
 	var err error
 
 	// bootstrap logging (configured independently and required before any other action)
@@ -429,7 +429,7 @@ func bootstrapEnvironment() *Environment {
 		zap.L().Sugar().Fatalf("Could not setup database")
 	}
 
-	env := &Environment{appConfig: ac,
+	env := &environment{appConfig: ac,
 		embeddedWebInterfaceConfig: embeddedWebInterfaceC,
 		authConfig:                 authC,
 		serverConfig:               sc,
