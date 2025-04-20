@@ -23,14 +23,14 @@ import (
 
 func Start(c context.Context) {
 	// configuration init
-	cfg := config.BootstrapFromEnv()
+	cfg, db := config.LoadFromEnvironment(c)
 
 	// adhere to GOMAXPROCS, but silence default output
 	_, _ = maxprocs.Set(maxprocs.Logger(nil))
 	zap.L().Sugar().Debugf("GOMAXPROCS '%d'", runtime.GOMAXPROCS(0))
 
 	// set gin mode derived
-	if cfg.App.IsDevelopment {
+	if cfg.App.Development {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
@@ -59,13 +59,13 @@ func Start(c context.Context) {
 		router.Use(prometheusService.GetProm().Instrument())
 	}
 
-	updateRepo := repository.NewUpdateDbRepo(cfg.Database)
-	webhookRepo := repository.NewWebhookDbRepo(cfg.Database)
-	eventRepo := repository.NewEventDbRepo(cfg.Database)
-	secretRepo := repository.NewSecretDbRepo(cfg.Database)
-	constantRepo := repository.NewConstantDbRepo(cfg.Database)
-	actionRepo := repository.NewActionDbRepo(cfg.Database)
-	actionInvocationRepo := repository.NewActionInvocationDbRepo(cfg.Database)
+	updateRepo := repository.NewUpdateDbRepo(db)
+	webhookRepo := repository.NewWebhookDbRepo(db)
+	eventRepo := repository.NewEventDbRepo(db)
+	secretRepo := repository.NewSecretDbRepo(db)
+	constantRepo := repository.NewConstantDbRepo(db)
+	actionRepo := repository.NewActionDbRepo(db)
+	actionInvocationRepo := repository.NewActionInvocationDbRepo(db)
 
 	var lockService service.LockService
 
@@ -120,7 +120,7 @@ func Start(c context.Context) {
 	// if the prod tag is missing, development setup is used and a dummy frontend is shown on /
 	if cfg.EmbeddedWebInterface.Enabled {
 		var targetPath string
-		if cfg.App.IsDevelopment {
+		if cfg.App.Development {
 			targetPath = "web_dev"
 		} else {
 			targetPath = "web/build"
@@ -131,7 +131,7 @@ func Start(c context.Context) {
 		}
 		router.Use(ginstatic.Serve(fmt.Sprintf("%s", cfg.Server.BasePath), embeddedFolder))
 
-		if !cfg.App.IsDevelopment {
+		if !cfg.App.Development {
 			embeddedFrontendGroup := router.Group(fmt.Sprintf("%s", cfg.Server.BasePath))
 			embeddedFrontendGroup.GET("/conf/runtime-config.js", func(c *gin.Context) {
 				runtimeConfig := `

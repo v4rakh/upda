@@ -1,17 +1,21 @@
 package config
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/internal/file"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
+	"git.myservermanager.com/varakh/upda/internal/validate"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database"
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/sethvargo/go-envconfig"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/driver/postgres"
@@ -19,288 +23,173 @@ import (
 	"gorm.io/gorm/logger"
 	"log"
 	"moul.io/zapgorm2"
-	"os"
 	"path/filepath"
-	"strconv"
-	"strings"
 	"time"
 )
 
 const (
-	envDevelopment = "DEVELOPMENT"
-
-	envLoggingLevel        = "LOGGING_LEVEL"
-	loggingLevelDefault    = "info"
-	envLoggingEncoding     = "LOGGING_ENCODING"
-	loggingEncodingDefault = "json"
-
-	envLoggingDirectory    = "LOGGING_DIRECTORY"
-	loggingFileNameDefault = "upda.log"
-
 	EnvSecret = "SECRET"
 
-	envTZ     = "TZ"
-	tzDefault = "Etc/UTC"
-
-	envEmbeddedWebInterfaceEnabled     = "EMBEDDED_WEB_INTERFACE_ENABLED"
-	embeddedWebInterfaceEnabledDefault = "true"
-
-	envEmbeddedWebInterfaceApiUrl = "EMBEDDED_WEB_INTERFACE_API_URL"
-
-	envEmbeddedWebInterfaceTitle     = "EMBEDDED_WEB_INTERFACE_TITLE"
-	embeddedWebInterfaceTitleDefault = "upda"
-
-	envEmbeddedWebInterfaceDarkThemeEnabled     = "EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED"
-	embeddedWebInterfaceDarkThemeEnabledDefault = "false"
-
-	envEmbeddedWebInterfaceFooter            = "EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED"
-	embeddedWebInterfaceFooterEnabledDefault = "true"
-
-	envAuthMode              = "AUTH_MODE"
-	authModeDefault          = AuthModeBasicSingle
 	AuthModeBasicSingle      = "basic_single"
 	AuthModeBasicCredentials = "basic_credentials"
-	envBasicAuthUser         = "BASIC_AUTH_USER"
-	envBasicAuthPassword     = "BASIC_AUTH_PASSWORD"
-	envBasicAuthCredentials  = "BASIC_AUTH_CREDENTIALS"
-
-	envServerPort           = "SERVER_PORT"
-	serverPortDefault       = "8080"
-	envServerListen         = "SERVER_LISTEN"
-	serverListenDefault     = ""
-	envServerBasePath       = "SERVER_BASE_PATH"
-	serverBasePathDefault   = "/"
-	envServerTlsEnabled     = "SERVER_TLS_ENABLED"
-	serverTlsEnabledDefault = "false"
-	envServerTlsCertPath    = "SERVER_TLS_CERT_PATH"
-	envServerTlsKeyPath     = "SERVER_TLS_KEY_PATH"
-
-	envServerTimeout     = "SERVER_TIMEOUT"
-	serverTimeoutDefault = "1s"
-
-	envCorsAllowOrigins         = "CORS_ALLOW_ORIGINS"
-	envCorsAllowMethods         = "CORS_ALLOW_METHODS"
-	envCorsAllowHeaders         = "CORS_ALLOW_HEADERS"
-	envCorsAllowCredentials     = "CORS_ALLOW_CREDENTIALS"
-	envCorsExposeHeaders        = "CORS_EXPOSE_HEADERS"
-	corsAllowOriginsDefault     = "*"
-	corsAllowMethodsDefault     = "HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS"
-	corsAllowHeadersDefault     = "Authorization, Content-Type"
-	corsAllowCredentialsDefault = "true"
-	corsExposeHeadersDefault    = "*"
-
-	dbTypePostgres = "postgres"
-
-	envDbType                 = "DB_TYPE"
-	envDbPostgresHost         = "DB_POSTGRES_HOST"
-	envDbPostgresPort         = "DB_POSTGRES_PORT"
-	envDbPostgresName         = "DB_POSTGRES_NAME"
-	envDbPostgresTimeZone     = "DB_POSTGRES_TZ"
-	envDbPostgresUser         = "DB_POSTGRES_USER"
-	envDbPostgresPassword     = "DB_POSTGRES_PASSWORD"
-	dbTypePostgresHostDefault = "localhost"
-	dbTypePostgresPortDefault = "5432"
-	dbTypePostgresTZDefault   = "Etc/UTC"
-
-	envDbMigrationEnabled     = "DB_MIGRATION_ENABLED"
-	dbMigrationEnabledDefault = "true"
-
-	envTaskPrometheusRefreshInterval = "TASK_PROMETHEUS_REFRESH_INTERVAL"
-	taskPrometheusRefreshDefault     = "60s"
-
-	envWebhooksTokenLength     = "WEBHOOKS_TOKEN_LENGTH"
-	webhooksTokenLengthDefault = "32"
-
-	envPrometheusEnabled                = "PROMETHEUS_ENABLED"
-	envPrometheusMetricsPath            = "PROMETHEUS_METRICS_PATH"
-	envPrometheusSecureTokenEnabled     = "PROMETHEUS_SECURE_TOKEN_ENABLED"
-	envPrometheusSecureToken            = "PROMETHEUS_SECURE_TOKEN"
-	prometheusEnabledDefault            = "false"
-	prometheusMetricsPathDefault        = "/metrics"
-	prometheusSecureTokenEnabledDefault = "true"
-
-	envTaskUpdateCleanStaleEnabled      = "TASK_UPDATE_CLEAN_STALE_ENABLED"
-	envTaskUpdateCleanStaleInterval     = "TASK_UPDATE_CLEAN_STALE_INTERVAL"
-	envTaskUpdateCleanStaleMaxAge       = "TASK_UPDATE_CLEAN_STALE_MAX_AGE"
-	taskUpdateCleanStaleEnabledDefault  = "false"
-	taskUpdateCleanStaleIntervalDefault = "1h"
-	taskUpdateCleanStaleMaxAgeDefault   = "720h"
-
-	envTaskEventCleanStaleEnabled      = "TASK_EVENT_CLEAN_STALE_ENABLED"
-	envTaskEventCleanStaleInterval     = "TASK_EVENT_CLEAN_STALE_INTERVAL"
-	envTaskEventCleanStaleMaxAge       = "TASK_EVENT_CLEAN_STALE_MAX_AGE"
-	taskEventCleanStaleEnabledDefault  = "false"
-	taskEventCleanStaleIntervalDefault = "8h"
-	taskEventCleanStaleMaxAgeDefault   = "2190h"
-
-	envTaskActionsEnqueueEnabled       = "TASK_ACTIONS_ENQUEUE_ENABLED"
-	envTaskActionsEnqueueInterval      = "TASK_ACTIONS_ENQUEUE_INTERVAL"
-	envTaskActionsEnqueueBatchSize     = "TASK_ACTIONS_ENQUEUE_BATCH_SIZE"
-	taskActionsEnqueueEnabledDefault   = "true"
-	taskActionsEnqueueIntervalDefault  = "10s"
-	taskActionsEnqueueBatchSizeDefault = "1"
-
-	envTaskActionsInvokeEnabled        = "TASK_ACTIONS_INVOKE_ENABLED"
-	envTaskActionsInvokeInterval       = "TASK_ACTIONS_INVOKE_INTERVAL"
-	envTaskActionsInvokeBatchSize      = "TASK_ACTIONS_INVOKE_BATCH_SIZE"
-	envTaskActionsInvokeMaxRetries     = "TASK_ACTIONS_INVOKE_MAX_RETRIES"
-	taskActionsInvokeEnabledDefault    = "true"
-	taskActionsInvokeIntervalDefault   = "10s"
-	taskActionsInvokeBatchSizeDefault  = "1"
-	taskActionsInvokeMaxRetriesDefault = "3"
-
-	envTaskActionsCleanStaleEnabled      = "TASK_ACTIONS_CLEAN_STALE_ENABLED"
-	envTaskActionsCleanStaleInterval     = "TASK_ACTIONS_CLEAN_STALE_INTERVAL"
-	envTaskActionsCleanStaleMaxAge       = "TASK_ACTIONS_CLEAN_STALE_MAX_AGE"
-	taskActionsCleanStaleEnabledDefault  = "true"
-	taskActionsCleanStaleIntervalDefault = "12h"
-	taskActionsCleanStaleMaxAgeDefault   = "720h"
-
-	envLockRedisEnabled = "LOCK_REDIS_ENABLED"
-	envLockRedisUrl     = "LOCK_REDIS_URL"
-	redisEnabledDefault = "false"
 )
 
 //go:embed migrations_postgres/*.sql
 var migrationPostgresFS embed.FS
 
-type App struct {
-	TimeZone      string
-	IsDevelopment bool
-	IsDebug       bool
+type Logging struct {
+	Level       string `env:"LOGGING_LEVEL,default=info" validate:"required,oneof=debug info warn error dpanic panic fatal"`
+	Encoding    string `env:"LOGGING_ENCODING,default=json" validate:"required,oneof=json console"`
+	Directory   string `env:"LOGGING_DIRECTORY"`
+	Debug       bool   `env:"DEBUG,default=false"`
+	Development bool   `env:"DEVELOPMENT,default=false"`
 }
 
-type EmbeddedWebInterface struct {
-	Enabled          bool
-	ApiUrl           string
-	Title            string
-	DarkThemeEnabled bool
-	FooterEnabled    bool
+type App struct {
+	TimeZone    string `env:"TZ,default=Etc/UTC" validate:"required"`
+	Development bool   `env:"DEVELOPMENT,default=false"`
+}
+
+type Secret struct {
+	Secret string `env:"SECRET,required" validate:"required"`
 }
 
 type Server struct {
-	Port                 int
-	Listen               string
-	BasePath             string
-	TlsEnabled           bool
-	TlsCertPath          string
-	TlsKeyPath           string
-	Timeout              time.Duration
-	CorsAllowCredentials bool
-	CorsAllowOrigins     []string
-	CorsAllowMethods     []string
-	CorsAllowHeaders     []string
-	CorsExposeHeaders    []string
+	Port                 int           `env:"SERVER_PORT,default=8080" validate:"gte=1"`
+	Listen               string        `env:"SERVER_LISTEN"`
+	BasePath             string        `env:"SERVER_BASE_PATH,default=/" validate:"required"`
+	TlsEnabled           bool          `env:"SERVER_TLS_ENABLED,default=false"`
+	TlsCertPath          string        `env:"SERVER_TLS_CERT_PATH"`
+	TlsKeyPath           string        `env:"SERVER_TLS_KEY_PATH"`
+	Timeout              time.Duration `env:"SERVER_TIMEOUT,default=1s" validate:"gte=0"`
+	CorsAllowCredentials bool          `env:"CORS_ALLOW_CREDENTIALS,default=true"`
+	CorsAllowOrigins     []string      `env:"CORS_ALLOW_ORIGINS,default=*"`
+	CorsAllowMethods     []string      `env:"CORS_ALLOW_METHODS,default=HEAD,GET,POST,PUT,PATCH,DELETE,OPTIONS"`
+	CorsAllowHeaders     []string      `env:"CORS_ALLOW_HEADERS,default=Authorization,Content-Type"`
+	CorsExposeHeaders    []string      `env:"CORS_EXPOSE_HEADERS,default=*"`
+}
+
+type Database struct {
+	Type             string `env:"DB_TYPE,default=postgres" validate:"required,oneof=postgres"`
+	MigrationEnabled bool   `env:"DB_MIGRATION_ENABLED,default=true"`
+	PostgresHost     string `env:"DB_POSTGRES_HOST,default=localhost" validate:"required_if=Type postgres"`
+	PostgresPort     int    `env:"DB_POSTGRES_PORT,default=5432" validate:"required_if=Type postgres"`
+	PostgresName     string `env:"DB_POSTGRES_NAME" validate:"required_if=Type postgres"`
+	PostgresTimeZone string `env:"DB_POSTGRES_TZ,default=Etc/UTC" validate:"required_if=Type postgres"`
+	PostgresUser     string `env:"DB_POSTGRES_USER" validate:"required_if=Type postgres"`
+	PostgresPassword string `env:"DB_POSTGRES_PASSWORD" validate:"required_if=Type postgres"`
+}
+
+type EmbeddedWebInterface struct {
+	Enabled          bool   `env:"EMBEDDED_WEB_INTERFACE_ENABLED,default=true"`
+	ApiUrl           string `env:"EMBEDDED_WEB_INTERFACE_API_URL,default=upda" validate:"required_if=Enabled true"`
+	Title            string `env:"EMBEDDED_WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
+	DarkThemeEnabled bool   `env:"EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED,default=false"`
+	FooterEnabled    bool   `env:"EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED,default=true"`
 }
 
 type Auth struct {
-	AuthMethod           string
-	BasicAuthUser        string
-	BasicAuthPassword    string
-	BasicAuthCredentials map[string]string
+	AuthMethod           string            `env:"AUTH_MODE,default=basic_single" validate:"required,oneof=basic_single basic_credentials"`
+	BasicAuthUser        string            `env:"BASIC_AUTH_USER" validate:"required_if=AuthMethod basic_single"`
+	BasicAuthPassword    string            `env:"BASIC_AUTH_PASSWORD" validate:"required_if=AuthMethod basic_single"`
+	BasicAuthCredentials map[string]string `env:"BASIC_AUTH_CREDENTIALS,separator=|,delimiter=;" validate:"required_if=AuthMethod basic_credentials"`
 }
 
 type Task struct {
-	UpdateCleanStaleEnabled   bool
-	UpdateCleanStaleInterval  time.Duration
-	UpdateCleanStaleMaxAge    time.Duration
-	EventCleanStaleEnabled    bool
-	EventCleanStaleInterval   time.Duration
-	EventCleanStaleMaxAge     time.Duration
-	ActionsEnqueueEnabled     bool
-	ActionsEnqueueInterval    time.Duration
-	ActionsEnqueueBatchSize   int
-	ActionsInvokeEnabled      bool
-	ActionsInvokeInterval     time.Duration
-	ActionsInvokeBatchSize    int
-	ActionsInvokeMaxRetries   int
-	ActionsCleanStaleEnabled  bool
-	ActionsCleanStaleInterval time.Duration
-	ActionsCleanStaleMaxAge   time.Duration
-	PrometheusRefreshInterval time.Duration
+	UpdateCleanStaleEnabled  bool          `env:"TASK_UPDATE_CLEAN_STALE_ENABLED,default=true"`
+	UpdateCleanStaleInterval time.Duration `env:"TASK_EVENT_CLEAN_STALE_INTERVAL,default=1h" validate:"required_if=UpdateCleanStaleEnabled true,gt=0"`
+	UpdateCleanStaleMaxAge   time.Duration `env:"TASK_UPDATE_CLEAN_STALE_MAX_AGE,default=720h" validate:"required_if=UpdateCleanStaleEnabled true,gt=0"`
+
+	EventCleanStaleEnabled  bool          `env:"TASK_EVENT_CLEAN_STALE_ENABLED,default=false"`
+	EventCleanStaleInterval time.Duration `env:"TASK_EVENT_CLEAN_STALE_INTERVAL,default=8h" validate:"required_if=EventCleanStaleEnabled true,gt=0"`
+	EventCleanStaleMaxAge   time.Duration `env:"TASK_EVENT_CLEAN_STALE_MAX_AGE,default=2190h" validate:"required_if=EventCleanStaleEnabled true,gt=0"`
+
+	ActionsEnqueueEnabled   bool          `env:"TASK_ACTIONS_ENQUEUE_ENABLED,default=true"`
+	ActionsEnqueueInterval  time.Duration `env:"TASK_ACTIONS_ENQUEUE_INTERVAL,default=10s" validate:"required_if=ActionsEnqueueEnabled true,gt=0"`
+	ActionsEnqueueBatchSize int           `env:"TASK_ACTIONS_ENQUEUE_BATCH_SIZE,default=1" validate:"required_if=ActionsEnqueueEnabled true,numeric,gte=1"`
+
+	ActionsInvokeEnabled    bool          `env:"TASK_ACTIONS_INVOKE_ENABLED,default=true"`
+	ActionsInvokeInterval   time.Duration `env:"TASK_ACTIONS_INVOKE_INTERVAL,default=10s" validate:"required_if=ActionsInvokeEnabled true,gt=0"`
+	ActionsInvokeBatchSize  int           `env:"TASK_ACTIONS_INVOKE_BATCH_SIZE,default=1" validate:"required_if=ActionsInvokeEnabled true,numeric,gte=1"`
+	ActionsInvokeMaxRetries int           `env:"TASK_ACTIONS_INVOKE_MAX_RETRIES,default=3" validate:"required_if=ActionsInvokeEnabled true,numeric,gte=1"`
+
+	ActionsCleanStaleEnabled  bool          `env:"TASK_ACTIONS_CLEAN_STALE_ENABLED,default=true"`
+	ActionsCleanStaleInterval time.Duration `env:"TASK_ACTIONS_CLEAN_STALE_INTERVAL,default=12h" validate:"required_if=ActionsCleanStaleEnabled true,gt=0"`
+	ActionsCleanStaleMaxAge   time.Duration `env:"TASK_ACTIONS_CLEAN_STALE_MAX_AGE,default=720h" validate:"required_if=ActionsCleanStaleEnabled true,gt=0"`
+
+	PrometheusRefreshInterval time.Duration `env:"TASK_PROMETHEUS_REFRESH_INTERVAL,default=60s" validate:"required,gte=0"`
 }
 
 type Lock struct {
-	RedisEnabled bool
-	RedisUrl     string
+	RedisEnabled bool   `env:"LOCK_REDIS_ENABLED,default=false"`
+	RedisUrl     string `env:"LOCK_REDIS_URL" validate:"required_if=RedisEnabled true"`
 }
 
 type Webhook struct {
-	TokenLength int
+	TokenLength int `env:"WEBHOOKS_TOKEN_LENGTH,default=32" validate:"required,numeric,gte=4"`
 }
 
 type Prometheus struct {
-	Enabled            bool
-	Path               string
-	SecureTokenEnabled bool
-	SecureToken        string
+	Enabled            bool   `env:"PROMETHEUS_ENABLED,default=false"`
+	Path               string `env:"PROMETHEUS_METRICS_PATH,default=/metrics" validate:"required_if=Enabled true"`
+	SecureTokenEnabled bool   `env:"PROMETHEUS_SECURE_TOKEN_ENABLED,default=true"`
+	SecureToken        string `env:"PROMETHEUS_SECURE_TOKEN" validate:"required_if=Enabled true SecureTokenEnabled true"`
 }
 
 type Configuration struct {
 	App                  *App
-	EmbeddedWebInterface *EmbeddedWebInterface
 	Auth                 *Auth
+	Database             *Database
+	EmbeddedWebInterface *EmbeddedWebInterface
+	Lock                 *Lock
+	Prometheus           *Prometheus
+	Secret               *Secret
 	Server               *Server
 	Task                 *Task
-	Lock                 *Lock
 	Webhook              *Webhook
-	Prometheus           *Prometheus
-	Database             *gorm.DB
 }
 
-func BootstrapFromEnv() *Configuration {
+func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	var err error
 
 	// bootstrap logging (configured independently and required before any other action)
-	loggingLevel := os.Getenv(envLoggingLevel)
-	if loggingLevel == "" {
-		if err = os.Setenv(envLoggingLevel, loggingLevelDefault); err != nil {
-			log.Fatalf("Cannot set logging level: %v", err)
-		}
-		loggingLevel = os.Getenv(envLoggingLevel)
+	var lc Logging
+	if err = envconfig.Process(ctx, &lc); err != nil {
+		zap.L().Sugar().Fatalf("Cannot load logging configuration from environment. Reason: %v", err)
 	}
+	if err = validate.ValidOrError(lc); err != nil {
+		zap.L().Sugar().Fatalf("Cannot validate logging configuration. Reason: %s", err.Error())
+	}
+
 	var level zap.AtomicLevel
-	if level, err = zap.ParseAtomicLevel(loggingLevel); err != nil {
+	if level, err = zap.ParseAtomicLevel(lc.Level); err != nil {
 		log.Fatalf("Cannot parse logging level: %v", err)
 	}
-	loggingEncoding := os.Getenv(envLoggingEncoding)
-	if loggingEncoding == "" {
-		if err = os.Setenv(envLoggingEncoding, loggingEncodingDefault); err != nil {
-			log.Fatalf("Cannot set logging encoding: %v", err)
-		}
-		loggingEncoding = os.Getenv(envLoggingEncoding)
-	}
-	if loggingEncoding != "json" && loggingEncoding != "console" {
-		log.Fatalf("Cannot parse logging level: %v", errors.New("only 'json' and 'console' are allowed logging encodings"))
-	}
-	isDebug := level.Level() == zap.DebugLevel
-	isDevelopment := os.Getenv(envDevelopment) == "true"
+
 	var loggingEncoderConfig zapcore.EncoderConfig
-	if loggingEncoding == "json" {
+	if "json" == lc.Encoding {
 		loggingEncoderConfig = zap.NewProductionEncoderConfig()
 	} else {
 		loggingEncoderConfig = zap.NewDevelopmentEncoderConfig()
 	}
 
 	logPaths := []string{"stderr"}
-	loggingDirectory := os.Getenv(envLoggingDirectory)
-
-	if loggingDirectory != "" {
-		logFile := filepath.Join(loggingDirectory, loggingFileNameDefault)
+	if lc.Directory != "" {
+		logFile := filepath.Join(lc.Directory, fmt.Sprintf("%s.log", constant.AppName))
 
 		if err = file.CreateFileWithParent(logFile); err != nil {
-			log.Fatalf("Log file '%s' cannot be created: %v", loggingDirectory, err)
+			log.Fatalf("Log file '%s' cannot be created: %v", lc.Directory, err)
 		}
 
 		logPaths = append(logPaths, logFile)
 	}
 
 	var zapConfig *zap.Config
-	if isDebug {
+	if lc.Debug {
 		zapConfig = &zap.Config{
 			Level:            level,
-			Development:      isDevelopment,
-			Encoding:         loggingEncoding,
+			Development:      lc.Development,
+			Encoding:         lc.Encoding,
 			EncoderConfig:    loggingEncoderConfig,
 			OutputPaths:      logPaths,
 			ErrorOutputPaths: logPaths,
@@ -308,12 +197,12 @@ func BootstrapFromEnv() *Configuration {
 	} else {
 		zapConfig = &zap.Config{
 			Level:       level,
-			Development: isDevelopment,
+			Development: lc.Development,
 			Sampling: &zap.SamplingConfig{
 				Initial:    100,
 				Thereafter: 100,
 			},
-			Encoding:         loggingEncoding,
+			Encoding:         lc.Encoding,
 			EncoderConfig:    loggingEncoderConfig,
 			OutputPaths:      logPaths,
 			ErrorOutputPaths: logPaths,
@@ -326,187 +215,17 @@ func BootstrapFromEnv() *Configuration {
 	}(zapLogger)
 	zap.ReplaceGlobals(zapLogger)
 
-	// assign defaults from given environment variables and validate
-	bootstrapFromEnvironmentAndValidate()
-
-	// parse environment variables in actual configuration structs
-	// app prometheusConfig
-	ac := &App{
-		TimeZone:      os.Getenv(envTZ),
-		IsDebug:       isDebug,
-		IsDevelopment: isDevelopment,
+	// load configuration and validate from environment
+	var c Configuration
+	if err = envconfig.Process(ctx, &c); err != nil {
+		zap.L().Sugar().Fatalf("Cannot load configuration from environment. Reason: %v", err)
+	}
+	if err = validate.ValidOrError(c); err != nil {
+		zap.L().Sugar().Fatalf("Cannot validate configuration. Reason: %s", err.Error())
 	}
 
-	// embedded web interface prometheusConfig
-	embeddedWebInterfaceEnabled := os.Getenv(envEmbeddedWebInterfaceEnabled) == "true"
-
-	if embeddedWebInterfaceEnabled {
-		failIfEnvKeyNotPresent(envEmbeddedWebInterfaceApiUrl)
-	}
-
-	var embeddedWebInterfaceC *EmbeddedWebInterface
-	embeddedWebInterfaceC = &EmbeddedWebInterface{
-		Enabled:          embeddedWebInterfaceEnabled,
-		ApiUrl:           os.Getenv(envEmbeddedWebInterfaceApiUrl),
-		Title:            os.Getenv(envEmbeddedWebInterfaceTitle),
-		DarkThemeEnabled: os.Getenv(envEmbeddedWebInterfaceDarkThemeEnabled) == "true",
-		FooterEnabled:    os.Getenv(envEmbeddedWebInterfaceFooter) == "true",
-	}
-
-	// server prometheusConfig
-	var sc *Server
-
-	var serverPort int
-	if serverPort, err = strconv.Atoi(os.Getenv(envServerPort)); err != nil {
-		zap.L().Sugar().Fatalf("Invalid server port. Reason: %v", err)
-	}
-
-	serverTlsEnabled := os.Getenv(envServerTlsEnabled) == "true"
-
-	if serverTlsEnabled {
-		failIfEnvKeyNotPresent(envServerTlsCertPath)
-		failIfEnvKeyNotPresent(envServerTlsKeyPath)
-	}
-
-	var serverTimeout time.Duration
-	var errParse error
-	if serverTimeout, errParse = time.ParseDuration(os.Getenv(envServerTimeout)); errParse != nil {
-		zap.L().Sugar().Fatalf("Could not parse timeout. Reason: %s", errParse.Error())
-	}
-
-	sc = &Server{
-		Port:                 serverPort,
-		Listen:               os.Getenv(envServerListen),
-		BasePath:             os.Getenv(envServerBasePath),
-		Timeout:              serverTimeout,
-		TlsEnabled:           serverTlsEnabled,
-		TlsCertPath:          os.Getenv(envServerTlsCertPath),
-		TlsKeyPath:           os.Getenv(envServerTlsKeyPath),
-		CorsAllowCredentials: os.Getenv(envCorsAllowCredentials) == "true",
-		CorsExposeHeaders:    []string{os.Getenv(envCorsExposeHeaders)},
-		CorsAllowOrigins:     []string{os.Getenv(envCorsAllowOrigins)},
-		CorsAllowMethods:     []string{os.Getenv(envCorsAllowMethods)},
-		CorsAllowHeaders:     []string{os.Getenv(envCorsAllowHeaders)},
-	}
-
-	authMode := os.Getenv(envAuthMode)
-
-	if authMode != AuthModeBasicSingle && authMode != AuthModeBasicCredentials {
-		zap.L().Sugar().Fatalln("Invalid auth mode. Reason: must be one of ['basic_single','basic_credentials'")
-	}
-
-	authC := &Auth{
-		AuthMethod: authMode,
-	}
-
-	if AuthModeBasicSingle == authMode {
-		failIfEnvKeyNotPresent(envBasicAuthUser)
-		failIfEnvKeyNotPresent(envBasicAuthPassword)
-		authC.BasicAuthUser = os.Getenv(envBasicAuthUser)
-		authC.BasicAuthPassword = os.Getenv(envBasicAuthPassword)
-	}
-	if AuthModeBasicCredentials == authMode {
-		failIfEnvKeyNotPresent(envBasicAuthCredentials)
-		authC.BasicAuthCredentials = parseBasicAuthCredentials(envBasicAuthCredentials)
-	}
-
-	// task prometheusConfig
-	var tc *Task
-
-	updateCleanStaleInterval := parseDuration(envTaskUpdateCleanStaleInterval)
-	updateCleanStaleMaxAge := parseDuration(envTaskUpdateCleanStaleMaxAge)
-	eventCleanStaleMaxAge := parseDuration(envTaskEventCleanStaleMaxAge)
-	actionsCleanStaleMaxAge := parseDuration(envTaskActionsCleanStaleMaxAge)
-	eventCleanStaleInterval := parseDuration(envTaskEventCleanStaleInterval)
-	actionsEnqueueInterval := parseDuration(envTaskActionsEnqueueInterval)
-	actionsInvokeInterval := parseDuration(envTaskActionsInvokeInterval)
-	actionsCleanStaleInterval := parseDuration(envTaskActionsCleanStaleInterval)
-	prometheusRefreshInterval := parseDuration(envTaskPrometheusRefreshInterval)
-
-	var actionsEnqueueBatchSize int
-	if actionsEnqueueBatchSize, err = strconv.Atoi(os.Getenv(envTaskActionsEnqueueBatchSize)); err != nil {
-		zap.L().Sugar().Fatalf("Invalid actions enqueue batch size. Reason: %v", err)
-	}
-	if actionsEnqueueBatchSize <= 0 {
-		zap.L().Sugar().Fatalf("Invalid actions enqueue batch size, must be a positive number.")
-	}
-
-	var actionsInvokeBatchSize int
-	if actionsInvokeBatchSize, err = strconv.Atoi(os.Getenv(envTaskActionsInvokeBatchSize)); err != nil {
-		zap.L().Sugar().Fatalf("Invalid actions invoke batch size. Reason: %v", err)
-	}
-	if actionsInvokeBatchSize <= 0 {
-		zap.L().Sugar().Fatalf("Invalid actions invoke batch size, must be a positive number.")
-	}
-
-	var actionsInvokeMaxRetries int
-	if actionsInvokeMaxRetries, err = strconv.Atoi(os.Getenv(envTaskActionsInvokeMaxRetries)); err != nil {
-		zap.L().Sugar().Fatalf("Invalid actions invoke max retries. Reason: %v", err)
-	}
-	if actionsInvokeMaxRetries <= 0 {
-		zap.L().Sugar().Fatalf("Invalid actions invoke max retries, must be a positive number.")
-	}
-
-	tc = &Task{
-		UpdateCleanStaleEnabled:   os.Getenv(envTaskUpdateCleanStaleEnabled) == "true",
-		UpdateCleanStaleInterval:  updateCleanStaleInterval,
-		UpdateCleanStaleMaxAge:    updateCleanStaleMaxAge,
-		EventCleanStaleEnabled:    os.Getenv(envTaskEventCleanStaleEnabled) == "true",
-		EventCleanStaleInterval:   eventCleanStaleInterval,
-		EventCleanStaleMaxAge:     eventCleanStaleMaxAge,
-		ActionsEnqueueEnabled:     os.Getenv(envTaskActionsEnqueueEnabled) == "true",
-		ActionsEnqueueInterval:    actionsEnqueueInterval,
-		ActionsEnqueueBatchSize:   actionsEnqueueBatchSize,
-		ActionsInvokeEnabled:      os.Getenv(envTaskActionsInvokeEnabled) == "true",
-		ActionsInvokeInterval:     actionsInvokeInterval,
-		ActionsInvokeBatchSize:    actionsInvokeBatchSize,
-		ActionsInvokeMaxRetries:   actionsInvokeMaxRetries,
-		ActionsCleanStaleEnabled:  os.Getenv(envTaskActionsCleanStaleEnabled) == "true",
-		ActionsCleanStaleInterval: actionsCleanStaleInterval,
-		ActionsCleanStaleMaxAge:   actionsCleanStaleMaxAge,
-		PrometheusRefreshInterval: prometheusRefreshInterval,
-	}
-
-	var lc *Lock
-	lc = &Lock{
-		RedisEnabled: os.Getenv(envLockRedisEnabled) == "true",
-		RedisUrl:     os.Getenv(envLockRedisUrl),
-	}
-
-	if lc.RedisEnabled {
-		failIfEnvKeyNotPresent(envLockRedisUrl)
-	}
-
-	webhookTokenLength := -1
-	if webhookTokenLength, err = strconv.Atoi(os.Getenv(envWebhooksTokenLength)); err != nil {
-		zap.L().Sugar().Fatalf("Invalid webhook token length. Reason: %v", err)
-	}
-	if webhookTokenLength <= 0 {
-		zap.L().Sugar().Fatalln("Invalid webhook token length. Reason: must be a positive number")
-	}
-
-	wc := &Webhook{
-		TokenLength: webhookTokenLength,
-	}
-
-	pc := &Prometheus{
-		Enabled:            os.Getenv(envPrometheusEnabled) == "true",
-		Path:               os.Getenv(envPrometheusMetricsPath),
-		SecureTokenEnabled: os.Getenv(envPrometheusSecureTokenEnabled) == "true",
-		SecureToken:        os.Getenv(envPrometheusSecureToken),
-	}
-
-	if pc.Enabled {
-		failIfEnvKeyNotPresent(envPrometheusMetricsPath)
-	}
-
-	if pc.Enabled && pc.SecureTokenEnabled {
-		failIfEnvKeyNotPresent(envPrometheusSecureToken)
-	}
-
-	// database setup
 	gormConfig := &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)}
-	if isDebug && isDevelopment {
+	if lc.Debug && c.App.Development {
 		gormZapLogger := zap.Must(zapConfig.Build())
 		defer func(gormZapLogger *zap.Logger) {
 			_ = gormZapLogger.Sync()
@@ -520,20 +239,16 @@ func BootstrapFromEnv() *Configuration {
 	var migrationDatabaseName string
 	var migrationFS source.Driver
 
-	zap.L().Sugar().Infof("Using database type '%s'", os.Getenv(envDbType))
+	zap.L().Sugar().Infof("Using database type '%s'", c.Database.Type)
 
-	if os.Getenv(envDbType) == dbTypePostgres {
-		host := os.Getenv(envDbPostgresHost)
-		port := os.Getenv(envDbPostgresPort)
-		dbUser := os.Getenv(envDbPostgresUser)
-		dbPass := os.Getenv(envDbPostgresPassword)
-		dbName := os.Getenv(envDbPostgresName)
-		dbTZ := os.Getenv(envDbPostgresTimeZone)
+	if "postgres" == c.Database.Type {
+		host := c.Database.PostgresHost
+		port := c.Database.PostgresPort
+		dbUser := c.Database.PostgresUser
+		dbPass := c.Database.PostgresPassword
+		dbName := c.Database.PostgresName
+		dbTZ := c.Database.PostgresTimeZone
 		migrationDatabaseName = dbName
-
-		if host == "" || port == "" || dbUser == "" || dbPass == "" || dbName == "" || dbTZ == "" {
-			zap.L().Sugar().Fatalf("Some configuration for database type '%s' is missing", os.Getenv(envDbType))
-		}
 
 		dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable TimeZone=%v", host, dbUser, dbPass, dbName, port, dbTZ)
 		if db, err = gorm.Open(postgres.Open(dsn), gormConfig); err != nil {
@@ -556,26 +271,13 @@ func BootstrapFromEnv() *Configuration {
 		if migrationFS, err = iofs.New(migrationPostgresFS, "migrations_postgres"); err != nil {
 			zap.L().Sugar().Fatalf("Could not create migration source: %v", err)
 		}
-	} else {
-		zap.L().Sugar().Fatalf("Database type '%s' is required", dbTypePostgres)
 	}
 
 	if db == nil {
 		zap.L().Sugar().Fatalf("Could not setup database")
 	}
 
-	env := &Configuration{App: ac,
-		EmbeddedWebInterface: embeddedWebInterfaceC,
-		Auth:                 authC,
-		Server:               sc,
-		Task:                 tc,
-		Lock:                 lc,
-		Webhook:              wc,
-		Prometheus:           pc,
-		Database:             db}
-
-	migrationEnabled := os.Getenv(envDbMigrationEnabled) == "true"
-	if !migrationEnabled {
+	if !c.Database.MigrationEnabled {
 		zap.L().Warn("Database schema migration is disabled and not executed automatically. Make sure to run them manually, otherwise the application might misbehave. You can safely ignore this warning if application is started in high availability mode and you're sure necessary database schema already exists.")
 	} else {
 		var migrator *migrate.Migrate
@@ -607,147 +309,17 @@ func BootstrapFromEnv() *Configuration {
 		zap.L().Info("Applied all necessary database migration steps successfully")
 	}
 
-	zap.L().Sugar().Infof("App %+v", env.App)
-	zap.L().Sugar().Infof("EmbeddedWebInterface %+v", env.EmbeddedWebInterface)
-	zap.L().Info("Auth ***REDACTED***")
-	zap.L().Sugar().Infof("Server %+v", env.Server)
-	zap.L().Sugar().Infof("Task %+v", env.Task)
-	zap.L().Info("Lock ***REDACTED***")
-	zap.L().Sugar().Infof("Webhook %+v", env.Webhook)
-	zap.L().Info("Prometheus ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: App %+v", c.App)
+	zap.L().Sugar().Infof("Configuration: Auth ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: Database ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: EmbeddedWebInterface %+v", c.EmbeddedWebInterface)
+	zap.L().Sugar().Infof("Configuration: Lock ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: Logging %+v", lc)
+	zap.L().Sugar().Infof("Configuration: Prometheus ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: Secret ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: Server %+v", c.Server)
+	zap.L().Sugar().Infof("Configuration: Task %+v", c.Task)
+	zap.L().Sugar().Infof("Configuration: Webhook %+v", c.Webhook)
 
-	return env
-}
-
-func bootstrapFromEnvironmentAndValidate() {
-	failIfEnvKeyNotPresent(EnvSecret)
-
-	// auth mode
-	setEnvKeyDefault(envAuthMode, authModeDefault)
-
-	// app
-	setEnvKeyDefault(envTZ, tzDefault)
-
-	// web
-	setEnvKeyDefault(envEmbeddedWebInterfaceEnabled, embeddedWebInterfaceEnabledDefault)
-	setEnvKeyDefault(envEmbeddedWebInterfaceTitle, embeddedWebInterfaceTitleDefault)
-	setEnvKeyDefault(envEmbeddedWebInterfaceDarkThemeEnabled, embeddedWebInterfaceDarkThemeEnabledDefault)
-	setEnvKeyDefault(envEmbeddedWebInterfaceFooter, embeddedWebInterfaceFooterEnabledDefault)
-
-	// webhook
-	setEnvKeyDefault(envWebhooksTokenLength, webhooksTokenLengthDefault)
-
-	// lock
-	setEnvKeyDefault(envLockRedisEnabled, redisEnabledDefault)
-
-	// task
-	setEnvKeyDefault(envTaskUpdateCleanStaleEnabled, taskUpdateCleanStaleEnabledDefault)
-	setEnvKeyDefault(envTaskUpdateCleanStaleInterval, taskUpdateCleanStaleIntervalDefault)
-	setEnvKeyDefault(envTaskUpdateCleanStaleMaxAge, taskUpdateCleanStaleMaxAgeDefault)
-
-	setEnvKeyDefault(envTaskEventCleanStaleEnabled, taskEventCleanStaleEnabledDefault)
-	setEnvKeyDefault(envTaskEventCleanStaleInterval, taskEventCleanStaleIntervalDefault)
-	setEnvKeyDefault(envTaskEventCleanStaleMaxAge, taskEventCleanStaleMaxAgeDefault)
-
-	setEnvKeyDefault(envTaskActionsEnqueueEnabled, taskActionsEnqueueEnabledDefault)
-	setEnvKeyDefault(envTaskActionsEnqueueInterval, taskActionsEnqueueIntervalDefault)
-	setEnvKeyDefault(envTaskActionsEnqueueBatchSize, taskActionsEnqueueBatchSizeDefault)
-
-	setEnvKeyDefault(envTaskActionsInvokeEnabled, taskActionsInvokeEnabledDefault)
-	setEnvKeyDefault(envTaskActionsInvokeInterval, taskActionsInvokeIntervalDefault)
-	setEnvKeyDefault(envTaskActionsInvokeBatchSize, taskActionsInvokeBatchSizeDefault)
-	setEnvKeyDefault(envTaskActionsInvokeMaxRetries, taskActionsInvokeMaxRetriesDefault)
-
-	setEnvKeyDefault(envTaskActionsCleanStaleEnabled, taskActionsCleanStaleEnabledDefault)
-	setEnvKeyDefault(envTaskActionsCleanStaleInterval, taskActionsCleanStaleIntervalDefault)
-	setEnvKeyDefault(envTaskActionsCleanStaleMaxAge, taskActionsCleanStaleMaxAgeDefault)
-
-	setEnvKeyDefault(envTaskPrometheusRefreshInterval, taskPrometheusRefreshDefault)
-
-	// prometheus
-	setEnvKeyDefault(envPrometheusEnabled, prometheusEnabledDefault)
-	setEnvKeyDefault(envPrometheusMetricsPath, prometheusMetricsPathDefault)
-	setEnvKeyDefault(envPrometheusSecureTokenEnabled, prometheusSecureTokenEnabledDefault)
-
-	// db
-	setEnvKeyDefault(envDbType, dbTypePostgres)
-	setEnvKeyDefault(envDbMigrationEnabled, dbMigrationEnabledDefault)
-
-	if os.Getenv(envDbType) == dbTypePostgres {
-		setEnvKeyDefault(envDbPostgresHost, dbTypePostgresHostDefault)
-		setEnvKeyDefault(envDbPostgresPort, dbTypePostgresPortDefault)
-		setEnvKeyDefault(envDbPostgresTimeZone, dbTypePostgresTZDefault)
-	}
-
-	// server
-	setEnvKeyDefault(envServerPort, serverPortDefault)
-	setEnvKeyDefault(envServerListen, serverListenDefault)
-	setEnvKeyDefault(envServerBasePath, serverBasePathDefault)
-	setEnvKeyDefault(envServerTlsEnabled, serverTlsEnabledDefault)
-	setEnvKeyDefault(envCorsAllowOrigins, corsAllowOriginsDefault)
-	setEnvKeyDefault(envCorsAllowMethods, corsAllowMethodsDefault)
-	setEnvKeyDefault(envCorsAllowHeaders, corsAllowHeadersDefault)
-	setEnvKeyDefault(envCorsAllowCredentials, corsAllowCredentialsDefault)
-	setEnvKeyDefault(envCorsExposeHeaders, corsExposeHeadersDefault)
-	setEnvKeyDefault(envServerTimeout, serverTimeoutDefault)
-}
-
-func failIfEnvKeyNotPresent(key string) {
-	if os.Getenv(key) == "" {
-		zap.L().Sugar().Fatalf("Not all required ENV variables given. Please set '%s'", key)
-	}
-}
-
-func setEnvKeyDefault(key string, defaultValue string) {
-	var err error
-	if os.Getenv(key) == "" {
-		if err = os.Setenv(key, defaultValue); err != nil {
-			zap.L().Sugar().Fatalf("Could not set default value for ENV variable '%s'", key)
-		}
-
-		zap.L().Sugar().Infof("Setting default for '%s' to '%s'", key, defaultValue)
-	}
-}
-
-func parseDuration(envProperty string) time.Duration {
-	var duration time.Duration
-	var err error
-
-	if duration, err = time.ParseDuration(os.Getenv(envProperty)); err != nil {
-		zap.L().Sugar().Fatalf("Could not parse duration for '%s'. Reason: %s", envProperty, err.Error())
-	}
-
-	return duration
-}
-
-func parseBasicAuthCredentials(envProperty string) map[string]string {
-	if envProperty == "" {
-		zap.L().Sugar().Fatalln("Invalid env for parsing basic auth credentials")
-	}
-	credentialsFromEnv := os.Getenv(envProperty)
-
-	var credentials []string
-	credentials = strings.Split(credentialsFromEnv, ",")
-
-	basicAuthCredentials := make(map[string]string)
-
-	for _, c := range credentials {
-		pair := strings.Split(c, "=")
-
-		if len(pair) != 2 {
-			zap.L().Sugar().Fatalln("Invalid basic auth credentials. Reason: credentials must be specified with the = separator per credential entry")
-		}
-
-		if pair[0] == "" {
-			zap.L().Sugar().Fatalln("Invalid basic auth credentials. Reason: username must not be blank")
-		}
-
-		if pair[1] == "" {
-			zap.L().Sugar().Fatalln("Invalid basic auth credentials. Reason: password must not be blank")
-		}
-
-		basicAuthCredentials[pair[0]] = pair[1]
-	}
-
-	return basicAuthCredentials
+	return &c, db
 }

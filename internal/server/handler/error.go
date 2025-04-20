@@ -6,6 +6,7 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"git.myservermanager.com/varakh/upda/internal/str"
+	"git.myservermanager.com/varakh/upda/internal/validate"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
@@ -17,7 +18,7 @@ func AbortWithValidatorPayload(c *gin.Context, err error) {
 
 	errorMap := make(map[string]string)
 	for _, v := range errs {
-		key, txt := validatorErrorToText(&v)
+		key, txt := validate.ErrorToText(&v)
 		errorMap[key] = txt
 	}
 
@@ -62,20 +63,4 @@ func CodeToStr(err error) string {
 	}
 
 	return string(service_error.ErrCodeGeneral)
-}
-
-func validatorErrorToText(e *validator.FieldError) (string, string) {
-	x := *e
-
-	switch x.Tag() {
-	case "required":
-		return x.Field(), fmt.Sprintf("%s is required", x.Field())
-	case "max":
-		return x.Field(), fmt.Sprintf("%s cannot be longer than %s", x.Field(), x.Param())
-	case "min":
-		return x.Field(), fmt.Sprintf("%s must be longer than %s", x.Field(), x.Param())
-	case "len":
-		return x.Field(), fmt.Sprintf("%s must be %s characters long", x.Field(), x.Param())
-	}
-	return x.Field(), fmt.Sprintf("%s is not valid", x.Field())
 }
