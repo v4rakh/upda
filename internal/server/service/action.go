@@ -48,7 +48,7 @@ func (s *ActionService) Create(label string, t api.ActionType, matchEvent *strin
 
 	var err error
 	var e *model.Action
-	if e, err = s.repo.Create(label, t, matchEvent, matchHost, matchApplication, matchProvider, payload, enabled); err != nil {
+	if e, err = s.repo.Create(label, t.Value(), matchEvent, matchHost, matchApplication, matchProvider, payload, enabled); err != nil {
 		return nil, err
 	} else {
 		zap.L().Sugar().Info("Created action")
@@ -204,7 +204,7 @@ func (s *ActionService) UpdateTypeAndPayload(id string, t api.ActionType, payloa
 		return nil, service_error.NewServiceError(service_error.ErrCodeIllegalArgument, validationErr)
 	}
 
-	if e, err = s.repo.UpdateTypeAndPayload(id, t, payload); err != nil {
+	if e, err = s.repo.UpdateTypeAndPayload(id, t.Value(), payload); err != nil {
 		return nil, err
 	}
 

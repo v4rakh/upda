@@ -2,7 +2,6 @@ package repository
 
 import (
 	"encoding/json"
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -10,16 +9,16 @@ import (
 )
 
 type UpdateRepository interface {
-	Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...api.UpdateState) ([]*model.Update, error)
-	Count(searchTerm string, searchIn string, state ...api.UpdateState) (int64, error)
+	Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...string) ([]*model.Update, error)
+	Count(searchTerm string, searchIn string, state ...string) (int64, error)
 	FindAll() ([]*model.Update, error)
 	Find(id string) (*model.Update, error)
 	FindBy(application string, provider string, host string) (*model.Update, error)
-	Create(application string, provider string, host string, version string, metadata interface{}) (*model.Update, error)
+	Create(application string, provider string, host string, version string, state string, metadata interface{}) (*model.Update, error)
 	Update(id string, version string, metadata interface{}) (*model.Update, error)
-	UpdateState(id string, state api.UpdateState) (*model.Update, error)
+	UpdateState(id string, state string) (*model.Update, error)
 	Delete(id string) (int64, error)
-	DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...api.UpdateState) (int64, error)
+	DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...string) (int64, error)
 }
 
 type UpdateDbRepo struct {
@@ -81,8 +80,8 @@ func (r *UpdateDbRepo) FindBy(application string, provider string, host string) 
 	return e, nil
 }
 
-func (r *UpdateDbRepo) Create(application string, provider string, host string, version string, metadata interface{}) (*model.Update, error) {
-	if application == "" || provider == "" || host == "" || version == "" {
+func (r *UpdateDbRepo) Create(application string, provider string, host string, version string, state string, metadata interface{}) (*model.Update, error) {
+	if application == "" || provider == "" || host == "" || version == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
 
@@ -91,7 +90,7 @@ func (r *UpdateDbRepo) Create(application string, provider string, host string, 
 		Provider:    provider,
 		Host:        host,
 		Version:     version,
-		State:       api.UpdateStatePending.Value(),
+		State:       state,
 	}
 
 	if metadata != nil {
@@ -113,7 +112,7 @@ func (r *UpdateDbRepo) Create(application string, provider string, host string, 
 	return e, nil
 }
 
-func (r *UpdateDbRepo) UpdateState(id string, state api.UpdateState) (*model.Update, error) {
+func (r *UpdateDbRepo) UpdateState(id string, state string) (*model.Update, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -125,7 +124,7 @@ func (r *UpdateDbRepo) UpdateState(id string, state api.UpdateState) (*model.Upd
 		return nil, err
 	}
 
-	e.State = state.Value()
+	e.State = state
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {
@@ -183,25 +182,20 @@ func (r *UpdateDbRepo) Delete(id string) (int64, error) {
 	return res.RowsAffected, nil
 }
 
-func (r *UpdateDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...api.UpdateState) (int64, error) {
+func (r *UpdateDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...string) (int64, error) {
 	if len(state) == 0 {
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	states := make([]string, 0, len(state))
-	for _, i := range state {
-		states = append(states, i.Value())
-	}
-
 	var res *gorm.DB
-	if res = r.db.Where("state IN ?", states).Where("updated_at < ?", time).Delete(&model.Update{}); res.Error != nil {
+	if res = r.db.Where("state IN ?", state).Where("updated_at < ?", time).Delete(&model.Update{}); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return res.RowsAffected, nil
 }
 
-func (r *UpdateDbRepo) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...api.UpdateState) ([]*model.Update, error) {
+func (r *UpdateDbRepo) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...string) ([]*model.Update, error) {
 	if page == 0 {
 		return nil, service_error.ErrValidationPageGreaterZero
 	}
@@ -220,31 +214,17 @@ func (r *UpdateDbRepo) Paginate(page int, pageSize int, orderBy string, order st
 		order = "desc"
 	}
 
-	states := make([]string, 0, len(state))
-	if len(state) > 0 {
-		for _, s := range state {
-			states = append(states, s.Value())
-		}
-	}
-
-	if res := r.db.Scopes(allGetUpdateCriterion(searchTerm, searchIn, states)).Order(orderBy + " " + order).Offset(offset).Limit(pageSize).Find(&e); res.Error != nil {
+	if res := r.db.Scopes(allGetUpdateCriterion(searchTerm, searchIn, state)).Order(orderBy + " " + order).Offset(offset).Limit(pageSize).Find(&e); res.Error != nil {
 		return nil, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return e, nil
 }
 
-func (r *UpdateDbRepo) Count(searchTerm string, searchIn string, state ...api.UpdateState) (int64, error) {
+func (r *UpdateDbRepo) Count(searchTerm string, searchIn string, state ...string) (int64, error) {
 	var c int64
 
-	states := make([]string, 0, len(state))
-	if len(state) > 0 {
-		for _, s := range state {
-			states = append(states, s.Value())
-		}
-	}
-
-	if res := r.db.Model(&model.Update{}).Scopes(allGetUpdateCriterion(searchTerm, searchIn, states)).Count(&c); res.Error != nil {
+	if res := r.db.Model(&model.Update{}).Scopes(allGetUpdateCriterion(searchTerm, searchIn, state)).Count(&c); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
 

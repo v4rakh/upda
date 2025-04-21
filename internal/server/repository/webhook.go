@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -11,7 +10,7 @@ type WebhookRepository interface {
 	Paginate(page int, pageSize int, orderBy string, order string) ([]*model.Webhook, error)
 	Count() (int64, error)
 	Find(id string) (*model.Webhook, error)
-	Create(label string, t api.WebhookType, token string, ignoreHost bool) (*model.Webhook, error)
+	Create(label string, t string, token string, ignoreHost bool) (*model.Webhook, error)
 	UpdateLabel(id string, label string) (*model.Webhook, error)
 	UpdateIgnoreHost(id string, ignoreHost bool) (*model.Webhook, error)
 	Delete(id string) (int64, error)
@@ -44,14 +43,14 @@ func (r *WebhookDbRepo) Find(id string) (*model.Webhook, error) {
 	return &e, nil
 }
 
-func (r *WebhookDbRepo) Create(label string, t api.WebhookType, token string, ignoreHost bool) (*model.Webhook, error) {
+func (r *WebhookDbRepo) Create(label string, t string, token string, ignoreHost bool) (*model.Webhook, error) {
 	if label == "" || t == "" || token == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
 
 	e := &model.Webhook{
 		Label:      label,
-		Type:       t.Value(),
+		Type:       t,
 		Token:      token,
 		IgnoreHost: ignoreHost,
 	}

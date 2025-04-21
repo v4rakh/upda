@@ -2,7 +2,6 @@ package repository
 
 import (
 	"encoding/json"
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -13,12 +12,12 @@ type EventRepository interface {
 	Find(id string) (*model.Event, error)
 	Window(size int, skip int, orderBy string, order string) ([]*model.Event, error)
 	WindowHasNext(size int, skip int, orderBy string, order string) (bool, error)
-	Count(state ...api.EventState) (int64, error)
-	FindAllByState(limit int, state ...api.EventState) ([]*model.Event, error)
-	Create(name api.EventName, state api.EventState, payload interface{}) (*model.Event, error)
-	UpdateState(id string, state api.EventState) (*model.Event, error)
+	Count(state ...string) (int64, error)
+	FindAllByState(limit int, state ...string) ([]*model.Event, error)
+	Create(name string, state string, payload interface{}) (*model.Event, error)
+	UpdateState(id string, state string) (*model.Event, error)
 	Delete(id string) (int64, error)
-	DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...api.EventState) (int64, error)
+	DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...string) (int64, error)
 }
 
 type EventDbRepo struct {
@@ -49,7 +48,7 @@ func (r *EventDbRepo) Find(id string) (*model.Event, error) {
 	return &e, nil
 }
 
-func (r *EventDbRepo) Create(name api.EventName, state api.EventState, payload interface{}) (*model.Event, error) {
+func (r *EventDbRepo) Create(name string, state string, payload interface{}) (*model.Event, error) {
 	if name == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -57,8 +56,8 @@ func (r *EventDbRepo) Create(name api.EventName, state api.EventState, payload i
 	var err error
 	var e *model.Event
 	e = &model.Event{
-		Name:  name.Value(),
-		State: state.Value(),
+		Name:  name,
+		State: state,
 	}
 
 	if payload != nil {
@@ -81,7 +80,7 @@ func (r *EventDbRepo) Create(name api.EventName, state api.EventState, payload i
 	return e, nil
 }
 
-func (r *EventDbRepo) UpdateState(id string, state api.EventState) (*model.Event, error) {
+func (r *EventDbRepo) UpdateState(id string, state string) (*model.Event, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -93,7 +92,7 @@ func (r *EventDbRepo) UpdateState(id string, state api.EventState) (*model.Event
 		return nil, err
 	}
 
-	e.State = state.Value()
+	e.State = state
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {
@@ -118,18 +117,13 @@ func (r *EventDbRepo) Delete(id string) (int64, error) {
 	return res.RowsAffected, nil
 }
 
-func (r *EventDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...api.EventState) (int64, error) {
+func (r *EventDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...string) (int64, error) {
 	if len(state) == 0 {
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	states := make([]string, 0, len(state))
-	for _, i := range state {
-		states = append(states, i.Value())
-	}
-
 	var res *gorm.DB
-	if res = r.db.Where("state IN ?", states).Where("updated_at < ?", time).Delete(&model.Event{}); res.Error != nil {
+	if res = r.db.Where("state IN ?", state).Where("updated_at < ?", time).Delete(&model.Event{}); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
 
@@ -172,7 +166,7 @@ func (r *EventDbRepo) WindowHasNext(size int, skip int, orderBy string, order st
 	return len(e) > 0, nil
 }
 
-func (r *EventDbRepo) FindAllByState(limit int, state ...api.EventState) ([]*model.Event, error) {
+func (r *EventDbRepo) FindAllByState(limit int, state ...string) ([]*model.Event, error) {
 	if len(state) == 0 {
 		return nil, service_error.ErrValidationNotEmpty
 	}
@@ -182,35 +176,21 @@ func (r *EventDbRepo) FindAllByState(limit int, state ...api.EventState) ([]*mod
 
 	var e []*model.Event
 
-	states := TranslateEventState(state...)
-
-	if res := r.db.Model(&model.Event{}).Scopes(AllGetEventCriterion(states)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
+	if res := r.db.Model(&model.Event{}).Scopes(AllGetEventCriterion(state)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
 		return nil, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return e, nil
 }
 
-func (r *EventDbRepo) Count(state ...api.EventState) (int64, error) {
+func (r *EventDbRepo) Count(state ...string) (int64, error) {
 	var c int64
 
-	states := TranslateEventState(state...)
-	if res := r.db.Model(&model.Event{}).Scopes(AllGetEventCriterion(states)).Count(&c); res.Error != nil {
+	if res := r.db.Model(&model.Event{}).Scopes(AllGetEventCriterion(state)).Count(&c); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return c, nil
-}
-
-func TranslateEventState(state ...api.EventState) []string {
-	states := make([]string, 0)
-	if len(state) > 0 {
-		for _, s := range state {
-			states = append(states, s.Value())
-		}
-	}
-
-	return states
 }
 
 func CriterionEventState(states []string) func(db *gorm.DB) *gorm.DB {

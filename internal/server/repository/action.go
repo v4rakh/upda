@@ -2,7 +2,6 @@ package repository
 
 import (
 	"encoding/json"
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -14,13 +13,13 @@ type ActionRepository interface {
 	Find(id string) (*model.Action, error)
 	FindByEnabled(enabled bool) ([]*model.Action, error)
 	FindAll() ([]*model.Action, error)
-	Create(label string, t api.ActionType, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool) (*model.Action, error)
+	Create(label string, t string, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool) (*model.Action, error)
 	UpdateLabel(id string, label string) (*model.Action, error)
 	UpdateMatchEvent(id string, matchEvent *string) (*model.Action, error)
 	UpdateMatchApplication(id string, matchApplication *string) (*model.Action, error)
 	UpdateMatchProvider(id string, matchProvider *string) (*model.Action, error)
 	UpdateMatchHost(id string, matchHost *string) (*model.Action, error)
-	UpdateTypeAndPayload(id string, t api.ActionType, payload interface{}) (*model.Action, error)
+	UpdateTypeAndPayload(id string, t string, payload interface{}) (*model.Action, error)
 	UpdateEnabled(id string, enabled bool) (*model.Action, error)
 	Delete(id string) (int64, error)
 }
@@ -64,14 +63,14 @@ func (r *ActionDbRepo) FindByEnabled(enabled bool) ([]*model.Action, error) {
 	return e, nil
 }
 
-func (r *ActionDbRepo) Create(label string, t api.ActionType, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool) (*model.Action, error) {
+func (r *ActionDbRepo) Create(label string, t string, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool) (*model.Action, error) {
 	if label == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
 
 	e := &model.Action{
 		Label:            label,
-		Type:             t.Value(),
+		Type:             t,
 		MatchEvent:       matchEvent,
 		MatchHost:        matchHost,
 		MatchApplication: matchApplication,
@@ -123,7 +122,7 @@ func (r *ActionDbRepo) UpdateLabel(id string, label string) (*model.Action, erro
 	return e, nil
 }
 
-func (r *ActionDbRepo) UpdateType(id string, t api.ActionType) (*model.Action, error) {
+func (r *ActionDbRepo) UpdateType(id string, t string) (*model.Action, error) {
 	if id == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -135,7 +134,7 @@ func (r *ActionDbRepo) UpdateType(id string, t api.ActionType) (*model.Action, e
 		return nil, err
 	}
 
-	e.Type = t.Value()
+	e.Type = t
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {
@@ -248,7 +247,7 @@ func (r *ActionDbRepo) UpdateMatchHost(id string, matchHost *string) (*model.Act
 	return e, nil
 }
 
-func (r *ActionDbRepo) UpdateTypeAndPayload(id string, t api.ActionType, payload interface{}) (*model.Action, error) {
+func (r *ActionDbRepo) UpdateTypeAndPayload(id string, t string, payload interface{}) (*model.Action, error) {
 	if id == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -263,7 +262,7 @@ func (r *ActionDbRepo) UpdateTypeAndPayload(id string, t api.ActionType, payload
 		return nil, err
 	}
 
-	e.Type = t.Value()
+	e.Type = t
 
 	var b []byte
 	if b, err = json.Marshal(payload); err != nil {

@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -12,13 +11,13 @@ type ActionInvocationRepository interface {
 	Paginate(page int, pageSize int, orderBy string, order string) ([]*model.ActionInvocation, error)
 	Count() (int64, error)
 	Find(id string) (*model.ActionInvocation, error)
-	FindAllByState(limit int, maxRetries int, state ...api.ActionInvocationState) ([]*model.ActionInvocation, error)
-	Create(eventId string, actionId string, state api.ActionInvocationState) (*model.ActionInvocation, error)
-	UpdateState(id string, state api.ActionInvocationState) (*model.ActionInvocation, error)
+	FindAllByState(limit int, maxRetries int, state ...string) ([]*model.ActionInvocation, error)
+	Create(eventId string, actionId string, state string) (*model.ActionInvocation, error)
+	UpdateState(id string, state string) (*model.ActionInvocation, error)
 	UpdateMessage(id string, message *string) (*model.ActionInvocation, error)
 	UpdateRetryCount(id string, retryCount int) (*model.ActionInvocation, error)
 	Delete(id string) (int64, error)
-	DeleteByUpdatedAtBeforeAndStates(time time.Time, retryCount int, state ...api.ActionInvocationState) (int64, error)
+	DeleteByUpdatedAtBeforeAndStates(time time.Time, retryCount int, state ...string) (int64, error)
 }
 
 type ActionInvocationDbRepo struct {
@@ -48,7 +47,7 @@ func (r *ActionInvocationDbRepo) Find(id string) (*model.ActionInvocation, error
 	return &e, nil
 }
 
-func (r *ActionInvocationDbRepo) Create(eventId string, actionId string, state api.ActionInvocationState) (*model.ActionInvocation, error) {
+func (r *ActionInvocationDbRepo) Create(eventId string, actionId string, state string) (*model.ActionInvocation, error) {
 	if eventId == "" || actionId == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -56,7 +55,7 @@ func (r *ActionInvocationDbRepo) Create(eventId string, actionId string, state a
 	e := &model.ActionInvocation{
 		EventID:  eventId,
 		ActionID: actionId,
-		State:    state.Value(),
+		State:    state,
 	}
 
 	var res *gorm.DB
@@ -95,7 +94,7 @@ func (r *ActionInvocationDbRepo) UpdateRetryCount(id string, retryCount int) (*m
 	return e, nil
 }
 
-func (r *ActionInvocationDbRepo) UpdateState(id string, state api.ActionInvocationState) (*model.ActionInvocation, error) {
+func (r *ActionInvocationDbRepo) UpdateState(id string, state string) (*model.ActionInvocation, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -107,7 +106,7 @@ func (r *ActionInvocationDbRepo) UpdateState(id string, state api.ActionInvocati
 		return nil, err
 	}
 
-	e.State = state.Value()
+	e.State = state
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {
@@ -195,46 +194,31 @@ func (r *ActionInvocationDbRepo) Count() (int64, error) {
 	return c, nil
 }
 
-func (r *ActionInvocationDbRepo) FindAllByState(limit int, maxRetries int, state ...api.ActionInvocationState) ([]*model.ActionInvocation, error) {
+func (r *ActionInvocationDbRepo) FindAllByState(limit int, maxRetries int, state ...string) ([]*model.ActionInvocation, error) {
 	if limit <= 0 {
 		return nil, service_error.ErrValidationLimitGreaterZero
 	}
 
 	var e []*model.ActionInvocation
 
-	states := translateActionInvocationState(state...)
-
-	if res := r.db.Model(&model.ActionInvocation{}).Scopes(allGetActionInvocationCriterion(states, maxRetries)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
+	if res := r.db.Model(&model.ActionInvocation{}).Scopes(allGetActionInvocationCriterion(state, maxRetries)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
 		return nil, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return e, nil
 }
 
-func (r *ActionInvocationDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, maxRetries int, state ...api.ActionInvocationState) (int64, error) {
+func (r *ActionInvocationDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, maxRetries int, state ...string) (int64, error) {
 	if len(state) == 0 {
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	states := translateActionInvocationState(state...)
-
 	var res *gorm.DB
-	if res = r.db.Where("retry_count >= ?", maxRetries).Where("state IN ?", states).Where("updated_at < ?", time).Delete(&model.ActionInvocation{}); res.Error != nil {
+	if res = r.db.Where("retry_count >= ?", maxRetries).Where("state IN ?", state).Where("updated_at < ?", time).Delete(&model.ActionInvocation{}); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return res.RowsAffected, nil
-}
-
-func translateActionInvocationState(state ...api.ActionInvocationState) []string {
-	states := make([]string, 0, len(state))
-	if len(state) > 0 {
-		for _, s := range state {
-			states = append(states, s.Value())
-		}
-	}
-
-	return states
 }
 
 func criterionActonInvocationMaxRetries(maxRetries int) func(db *gorm.DB) *gorm.DB {

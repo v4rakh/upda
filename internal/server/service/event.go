@@ -104,7 +104,7 @@ func (s *EventService) Create(name api.EventName, payload interface{}) (*model.E
 	var e *model.Event
 	var err error
 
-	if e, err = s.repo.Create(name, api.EventStateCreated, payload); err != nil {
+	if e, err = s.repo.Create(name.Value(), api.EventStateCreated.Value(), payload); err != nil {
 		return nil, err
 	}
 
@@ -143,7 +143,7 @@ func (s *EventService) CleanStale(time time.Time, state ...api.EventState) (int6
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, state...)
+	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, api.FromVariadicToStr(state...)...)
 }
 
 func (s *EventService) Window(size int, skip int, orderBy string, order string) ([]*model.Event, error) {
@@ -155,7 +155,7 @@ func (s *EventService) WindowHasNext(size int, skip int, orderBy string, order s
 }
 
 func (s *EventService) Count(state ...api.EventState) (int64, error) {
-	return s.repo.Count(state...)
+	return s.repo.Count(api.FromVariadicToStr(state...)...)
 }
 
 func (s *EventService) GetByState(limit int, state ...api.EventState) ([]*model.Event, error) {
@@ -166,7 +166,7 @@ func (s *EventService) GetByState(limit int, state ...api.EventState) ([]*model.
 		return nil, service_error.ErrValidationLimitGreaterZero
 	}
 
-	return s.repo.FindAllByState(limit, state...)
+	return s.repo.FindAllByState(limit, api.FromVariadicToStr(state...)...)
 }
 
 func (s *EventService) UpdateState(id string, state api.EventState) (*model.Event, error) {
@@ -181,7 +181,7 @@ func (s *EventService) UpdateState(id string, state api.EventState) (*model.Even
 		return nil, err
 	}
 
-	if e, err = s.repo.UpdateState(id, state); err != nil {
+	if e, err = s.repo.UpdateState(id, state.Value()); err != nil {
 		return nil, err
 	}
 

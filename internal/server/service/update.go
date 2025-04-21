@@ -47,7 +47,7 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 	if err != nil && !errors.Is(err, service_error.ErrResourceNotFound) {
 		return nil, err
 	} else if err != nil && errors.Is(err, service_error.ErrResourceNotFound) {
-		if e, err = s.repo.Create(application, provider, host, version, metadata); err != nil {
+		if e, err = s.repo.Create(application, provider, host, version, api.UpdateStatePending.Value(), metadata); err != nil {
 			return nil, err
 		}
 		s.eventService.CreateUpdateCreated(e)
@@ -70,7 +70,7 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 
 		if api.UpdateStateApproved.Value() == e.State {
 			zap.L().Sugar().Infof("Setting update '%v' state to '%v'", e.ID, api.UpdateStatePending)
-			if e, err = s.repo.UpdateState(e.ID.String(), api.UpdateStatePending); err != nil {
+			if e, err = s.repo.UpdateState(e.ID.String(), api.UpdateStatePending.Value()); err != nil {
 				return nil, err
 			}
 		}
@@ -92,7 +92,7 @@ func (s *UpdateService) UpdateState(id string, state api.UpdateState) (*model.Up
 	}
 
 	oldUpdate := e
-	if e, err = s.repo.UpdateState(id, state); err != nil {
+	if e, err = s.repo.UpdateState(id, state.Value()); err != nil {
 		return nil, err
 	}
 
@@ -128,13 +128,13 @@ func (s *UpdateService) CleanStale(time time.Time, state ...api.UpdateState) (in
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, state...)
+	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, api.FromVariadicToStr(state...)...)
 }
 
 func (s *UpdateService) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...api.UpdateState) ([]*model.Update, error) {
-	return s.repo.Paginate(page, pageSize, orderBy, order, searchTerm, searchIn, state...)
+	return s.repo.Paginate(page, pageSize, orderBy, order, searchTerm, searchIn, api.FromVariadicToStr(state...)...)
 }
 
 func (s *UpdateService) Count(searchTerm string, searchIn string, state ...api.UpdateState) (int64, error) {
-	return s.repo.Count(searchTerm, searchIn, state...)
+	return s.repo.Count(searchTerm, searchIn, api.FromVariadicToStr(state...)...)
 }

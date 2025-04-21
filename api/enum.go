@@ -123,3 +123,12 @@ func (e *FilterPresetType) Scan(value interface{}) error {
 func (e FilterPresetType) Value() string {
 	return string(e)
 }
+
+// FromVariadicToStr converts variadic notation to string array if type is of string
+func FromVariadicToStr[T ~string](s ...T) []string {
+	arr := make([]string, 0, len(s))
+	for _, i := range s {
+		arr = append(arr, string(i))
+	}
+	return arr
+}

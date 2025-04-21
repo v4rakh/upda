@@ -50,7 +50,7 @@ func (s *WebhookService) Create(label string, t api.WebhookType, ignoreHost bool
 	}
 
 	var e *model.Webhook
-	if e, err = s.repo.Create(label, t, token, ignoreHost); err != nil {
+	if e, err = s.repo.Create(label, t.Value(), token, ignoreHost); err != nil {
 		return nil, err
 	} else {
 		zap.L().Sugar().Info("Created webhook")

@@ -322,7 +322,7 @@ func (s *ActionInvocationService) GetByState(limit int, maxRetries int, state ..
 		return nil, service_error.ErrValidationMaxRetriesGreaterZero
 	}
 
-	return s.repo.FindAllByState(limit, maxRetries, state...)
+	return s.repo.FindAllByState(limit, maxRetries, api.FromVariadicToStr(state...)...)
 }
 
 func (s *ActionInvocationService) Count() (int64, error) {
@@ -360,7 +360,7 @@ func (s *ActionInvocationService) UpdateState(id string, state api.ActionInvocat
 		return nil, err
 	}
 
-	if e, err = s.repo.UpdateState(id, state); err != nil {
+	if e, err = s.repo.UpdateState(id, state.Value()); err != nil {
 		return nil, err
 	}
 
@@ -418,7 +418,7 @@ func (s *ActionInvocationService) Create(event *model.Event, action *model.Actio
 
 	var err error
 	var e *model.ActionInvocation
-	if e, err = s.repo.Create(event.ID.String(), action.ID.String(), state); err != nil {
+	if e, err = s.repo.Create(event.ID.String(), action.ID.String(), state.Value()); err != nil {
 		return nil, err
 	} else {
 		zap.L().Sugar().Info("Created action invocation")
@@ -431,5 +431,5 @@ func (s *ActionInvocationService) CleanStale(time time.Time, maxRetries int, sta
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, maxRetries, state...)
+	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, maxRetries, api.FromVariadicToStr(state...)...)
 }
