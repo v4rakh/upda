@@ -7,7 +7,8 @@ enum ApiTags {
 	Constants = 'Constants',
 	Actions = 'Actions',
 	ActionInvocations = 'ActionInvocations',
-	Events = 'Events'
+	Events = 'Events',
+	FilterPresets = 'FilterPresets'
 }
 
 export default ApiTags;

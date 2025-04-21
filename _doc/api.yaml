@@ -23,6 +23,8 @@ tags:
     description: Actions endpoints
   - name: action-invocations
     description: Action invocations endpoints
+  - name: filter-presets
+    description: Filter presets endpoints
   - name: application
     description: Application related endpoints
   - name: auth
@@ -2345,6 +2347,168 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /filter-presets:
+    post:
+      tags:
+        - filter-presets
+      security:
+        - basicAuth: [ ]
+      summary: Creates filter preset
+      description: Creates filter preset
+      operationId: createFilterPreset
+      requestBody:
+        description: Creates a filter preset
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFilterPresetRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterPresetSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/filter-presets/{type}':
+    get:
+      tags:
+        - filter-presets
+      security:
+        - basicAuth: [ ]
+      summary: Finds a filter preset by type
+      description: Finds filter preset by type
+      operationId: findFilterPresetByType
+      parameters:
+        - name: type
+          in: path
+          description: the type
+          required: true
+          schema:
+            type: string
+            enum:
+              - update
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterPresetPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/filter-presets/{id}':
+    delete:
+      tags:
+        - filter-presets
+      security:
+        - basicAuth: [ ]
+      summary: Deletes a filter preset by ID
+      description: 'Deletes a filter preset by ID'
+      operationId: deleteFilterPresetById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /login:
     get:
       tags:
@@ -2886,6 +3050,43 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ConstantResponse'
+    FilterPresetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - update
+        label:
+          type: string
+        parameters:
+          type: string
+        color:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    FilterPresetSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/FilterPresetResponse'
+    FilterPresetPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/FilterPresetResponse'
     # requests
     ModifyUpdateStateRequest:
       type: object
@@ -3079,6 +3280,24 @@ components:
           type: string
         value:
           type: string
+    CreateFilterPresetRequest:
+      type: object
+      required:
+        - type
+        - label
+        - parameters
+      properties:
+        type:
+          type: string
+          enum:
+            - update
+        label:
+          type: string
+        parameters:
+          type: string
+        color:
+          type: string
+          nullable: true
     ModifySecretValueRequest:
       type: object
       required:
@@ -3100,15 +3319,6 @@ components:
       properties:
         label:
           type: string
-    ModifyActionTypeRequest:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          type: string
-          enum:
-            - shoutrrr
     ModifyActionMatchEventRequest:
       type: object
       properties:

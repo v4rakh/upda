@@ -7,6 +7,8 @@ import (
 
 // Requests
 
+// json/body
+
 type ModifyUpdateStateRequest struct {
 	State string `json:"state" binding:"required,oneof=pending approved ignored"`
 }
@@ -44,6 +46,12 @@ type CreateActionRequest struct {
 	MatchProvider    *string     `json:"matchProvider"`
 	Payload          interface{} `json:"payload"`
 	Enabled          bool        `json:"enabled"`
+}
+type CreateFilterPresetRequest struct {
+	Type       string  `json:"type" binding:"required,oneof=update"`
+	Label      string  `json:"label" binding:"required,min=1,max=255"`
+	Parameters string  `json:"parameters" binding:"required"`
+	Color      *string `json:"color"`
 }
 
 type ModifySecretValueRequest struct {
@@ -91,36 +99,6 @@ type TestActionRequest struct {
 	State       string `json:"state" binding:"required,min=1"`
 }
 
-type PaginateUpdateRequest struct {
-	PageSize   int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page       int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order      string `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy    string `form:"orderBy,default=updated_at" binding:"oneof=id application provider host version created_at updated_at"`
-	SearchTerm string `form:"searchTerm"`
-	SearchIn   string `form:"searchIn,default=application" binding:"oneof=application provider host version"`
-}
-
-type PaginateWebhookRequest struct {
-	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
-}
-
-type PaginateActionRequest struct {
-	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
-}
-
-type PaginateActionInvocationRequest struct {
-	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order    string `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=created_at" binding:"oneof=id state retry_count created_at updated_at"`
-}
-
 type WebhookGenericRequest struct {
 	Application string      `json:"application" binding:"required,min=1"`
 	Provider    string      `json:"provider"`
@@ -153,11 +131,53 @@ type WebhookDiunRequest struct {
 	Metadata    WebhookDiunMetadataRequest `json:"metadata"`
 }
 
+// query parameters
+
+type PaginateUpdateRequest struct {
+	PageSize   int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page       int    `form:"page,default=1" binding:"numeric,gte=1"`
+	Order      string `form:"order,default=desc" binding:"oneof=asc desc"`
+	OrderBy    string `form:"orderBy,default=updated_at" binding:"oneof=id application provider host version created_at updated_at"`
+	SearchTerm string `form:"searchTerm"`
+	SearchIn   string `form:"searchIn,default=application" binding:"oneof=application provider host version"`
+}
+
+type PaginateWebhookRequest struct {
+	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
+	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
+	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
+}
+
+type PaginateActionRequest struct {
+	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
+	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
+	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
+}
+
+type PaginateActionInvocationRequest struct {
+	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
+	Order    string `form:"order,default=desc" binding:"oneof=asc desc"`
+	OrderBy  string `form:"orderBy,default=created_at" binding:"oneof=id state retry_count created_at updated_at"`
+}
+
 type EventWindowRequest struct {
 	Size    int    `form:"size,default=10" binding:"numeric,gte=1"`
 	Skip    int    `form:"skip,default=0" binding:"numeric"`
 	Order   string `form:"order,default=desc" binding:"oneof=asc desc"`
 	OrderBy string `form:"orderBy,default=created_at" binding:"oneof=id name created_at updated_at"`
+}
+
+// uri parameters
+
+type FilterPresetUriRequest struct {
+	Type string `uri:"type" binding:"required,oneof=update"`
+}
+
+type IDUriRequest struct {
+	ID string `uri:"id" binding:"required,uuid4"`
 }
 
 // Responses
@@ -578,5 +598,45 @@ func NewActionInvocationPageResponse(content []*ActionInvocationResponse, page i
 	e.Order = order
 	e.TotalElements = totalElements
 	e.TotalPages = totalPages
+	return e
+}
+
+type FilterPresetResponse struct {
+	ID         uuid.UUID `json:"id"`
+	Type       string    `json:"type"`
+	Label      string    `json:"label"`
+	Parameters string    `json:"parameters"`
+	Color      *string   `json:"color,omitempty"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
+}
+
+type FilterPresetSingleResponse struct {
+	Data FilterPresetResponse `json:"data"`
+}
+
+func NewFilterPresetSingleResponse(id uuid.UUID, t string, label string, parameters string, color *string, createdAt time.Time, updatedAt time.Time) *FilterPresetSingleResponse {
+	e := new(FilterPresetSingleResponse)
+	e.Data.ID = id
+	e.Data.Type = t
+	e.Data.Label = label
+	e.Data.Parameters = parameters
+	e.Data.Color = color
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type FilterPresetPageResponse struct {
+	Content []*FilterPresetResponse `json:"content"`
+}
+
+type FilterPresetDataPageResponse struct {
+	Data *FilterPresetDataPageResponse `json:"data"`
+}
+
+func NewFilterPresetPageResponse(content []*FilterPresetResponse) *FilterPresetPageResponse {
+	e := new(FilterPresetPageResponse)
+	e.Content = content
 	return e
 }

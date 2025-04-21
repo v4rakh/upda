@@ -4,6 +4,11 @@
 
 ### 2025-04-07
 
+* Add capability to manage filter presets which provide shortcuts to quickly filter Updates
+* Add capability to reset filters on Updates
+
+### 2025-04-07
+
 * _upda_ is only built as one binary instead of separating between cli helper and server, start server with `upda server serve` or see `upda help`
 * Rename `--server-url` to `--url` for cli helper
 * Added `direnv` with `dotenv` to ease getting started on development

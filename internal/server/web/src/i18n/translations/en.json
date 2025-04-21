@@ -296,6 +296,32 @@
     "reload_tooltip": "Reload all updates",
     "title": "Events"
   },
+  "filter_presets": {
+    "error_bad_request_get": "Invalid input. Unable to retrieve filter presets.",
+    "error_default_delete": "Unable to delete filter preset. Please make sure your device has network connection.",
+    "error_default_get": "Unable to retrieve filter presets. Please make sure your device has network connection.",
+    "error_forbidden_delete": "Forbidden to delete filter preset.",
+    "error_forbidden_get": "Forbidden to retrieve filter presets.",
+    "error_not_found_delete": "Resource cannot be found. Unable to delete filter preset. Please refresh the page.",
+    "error_unauthorized_delete": "Unable to delete filter preset. Please refresh this page.",
+    "error_unauthorized_get": "Unable to retrieve filter presets. Please refresh this page."
+  },
+  "filter_presets_create": {
+    "color": "Color",
+    "create": "Save active filters as preset",
+    "error_bad_request": "Invalid input. Unable to create filter preset.",
+    "error_default": "Unable to create filter preset. Please make sure your device has network connection.",
+    "error_forbidden": "Forbidden to create filter preset.",
+    "error_unable": "Unable to create filter preset. Please refresh this page.",
+    "error_unauthorized": "Unable to create filter preset. Please refresh this page.",
+    "label": "Label",
+    "label_placeholder": "Label for your filter",
+    "label_required": "Label is required",
+    "label_size": "Label must be at least 1 and at most 255 characters long"
+  },
+  "filter_reset_button": {
+    "tooltip_reset": "Reset all filters"
+  },
   "health": {
     "generic_error_content": "Health check failed, please try again later.",
     "generic_error_title": "Services unhealthy",

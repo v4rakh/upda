@@ -1,11 +1,14 @@
 import Update from './Update';
 import UpdatePageFilter from './UpdatePageFilter';
 import { useGetUpdatesQuery } from '../../api/updatesApi';
+import FilterPreset from '../../components/FilterPresets';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
 import { PAGE_DEFAULT, PAGE_DEFAULT_OPTIONS, PAGE_SIZE_DEFAULT } from '../../constants/pagination';
 import { UpdatesRequestParams } from '../../types';
+import { FilterPresetType } from '../../types/filterPreset';
 import { useResponsiveGridSize } from '../../use/useResponsiveGridSize';
 import useUpdatesFilterQueryParams from '../../use/useUpdatesFilterQueryParams';
+import useUpdateFiltersActive from '../../use/useUpdatesFiltersActive';
 import AppBreadcrumb from '../common/AppBreadcrumb';
 import { QuestionCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
@@ -27,6 +30,7 @@ const UpdatesPage: FC = () => {
 	const [pollingInterval, setPollingInterval] = useState<number>(0);
 	const [queryParams, setSearchQueryParams] = useSearchParams();
 	const { orderBy, order, page, pageSize, state, searchIn, searchTerm } = useUpdatesFilterQueryParams();
+	const { filtersActive } = useUpdateFiltersActive();
 
 	const { isLoading, isError, refetch, isFetching, isSuccess, data } = useGetUpdatesQuery(
 		{
@@ -117,6 +121,7 @@ const UpdatesPage: FC = () => {
 				}
 			/>
 			<UpdatePageFilter loading={isLoading || isFetching} />
+			<FilterPreset type={FilterPresetType.UPDATE} showFilterReset filtersActive={filtersActive} />
 			{isLoading && <Skeleton loading={isLoading} active={isLoading} />}
 			{isError && <Result status="error" title={t('error_default_loading')} />}
 			{isSuccess && data.data.content.length === 0 && <Result status={404} title={t('no_updates')} />}

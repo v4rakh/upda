@@ -1,13 +1,17 @@
+import CreateFilterPreset from '../../components/CreateFilterPreset';
+import FilterResetButton from '../../components/FilterResetButton';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
 import UpdateOrder from '../../constants/api/updateOrder';
 import UpdateOrderBy from '../../constants/api/updateOrderBy';
 import UpdateSearchIn from '../../constants/api/updateSearchIn';
 import { UpdateState } from '../../types';
+import { FilterPresetType } from '../../types/filterPreset';
 import useUpdatesFilterQueryParams from '../../use/useUpdatesFilterQueryParams';
+import useUpdateFiltersActive from '../../use/useUpdatesFiltersActive';
 import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
-import { Badge, Button, Collapse, Divider, Form, Input, Select } from 'antd';
+import { Badge, Button, Collapse, Divider, Form, Input, Select, Space } from 'antd';
 import { compact, forEach, uniq } from 'lodash';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
@@ -26,17 +30,17 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 
 	const [queryParams, setSearchQueryParams] = useSearchParams();
 	const { searchTerm, searchIn, orderBy, order, state } = useUpdatesFilterQueryParams();
-
-	const [filtersActive, setFiltersActive] = useState<boolean>(
-		(searchTerm && searchTerm != '' && searchIn && searchIn != '') || (state && state.length > 0) || false
-	);
+	const { filtersActive } = useUpdateFiltersActive();
 
 	useEffect(() => {
-		const newActive = (searchTerm && searchTerm != '' && searchIn && searchIn != '') || (state && state.length > 0);
-		if (newActive !== filtersActive) {
-			setFiltersActive(newActive || false);
-		}
-	}, [searchTerm, searchIn, state, filtersActive]);
+		form.setFieldsValue({
+			searchTerm,
+			searchIn: searchIn ?? UpdateSearchIn.APPLICATION,
+			state,
+			orderBy: orderBy ?? UpdateOrderBy.UPDATED_AT,
+			order: order ?? UpdateOrder.DESC
+		});
+	}, [form, order, orderBy, searchIn, searchTerm, state]);
 
 	const onSearchTermChange = useCallback(
 		(value: string | undefined) => {
@@ -102,25 +106,23 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 		[queryParams, setSearchQueryParams]
 	);
 
-	const initialValues = {
-		searchTerm,
-		searchIn: searchIn ?? UpdateSearchIn.APPLICATION,
-		state,
-		orderBy: orderBy ?? UpdateOrderBy.UPDATED_AT,
-		order: order ?? UpdateOrder.DESC
-	};
+	const filterButtonActive = useMemo(() => {
+		return (
+			<Badge dot offset={[-10, 5]}>
+				<Button type="link" icon={<FilterOutlined />}>
+					{t('filters')}
+				</Button>
+			</Badge>
+		);
+	}, [t]);
 
-	const filterButton = filtersActive ? (
-		<Badge dot offset={[-10, 5]}>
+	const filterButtonInactive = useMemo(() => {
+		return (
 			<Button type="link" icon={<FilterOutlined />}>
 				{t('filters')}
 			</Button>
-		</Badge>
-	) : (
-		<Button type="link" icon={<FilterOutlined />}>
-			{t('filters')}
-		</Button>
-	);
+		);
+	}, [t]);
 
 	return (
 		<Collapse
@@ -136,10 +138,10 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 				{
 					key: COLLAPSE_KEY,
 					showArrow: false,
-					label: filterButton,
+					label: filtersActive ? filterButtonActive : filterButtonInactive,
 					children: (
-						<>
-							<Form layout="inline" form={form} initialValues={initialValues}>
+						<Space direction="vertical">
+							<Form layout="inline" form={form} disabled={loading}>
 								<Form.Item label={t('search_term')} name="searchTerm">
 									<Search
 										variant="filled"
@@ -246,9 +248,15 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 										]}
 									/>
 								</Form.Item>
+								<FilterResetButton enabled={filtersActive} />
 							</Form>
-							<Divider />
-						</>
+							{filtersActive && (
+								<>
+									<Divider />
+									<CreateFilterPreset type={FilterPresetType.UPDATE} />
+								</>
+							)}
+						</Space>
 					)
 				}
 			]}

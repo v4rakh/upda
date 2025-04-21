@@ -66,6 +66,7 @@ func Start(c context.Context) {
 	constantRepo := repository.NewConstantDbRepo(db)
 	actionRepo := repository.NewActionDbRepo(db)
 	actionInvocationRepo := repository.NewActionInvocationDbRepo(db)
+	filterPresetRepo := repository.NewFilterPresetDbRepo(db)
 
 	var lockService service.LockService
 
@@ -84,11 +85,11 @@ func Start(c context.Context) {
 	updateService := service.NewUpdateService(updateRepo, eventService)
 	webhookService := service.NewWebhookService(webhookRepo, cfg.Webhook)
 	webhookInvocationService := service.NewWebhookInvocationService(webhookService, updateService, cfg.Webhook)
-
 	secretService := service.NewSecretService(secretRepo)
 	constantService := service.NewConstantService(constantRepo)
 	actionService := service.NewActionService(actionRepo, eventService)
 	actionInvocationService := service.NewActionInvocationService(actionInvocationRepo, actionService, eventService, secretService, constantService)
+	filterPresetService := service.NewFilterPresetService(filterPresetRepo)
 
 	var taskService *service.TaskService
 
@@ -110,6 +111,7 @@ func Start(c context.Context) {
 	constantHandler := handler.NewConstantHandler(constantService)
 	actionHandler := handler.NewActionHandler(actionService)
 	actionInvocationHandler := handler.NewActionInvocationHandler(actionService, actionInvocationService)
+	filterPresetHandler := handler.NewFilterPresetHandler(filterPresetService)
 
 	infoHandler := handler.NewInfoHandler(cfg.App)
 	healthHandler := handler.NewHealthHandler()
@@ -228,6 +230,10 @@ Object.defineProperty(window, 'runtime_config', {
 	apiAuthGroup.GET("/action-invocations", actionInvocationHandler.Paginate)
 	apiAuthGroup.GET("/action-invocations/:id", actionInvocationHandler.Get)
 	apiAuthGroup.DELETE("/action-invocations/:id", actionInvocationHandler.Delete)
+
+	apiAuthGroup.GET("/filter-presets/:type", filterPresetHandler.GetByType)
+	apiAuthGroup.POST("/filter-presets", middlewareEnforceJsonContentType(), filterPresetHandler.Create)
+	apiAuthGroup.DELETE("/filter-presets/:id", filterPresetHandler.Delete)
 
 	serverAddress := fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port)
 	srv := &http.Server{

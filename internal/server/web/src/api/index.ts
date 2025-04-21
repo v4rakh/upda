@@ -33,6 +33,7 @@ const baseQueryWithReAuth = async (args: string | FetchArgs, api: BaseQueryApi, 
 export const api = createApi({
 	reducerPath: 'api',
 	baseQuery: baseQueryWithReAuth,
+	refetchOnMountOrArgChange: true,
 	tagTypes: Object.values(ApiTags),
 	endpoints: () => ({})
 });

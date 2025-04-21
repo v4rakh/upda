@@ -1,8 +1,7 @@
 # Usage
 
 Getting started in _upda_ is easy after it has been [deployed](./Deployment.md) successfully and is reachable through
-your
-browser.
+your browser.
 
 ![img](./img/updates.png)
 
@@ -171,6 +170,22 @@ Furthermore, you can change their state to be ignored (see [Concepts](./Concepts
 In addition, you can view an Update's details by clicking on the small info icon for an Update.
 
 ![img](./img/updates_detail.png)
+
+## Manage filter presets
+
+_upda_ allows to manage filter presets which are a set of filters you can set a label on. To create, start filtering
+Updates, then provide a label and hit the create button.
+
+Presets can only be created if there are active filters.
+
+![img](./img/filter_presets_01.png)
+
+Afterward, you can reset the filter and re-apply it any time by clicking on the tag.
+
+With this, you can build arbitrary filters to match your needs, e.g., filter down pending Updates on specific host or
+application with the ease of one click.
+
+![img](./img/filter_presets_02.png)
 
 ## See what has changed
 

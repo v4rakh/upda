@@ -1,8 +1,8 @@
 import UpdateFilterQueryParamNames from '../constants/api/updateFilterQueryParamNames';
 import { PAGE_DEFAULT, PAGE_SIZE_DEFAULT } from '../constants/pagination';
-import { compact, isEmpty, parseInt, uniq } from 'lodash';
-import { useCallback } from 'react';
+import { parseInt } from 'lodash';
 import { useSearchParams } from 'react-router';
+import { replaceEmptyValue, replaceNullValue } from '../utils/queryParamsHelper';
 
 export interface UseUpdatesFilterQueryParams {
 	searchTerm: string | undefined | number;
@@ -16,14 +16,6 @@ export interface UseUpdatesFilterQueryParams {
 
 const useUpdatesFilterQueryParams = (): UseUpdatesFilterQueryParams => {
 	const [queryParams] = useSearchParams();
-
-	const replaceNullValue = useCallback((val: null | number | string): undefined | number | string => {
-		return val ? val : undefined;
-	}, []);
-
-	const replaceEmptyValue = useCallback((val: string[]) => {
-		return isEmpty(val) ? undefined : uniq(compact(val));
-	}, []);
 
 	return {
 		searchTerm: replaceNullValue(queryParams.get(UpdateFilterQueryParamNames.SEARCH_TERM)),

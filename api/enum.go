@@ -1,6 +1,6 @@
 package api
 
-// UpdateState state of an update
+// UpdateState state of a model.Update
 type UpdateState string
 
 const (
@@ -18,7 +18,7 @@ func (e UpdateState) Value() string {
 	return string(e)
 }
 
-// WebhookType type of webhook
+// WebhookType type of model.Webhook
 type WebhookType string
 
 const (
@@ -35,7 +35,7 @@ func (e WebhookType) Value() string {
 	return string(e)
 }
 
-// EventName name of event
+// EventName name of a model.Event
 type EventName string
 
 const (
@@ -55,7 +55,7 @@ func (e EventName) Value() string {
 	return string(e)
 }
 
-// EventState name of event
+// EventState state of a model.Event
 type EventState string
 
 const (
@@ -72,7 +72,7 @@ func (e EventState) Value() string {
 	return string(e)
 }
 
-// ActionType state of an update
+// ActionType state of a model.Action
 type ActionType string
 
 const (
@@ -88,7 +88,7 @@ func (e ActionType) Value() string {
 	return string(e)
 }
 
-// ActionInvocationState state of an action invocation
+// ActionInvocationState state of a model.ActionInvocation
 type ActionInvocationState string
 
 const (
@@ -105,5 +105,21 @@ func (e *ActionInvocationState) Scan(value interface{}) error {
 }
 
 func (e ActionInvocationState) Value() string {
+	return string(e)
+}
+
+// FilterPresetType the type for the model.FilterPreset
+type FilterPresetType string
+
+const (
+	FilterPresetTypeUpdate FilterPresetType = "update"
+)
+
+func (e *FilterPresetType) Scan(value interface{}) error {
+	*e = FilterPresetType(value.([]byte))
+	return nil
+}
+
+func (e FilterPresetType) Value() string {
 	return string(e)
 }

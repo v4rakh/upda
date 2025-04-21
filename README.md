@@ -35,7 +35,7 @@ See [getting started](#getting-started) for setting up the development environme
     * Repositories, handlers and services should always properly return `error` including any `init`-like function (
       best to avoid them and call in `newXXX`). **Do not abort with `Fatalf` or similar**
     * `log.Fatalf` or `zap.L().Fatal` is allowed in `environment.go` or `app.go`
-* Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml) and a Postman Collection.
+* Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml).
 * Consider reading [Effective Go](https://go.dev/doc/effective_go)
 * Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
 
