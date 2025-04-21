@@ -60,8 +60,16 @@ func (h *ActionHandler) Paginate(c *gin.Context) {
 }
 
 func (h *ActionHandler) Get(c *gin.Context) {
-	e, err := h.service.Get(c.Param("id"))
-	if err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	var e *model.Action
+	if e, err = h.service.Get(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -99,7 +107,14 @@ func (h *ActionHandler) UpdateLabel(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateLabel(c.Param("id"), req.Label); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateLabel(pathParams.ID, req.Label); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -118,7 +133,14 @@ func (h *ActionHandler) UpdateMatchEvent(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateMatchEvent(c.Param("id"), req.MatchEvent); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateMatchEvent(pathParams.ID, req.MatchEvent); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -137,7 +159,14 @@ func (h *ActionHandler) UpdateMatchHost(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateMatchHost(c.Param("id"), req.MatchHost); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateMatchHost(pathParams.ID, req.MatchHost); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -156,7 +185,14 @@ func (h *ActionHandler) UpdateMatchApplication(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateMatchApplication(c.Param("id"), req.MatchApplication); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateMatchApplication(pathParams.ID, req.MatchApplication); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -175,7 +211,14 @@ func (h *ActionHandler) UpdateMatchProvider(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateMatchProvider(c.Param("id"), req.MatchProvider); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateMatchProvider(pathParams.ID, req.MatchProvider); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -194,7 +237,14 @@ func (h *ActionHandler) UpdatePayload(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateTypeAndPayload(c.Param("id"), req.Type, req.Payload); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateTypeAndPayload(pathParams.ID, req.Type, req.Payload); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -213,7 +263,14 @@ func (h *ActionHandler) UpdateEnabled(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateEnabled(c.Param("id"), req.Enabled); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateEnabled(pathParams.ID, req.Enabled); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -222,7 +279,15 @@ func (h *ActionHandler) UpdateEnabled(c *gin.Context) {
 }
 
 func (h *ActionHandler) Delete(c *gin.Context) {
-	if err := h.service.Delete(c.Param("id")); err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if err = h.service.Delete(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

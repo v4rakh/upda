@@ -21,10 +21,17 @@ func NewWebhookInvocationHandler(i *service.WebhookInvocationService, w *service
 
 func (h *WebhookInvocationHandler) Execute(c *gin.Context) {
 	tokenHeader := c.GetHeader(api.HeaderWebhookToken)
-	webhookId := c.Param("id")
 
-	var w *model.Webhook
 	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	webhookId := pathParams.ID
+	var w *model.Webhook
 
 	if w, err = h.webhookService.Get(webhookId); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)

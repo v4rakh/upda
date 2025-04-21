@@ -27,8 +27,15 @@ func (h *ActionInvocationHandler) Test(c *gin.Context) {
 		return
 	}
 
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
 	var e *model.Action
-	if e, err = h.actionService.Get(c.Param("id")); err != nil {
+	if e, err = h.actionService.Get(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -85,8 +92,16 @@ func (h *ActionInvocationHandler) Paginate(c *gin.Context) {
 }
 
 func (h *ActionInvocationHandler) Get(c *gin.Context) {
-	e, err := h.actionInvocationService.Get(c.Param("id"))
-	if err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	var e *model.ActionInvocation
+	if e, err = h.actionInvocationService.Get(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -95,7 +110,15 @@ func (h *ActionInvocationHandler) Get(c *gin.Context) {
 }
 
 func (h *ActionInvocationHandler) Delete(c *gin.Context) {
-	if err := h.actionInvocationService.Delete(c.Param("id")); err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if err = h.actionInvocationService.Delete(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

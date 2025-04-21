@@ -71,7 +71,13 @@ func (h *ConstantHandler) UpdateValue(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateValue(c.Param("id"), req.Value); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+	if e, err = h.service.UpdateValue(pathParams.ID, req.Value); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -80,8 +86,17 @@ func (h *ConstantHandler) UpdateValue(c *gin.Context) {
 }
 
 func (h *ConstantHandler) Get(c *gin.Context) {
-	e, err := h.service.Get(c.Param("id"))
-	if err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	var e *model.Constant
+
+	if e, err = h.service.Get(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -90,7 +105,15 @@ func (h *ConstantHandler) Get(c *gin.Context) {
 }
 
 func (h *ConstantHandler) Delete(c *gin.Context) {
-	if err := h.service.Delete(c.Param("id")); err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if err = h.service.Delete(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

@@ -55,8 +55,16 @@ func (h *WebhookHandler) Paginate(c *gin.Context) {
 }
 
 func (h *WebhookHandler) Get(c *gin.Context) {
-	e, err := h.service.Get(c.Param("id"))
-	if err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	var e *model.Webhook
+	if e, err = h.service.Get(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -94,7 +102,14 @@ func (h *WebhookHandler) UpdateLabel(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateLabel(c.Param("id"), req.Label); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateLabel(pathParams.ID, req.Label); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -113,7 +128,14 @@ func (h *WebhookHandler) UpdateIgnoreHost(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateIgnoreHost(c.Param("id"), req.IgnoreHost); err != nil {
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateIgnoreHost(pathParams.ID, req.IgnoreHost); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -122,7 +144,15 @@ func (h *WebhookHandler) UpdateIgnoreHost(c *gin.Context) {
 }
 
 func (h *WebhookHandler) Delete(c *gin.Context) {
-	if err := h.service.Delete(c.Param("id")); err != nil {
+	var err error
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if err = h.service.Delete(pathParams.ID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
