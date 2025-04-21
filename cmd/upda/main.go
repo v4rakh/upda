@@ -43,7 +43,7 @@ var (
 	password       string
 	webhookId      string
 	webhookToken   string
-	updatePageSize int64
+	updatePageSize int
 
 	rawFlag = &cli.BoolFlag{
 		Name:        flagRaw,
@@ -52,8 +52,7 @@ var (
 		Value:       false,
 		Destination: &raw,
 	}
-
-	serverUrlFlag = &cli.StringFlag{
+	urlFlag = &cli.StringFlag{
 		Name:        flagUrl,
 		Usage:       "the server url (FQDN without context path)",
 		Required:    true,
@@ -129,7 +128,7 @@ func main() {
 						Name:  "create",
 						Usage: "Creates a webhook",
 						Flags: []cli.Flag{
-							serverUrlFlag,
+							urlFlag,
 							userFlag,
 							passwordFlag,
 							rawFlag,
@@ -141,7 +140,7 @@ func main() {
 						Name:  "send",
 						Usage: "Sends data to a webhook",
 						Flags: []cli.Flag{
-							serverUrlFlag,
+							urlFlag,
 							webhookIdFlag,
 							webhookTokenFlag,
 						},
@@ -157,7 +156,7 @@ func main() {
 						Name:  "show",
 						Usage: "Shows updates",
 						Flags: []cli.Flag{
-							serverUrlFlag,
+							urlFlag,
 							userFlag,
 							passwordFlag,
 							updatePageSizeFlag,
