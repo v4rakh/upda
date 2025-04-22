@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"github.com/go-co-op/gocron-redis-lock/v2"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
@@ -147,7 +147,7 @@ func (s *TaskService) configureCleanupStaleUpdatesTask() error {
 		var err error
 		var c int64
 
-		if c, err = s.updateService.CleanStale(t, api.UpdateStateApproved, api.UpdateStateIgnored); err != nil {
+		if c, err = s.updateService.CleanStale(t, constant.UpdateStateApproved, constant.UpdateStateIgnored); err != nil {
 			zap.L().Sugar().Errorf("Could not clean up ignored or approved updates older than %s (%s). Reason: %s", s.taskConfig.UpdateCleanStaleMaxAge, t, err.Error())
 			return
 		}
@@ -179,7 +179,7 @@ func (s *TaskService) configureCleanupStaleEventsTask() error {
 		var err error
 		var c int64
 
-		if c, err = s.eventService.CleanStale(t, api.EventStateCreated, api.EventStateEnqueued); err != nil {
+		if c, err = s.eventService.CleanStale(t, constant.EventStateCreated, constant.EventStateEnqueued); err != nil {
 			zap.L().Sugar().Errorf("Could not clean up stale events older than %s (%s). Reason: %s", s.taskConfig.EventCleanStaleMaxAge, t, err.Error())
 			return
 		}
@@ -249,13 +249,13 @@ func (s *TaskService) configureCleanupStaleActionsTask() error {
 		var cError int64
 		var err error
 
-		if cError, err = s.actionInvocationService.CleanStale(t, s.taskConfig.ActionsInvokeMaxRetries, api.ActionInvocationStateError); err != nil {
+		if cError, err = s.actionInvocationService.CleanStale(t, s.taskConfig.ActionsInvokeMaxRetries, constant.ActionInvocationStateError); err != nil {
 			zap.L().Sugar().Errorf("Could not clean up error stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
 			return
 		}
 
 		var cSuccess int64
-		if cSuccess, err = s.actionInvocationService.CleanStale(t, 0, api.ActionInvocationStateSuccess); err != nil {
+		if cSuccess, err = s.actionInvocationService.CleanStale(t, 0, constant.ActionInvocationStateSuccess); err != nil {
 			zap.L().Sugar().Errorf("Could not clean up success stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
 			return
 		}
@@ -293,11 +293,11 @@ func (s *TaskService) configurePrometheusRefreshTask() error {
 		var ackTotal int64
 
 		for _, update := range updates {
-			if api.UpdateStatePending.Value() == update.State {
+			if constant.UpdateStatePending.String() == update.State {
 				pendingTotal += 1
-			} else if api.UpdateStateIgnored.Value() == update.State {
+			} else if constant.UpdateStateIgnored.String() == update.State {
 				ignoredTotal += 1
-			} else if api.UpdateStateApproved.Value() == update.State {
+			} else if constant.UpdateStateApproved.String() == update.State {
 				ackTotal += 1
 			}
 		}

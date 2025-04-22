@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
@@ -47,14 +47,14 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 	if err != nil && !errors.Is(err, service_error.ErrResourceNotFound) {
 		return nil, err
 	} else if err != nil && errors.Is(err, service_error.ErrResourceNotFound) {
-		if e, err = s.repo.Create(application, provider, host, version, api.UpdateStatePending.Value(), metadata); err != nil {
+		if e, err = s.repo.Create(application, provider, host, version, constant.UpdateStatePending.String(), metadata); err != nil {
 			return nil, err
 		}
 		s.eventService.CreateUpdateCreated(e)
 		zap.L().Sugar().Infof("Created update '%v'", e)
 	} else {
 		old := e
-		skip := e.State == api.UpdateStateIgnored.Value()
+		skip := e.State == constant.UpdateStateIgnored.String()
 
 		if skip {
 			zap.L().Sugar().Infof("Skipping ignored update '%v'", e.ID)
@@ -68,9 +68,9 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 		s.eventService.CreateUpdateUpdated(old, e)
 		zap.L().Sugar().Infof("Updated update '%v'", e)
 
-		if api.UpdateStateApproved.Value() == e.State {
-			zap.L().Sugar().Infof("Setting update '%v' state to '%v'", e.ID, api.UpdateStatePending)
-			if e, err = s.repo.UpdateState(e.ID.String(), api.UpdateStatePending.Value()); err != nil {
+		if constant.UpdateStateApproved.String() == e.State {
+			zap.L().Sugar().Infof("Setting update '%v' state to '%v'", e.ID, constant.UpdateStatePending)
+			if e, err = s.repo.UpdateState(e.ID.String(), constant.UpdateStatePending.String()); err != nil {
 				return nil, err
 			}
 		}
@@ -79,7 +79,7 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 	return e, err
 }
 
-func (s *UpdateService) UpdateState(id string, state api.UpdateState) (*model.Update, error) {
+func (s *UpdateService) UpdateState(id string, state constant.UpdateState) (*model.Update, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -92,7 +92,7 @@ func (s *UpdateService) UpdateState(id string, state api.UpdateState) (*model.Up
 	}
 
 	oldUpdate := e
-	if e, err = s.repo.UpdateState(id, state.Value()); err != nil {
+	if e, err = s.repo.UpdateState(id, state.String()); err != nil {
 		return nil, err
 	}
 
@@ -123,18 +123,18 @@ func (s *UpdateService) Delete(id string) error {
 	return nil
 }
 
-func (s *UpdateService) CleanStale(time time.Time, state ...api.UpdateState) (int64, error) {
+func (s *UpdateService) CleanStale(time time.Time, state ...constant.UpdateState) (int64, error) {
 	if len(state) == 0 {
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, api.FromVariadicToStr(state...)...)
+	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, constant.FromVariadicToStr(state...)...)
 }
 
-func (s *UpdateService) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...api.UpdateState) ([]*model.Update, error) {
-	return s.repo.Paginate(page, pageSize, orderBy, order, searchTerm, searchIn, api.FromVariadicToStr(state...)...)
+func (s *UpdateService) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...constant.UpdateState) ([]*model.Update, error) {
+	return s.repo.Paginate(page, pageSize, orderBy, order, searchTerm, searchIn, constant.FromVariadicToStr(state...)...)
 }
 
-func (s *UpdateService) Count(searchTerm string, searchIn string, state ...api.UpdateState) (int64, error) {
-	return s.repo.Count(searchTerm, searchIn, api.FromVariadicToStr(state...)...)
+func (s *UpdateService) Count(searchTerm string, searchIn string, state ...constant.UpdateState) (int64, error) {
+	return s.repo.Count(searchTerm, searchIn, constant.FromVariadicToStr(state...)...)
 }

@@ -1,0 +1,33 @@
+//go:generate go-enum --marshal --mustparse --values --names --output-suffix _generated
+
+package constant
+
+// ENUM(pending, approved, ignored)
+type UpdateState string
+
+// ENUM(generic, diun)
+type WebhookType string
+
+// ENUM(update_created, update_updated, update_updated_state, update_updated_version, update_deleted)
+type EventName string
+
+// ENUM(created, enqueued)
+type EventState string
+
+// ENUM(shoutrrr)
+type ActionType string
+
+// ENUM(created, running, retrying, success, error)
+type ActionInvocationState string
+
+// ENUM(update)
+type FilterPresetType string
+
+// FromVariadicToStr converts variadic notation to string array if type is of string
+func FromVariadicToStr[T ~string](s ...T) []string {
+	arr := make([]string, 0, len(s))
+	for _, i := range s {
+		arr = append(arr, string(i))
+	}
+	return arr
+}

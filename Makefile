@@ -43,6 +43,10 @@ checkstyle-server:
 checkstyle-web:
 	@cd ${WEB_DIR}; $(PNPM) run checkstyle
 
+generate: generate-server
+generate-server:
+	@$(GO) generate ./...
+
 test-unit: test-web-unit test-server-unit
 test-server-unit:
 	@$(GO_TEST) test -race -shuffle on ./...

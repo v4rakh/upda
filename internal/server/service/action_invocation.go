@@ -2,8 +2,8 @@ package service
 
 import (
 	"errors"
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/json"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/dto"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
@@ -41,7 +41,7 @@ func (s *ActionInvocationService) Enqueue(batchSize int) error {
 	var events []*model.Event
 	var err error
 
-	if events, err = s.eventService.GetByState(batchSize, api.EventStateCreated); err != nil {
+	if events, err = s.eventService.GetByState(batchSize, constant.EventStateCreated); err != nil {
 		return err
 	}
 
@@ -90,14 +90,14 @@ func (s *ActionInvocationService) EnqueueFromEvent(event *model.Event, actions [
 	}
 
 	for _, action := range filteredActions {
-		if _, err = s.Create(event, action, api.ActionInvocationStateCreated); err != nil {
+		if _, err = s.Create(event, action, constant.ActionInvocationStateCreated); err != nil {
 			zap.L().Sugar().Errorf("Could not enqueue action '%s' (%v). Reason: %s", action.Label, action.ID, err.Error())
 			continue
 		}
 	}
 
 	// mark event as enqueued
-	if _, err = s.eventService.UpdateState(event.ID.String(), api.EventStateEnqueued); err != nil {
+	if _, err = s.eventService.UpdateState(event.ID.String(), constant.EventStateEnqueued); err != nil {
 		return err
 	}
 
@@ -115,7 +115,7 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 	var err error
 	var actionInvocations []*model.ActionInvocation
 
-	if actionInvocations, err = s.GetByState(batchSize, maxRetries, api.ActionInvocationStateCreated, api.ActionInvocationStateRetrying); err != nil {
+	if actionInvocations, err = s.GetByState(batchSize, maxRetries, constant.ActionInvocationStateCreated, constant.ActionInvocationStateRetrying); err != nil {
 		return err
 	}
 
@@ -125,7 +125,7 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 	}
 
 	for _, actionInvocation := range actionInvocations {
-		if _, err = s.UpdateState(actionInvocation.ID.String(), api.ActionInvocationStateRunning); err != nil {
+		if _, err = s.UpdateState(actionInvocation.ID.String(), constant.ActionInvocationStateRunning); err != nil {
 			zap.L().Sugar().Errorf("Could not mark action invocation '%v' as running. Reason: %s", actionInvocation.ID, err.Error())
 			continue
 		}
@@ -159,13 +159,13 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 
 			zap.L().Sugar().Errorf("Could not invoke action '%s' (%v) for action invocation '%v'. Reason: %s", action.Label, action.ID, actionInvocation.ID, err.Error())
 
-			var newState api.ActionInvocationState
+			var newState constant.ActionInvocationState
 			newRetryCount := actionInvocation.RetryCount + 1
-			newState = api.ActionInvocationStateRetrying
+			newState = constant.ActionInvocationStateRetrying
 
 			if newRetryCount >= maxRetries {
 				zap.L().Sugar().Infof("Action invocation '%v' exceeded max retry count of '%d'. Not trying again.", actionInvocation.ID, newRetryCount)
-				newState = api.ActionInvocationStateError
+				newState = constant.ActionInvocationStateError
 			}
 
 			if _, err = s.UpdateState(actionInvocation.ID.String(), newState); err != nil {
@@ -185,7 +185,7 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 		}
 
 		zap.L().Sugar().Debugf("Processed action invocation '%v' for event '%s' (%v) and action '%s' (%v)", actionInvocation.ID, event.Name, event.ID, action.Label, action.ID)
-		if _, err = s.UpdateState(actionInvocation.ID.String(), api.ActionInvocationStateSuccess); err != nil {
+		if _, err = s.UpdateState(actionInvocation.ID.String(), constant.ActionInvocationStateSuccess); err != nil {
 			zap.L().Sugar().Errorf("Could not mark action invocation '%v' as success. Reason: %s", actionInvocation.ID, err.Error())
 		}
 		if _, err = s.UpdateMessage(actionInvocation.ID.String(), nil); err != nil {
@@ -209,7 +209,7 @@ func (s *ActionInvocationService) Execute(action *model.Action, eventPayloadInfo
 	}
 
 	switch action.Type {
-	case api.ActionTypeShoutrrr.Value():
+	case constant.ActionTypeShoutrrr.String():
 		var payload dto.ActionPayloadShoutrrrDto
 		if payload, err = json.UnmarshalGenericJSON[dto.ActionPayloadShoutrrrDto](bytes); err != nil {
 			return service_error.NewServiceError(service_error.ErrCodeGeneral, err)
@@ -311,7 +311,7 @@ func (s *ActionInvocationService) Get(id string) (*model.ActionInvocation, error
 	return e, nil
 }
 
-func (s *ActionInvocationService) GetByState(limit int, maxRetries int, state ...api.ActionInvocationState) ([]*model.ActionInvocation, error) {
+func (s *ActionInvocationService) GetByState(limit int, maxRetries int, state ...constant.ActionInvocationState) ([]*model.ActionInvocation, error) {
 	if len(state) == 0 {
 		return nil, service_error.ErrValidationNotEmpty
 	}
@@ -322,7 +322,7 @@ func (s *ActionInvocationService) GetByState(limit int, maxRetries int, state ..
 		return nil, service_error.ErrValidationMaxRetriesGreaterZero
 	}
 
-	return s.repo.FindAllByState(limit, maxRetries, api.FromVariadicToStr(state...)...)
+	return s.repo.FindAllByState(limit, maxRetries, constant.FromVariadicToStr(state...)...)
 }
 
 func (s *ActionInvocationService) Count() (int64, error) {
@@ -348,7 +348,7 @@ func (s *ActionInvocationService) Delete(id string) error {
 	return nil
 }
 
-func (s *ActionInvocationService) UpdateState(id string, state api.ActionInvocationState) (*model.ActionInvocation, error) {
+func (s *ActionInvocationService) UpdateState(id string, state constant.ActionInvocationState) (*model.ActionInvocation, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -360,7 +360,7 @@ func (s *ActionInvocationService) UpdateState(id string, state api.ActionInvocat
 		return nil, err
 	}
 
-	if e, err = s.repo.UpdateState(id, state.Value()); err != nil {
+	if e, err = s.repo.UpdateState(id, state.String()); err != nil {
 		return nil, err
 	}
 
@@ -408,7 +408,7 @@ func (s *ActionInvocationService) UpdateRetryCount(id string, retryCount int) (*
 	return e, nil
 }
 
-func (s *ActionInvocationService) Create(event *model.Event, action *model.Action, state api.ActionInvocationState) (*model.ActionInvocation, error) {
+func (s *ActionInvocationService) Create(event *model.Event, action *model.Action, state constant.ActionInvocationState) (*model.ActionInvocation, error) {
 	if state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -418,7 +418,7 @@ func (s *ActionInvocationService) Create(event *model.Event, action *model.Actio
 
 	var err error
 	var e *model.ActionInvocation
-	if e, err = s.repo.Create(event.ID.String(), action.ID.String(), state.Value()); err != nil {
+	if e, err = s.repo.Create(event.ID.String(), action.ID.String(), state.String()); err != nil {
 		return nil, err
 	} else {
 		zap.L().Sugar().Info("Created action invocation")
@@ -426,10 +426,10 @@ func (s *ActionInvocationService) Create(event *model.Event, action *model.Actio
 	}
 }
 
-func (s *ActionInvocationService) CleanStale(time time.Time, maxRetries int, state ...api.ActionInvocationState) (int64, error) {
+func (s *ActionInvocationService) CleanStale(time time.Time, maxRetries int, state ...constant.ActionInvocationState) (int64, error) {
 	if len(state) == 0 {
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, maxRetries, api.FromVariadicToStr(state...)...)
+	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, maxRetries, constant.FromVariadicToStr(state...)...)
 }

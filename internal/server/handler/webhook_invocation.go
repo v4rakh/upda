@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
@@ -39,7 +40,7 @@ func (h *WebhookInvocationHandler) Execute(c *gin.Context) {
 	}
 
 	switch w.Type {
-	case api.WebhookTypeGeneric.Value():
+	case constant.WebhookTypeGeneric.String():
 		var req api.WebhookGenericRequest
 		if err = c.ShouldBindJSON(&req); err != nil {
 			AbortWithValidatorPayload(c, err)
@@ -50,7 +51,7 @@ func (h *WebhookInvocationHandler) Execute(c *gin.Context) {
 			return
 		}
 		break
-	case api.WebhookTypeDiun.Value():
+	case constant.WebhookTypeDiun.String():
 		var req api.WebhookDiunRequest
 		if err = c.ShouldBindJSON(&req); err != nil {
 			AbortWithValidatorPayload(c, err)

@@ -51,7 +51,7 @@ You can also use [direnv](https://github.com/direnv/direnv) to load the environm
 When you change directory into the project, the environment variables are automatically loaded after you've allowed
 `direnv` with `direnv allow`.
 
-#### Pre-requisites
+### Pre-requisites
 
 Ensure to set the following environment variables for proper debug logs during development
 
@@ -103,6 +103,13 @@ path.
 
 For any `go` command you run, ensure that your `PATH` has the `gcc` binary and that you add `CGO_ENABLED=1` as
 environment if `go` commands fail.
+
+### enums
+
+For new enums or when changing existing ones, use the `make generate` task which
+uses [go-enum](https://github.com/abice/go-enum) to generate boilerplate code.
+
+See example `enum.go`. Make sure to use the same `//go:generate` directives.
 
 ### Using the `lockService` correctly
 

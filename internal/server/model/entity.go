@@ -206,12 +206,11 @@ type ActionInvocation struct {
 
 // Constant entity holding information for constants
 type Constant struct {
-	ID         uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
-	Key        string    `gorm:"unique;not null"`
-	Value      string    `gorm:"not null"`
-	Parameters string    `gorm:"not null"`
-	CreatedAt  time.Time `gorm:"time;autoCreateTime;not null"`
-	UpdatedAt  time.Time `gorm:"time;autoUpdateTime;not null"`
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
+	Key       string    `gorm:"unique;not null"`
+	Value     string    `gorm:"not null"`
+	CreatedAt time.Time `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
 func (e *Constant) BeforeCreate(tx *gorm.DB) (err error) {

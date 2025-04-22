@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
@@ -37,7 +37,7 @@ func (s *WebhookService) Get(id string) (*model.Webhook, error) {
 	return e, nil
 }
 
-func (s *WebhookService) Create(label string, t api.WebhookType, ignoreHost bool) (*model.Webhook, error) {
+func (s *WebhookService) Create(label string, t constant.WebhookType, ignoreHost bool) (*model.Webhook, error) {
 	if label == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -50,7 +50,7 @@ func (s *WebhookService) Create(label string, t api.WebhookType, ignoreHost bool
 	}
 
 	var e *model.Webhook
-	if e, err = s.repo.Create(label, t.Value(), token, ignoreHost); err != nil {
+	if e, err = s.repo.Create(label, t.String(), token, ignoreHost); err != nil {
 		return nil, err
 	} else {
 		zap.L().Sugar().Info("Created webhook")

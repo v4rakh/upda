@@ -83,7 +83,7 @@ type ModifyActionMatchProviderRequest struct {
 }
 
 type ModifyActionTypeAndPayloadRequest struct {
-	Type    ActionType  `json:"type" binding:"required,oneof=shoutrrr"`
+	Type    string      `json:"type" binding:"required,oneof=shoutrrr"`
 	Payload interface{} `json:"payload" binding:"required"`
 }
 

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"github.com/gin-gonic/gin"
@@ -88,7 +89,7 @@ func (h *ActionHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.Create(req.Label, api.ActionType(req.Type), req.MatchEvent, req.MatchHost, req.MatchApplication, req.MatchProvider, req.Payload, req.Enabled); err != nil {
+	if e, err = h.service.Create(req.Label, constant.ActionType(req.Type), req.MatchEvent, req.MatchHost, req.MatchApplication, req.MatchProvider, req.Payload, req.Enabled); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -244,7 +245,7 @@ func (h *ActionHandler) UpdatePayload(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateTypeAndPayload(pathParams.ID, req.Type, req.Payload); err != nil {
+	if e, err = h.service.UpdateTypeAndPayload(pathParams.ID, constant.ActionType(req.Type), req.Payload); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

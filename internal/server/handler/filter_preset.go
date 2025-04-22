@@ -2,6 +2,7 @@ package handler
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ func (h *FilterPresetHandler) GetByType(c *gin.Context) {
 		return
 	}
 
-	if filters, err = h.service.GetByType(api.FilterPresetType(pathParams.Type)); err != nil {
+	if filters, err = h.service.GetByType(constant.FilterPresetType(pathParams.Type)); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -60,7 +61,7 @@ func (h *FilterPresetHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.Create(api.FilterPresetType(req.Type), req.Label, req.Parameters, req.Color); err != nil {
+	if e, err = h.service.Create(constant.FilterPresetType(req.Type), req.Label, req.Parameters, req.Color); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

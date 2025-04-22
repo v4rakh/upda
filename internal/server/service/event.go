@@ -4,6 +4,7 @@ import (
 	"errors"
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/json"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/dto"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
@@ -27,7 +28,7 @@ func (s *EventService) CreateUpdateCreated(e *model.Update) *model.Event {
 		return nil
 	}
 
-	s.CreateWithWarnOnly(api.EventNameUpdateCreated, &api.EventPayloadUpdateCreatedDto{
+	s.CreateWithWarnOnly(constant.EventNameUpdateCreated, &api.EventPayloadUpdateCreatedDto{
 		ID:          e.ID,
 		Application: e.Application,
 		Provider:    e.Provider,
@@ -44,14 +45,14 @@ func (s *EventService) CreateUpdateUpdated(old *model.Update, new *model.Update)
 		return nil
 	}
 
-	eventName := api.EventNameUpdateUpdated
+	eventName := constant.EventNameUpdateUpdated
 
 	if old.State != new.State {
-		eventName = api.EventNameUpdateUpdatedState
+		eventName = constant.EventNameUpdateUpdatedState
 	}
 
 	if old.Version != new.Version {
-		eventName = api.EventNameUpdateUpdatedVersion
+		eventName = constant.EventNameUpdateUpdatedVersion
 	}
 
 	s.CreateWithWarnOnly(eventName, &api.EventPayloadUpdateUpdatedDto{
@@ -73,7 +74,7 @@ func (s *EventService) CreateUpdateDeleted(e *model.Update) *model.Event {
 		return nil
 	}
 
-	s.CreateWithWarnOnly(api.EventNameUpdateDeleted, &api.EventPayloadUpdateDeletedDto{
+	s.CreateWithWarnOnly(constant.EventNameUpdateDeleted, &api.EventPayloadUpdateDeletedDto{
 		Application: e.Application,
 		Provider:    e.Provider,
 		Host:        e.Host,
@@ -84,7 +85,7 @@ func (s *EventService) CreateUpdateDeleted(e *model.Update) *model.Event {
 	return nil
 }
 
-func (s *EventService) CreateWithWarnOnly(name api.EventName, payload interface{}) *model.Event {
+func (s *EventService) CreateWithWarnOnly(name constant.EventName, payload interface{}) *model.Event {
 	var e *model.Event
 	var err error
 
@@ -96,7 +97,7 @@ func (s *EventService) CreateWithWarnOnly(name api.EventName, payload interface{
 	return e
 }
 
-func (s *EventService) Create(name api.EventName, payload interface{}) (*model.Event, error) {
+func (s *EventService) Create(name constant.EventName, payload interface{}) (*model.Event, error) {
 	if name == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -104,7 +105,7 @@ func (s *EventService) Create(name api.EventName, payload interface{}) (*model.E
 	var e *model.Event
 	var err error
 
-	if e, err = s.repo.Create(name.Value(), api.EventStateCreated.Value(), payload); err != nil {
+	if e, err = s.repo.Create(name.String(), constant.EventStateCreated.String(), payload); err != nil {
 		return nil, err
 	}
 
@@ -138,12 +139,12 @@ func (s *EventService) Delete(id string) error {
 	return nil
 }
 
-func (s *EventService) CleanStale(time time.Time, state ...api.EventState) (int64, error) {
+func (s *EventService) CleanStale(time time.Time, state ...constant.EventState) (int64, error) {
 	if len(state) == 0 {
 		return 0, service_error.ErrValidationNotEmpty
 	}
 
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, api.FromVariadicToStr(state...)...)
+	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, constant.FromVariadicToStr(state...)...)
 }
 
 func (s *EventService) Window(size int, skip int, orderBy string, order string) ([]*model.Event, error) {
@@ -154,11 +155,11 @@ func (s *EventService) WindowHasNext(size int, skip int, orderBy string, order s
 	return s.repo.WindowHasNext(size, skip, orderBy, order)
 }
 
-func (s *EventService) Count(state ...api.EventState) (int64, error) {
-	return s.repo.Count(api.FromVariadicToStr(state...)...)
+func (s *EventService) Count(state ...constant.EventState) (int64, error) {
+	return s.repo.Count(constant.FromVariadicToStr(state...)...)
 }
 
-func (s *EventService) GetByState(limit int, state ...api.EventState) ([]*model.Event, error) {
+func (s *EventService) GetByState(limit int, state ...constant.EventState) ([]*model.Event, error) {
 	if len(state) == 0 {
 		return nil, service_error.ErrValidationNotEmpty
 	}
@@ -166,10 +167,10 @@ func (s *EventService) GetByState(limit int, state ...api.EventState) ([]*model.
 		return nil, service_error.ErrValidationLimitGreaterZero
 	}
 
-	return s.repo.FindAllByState(limit, api.FromVariadicToStr(state...)...)
+	return s.repo.FindAllByState(limit, constant.FromVariadicToStr(state...)...)
 }
 
-func (s *EventService) UpdateState(id string, state api.EventState) (*model.Event, error) {
+func (s *EventService) UpdateState(id string, state constant.EventState) (*model.Event, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -181,7 +182,7 @@ func (s *EventService) UpdateState(id string, state api.EventState) (*model.Even
 		return nil, err
 	}
 
-	if e, err = s.repo.UpdateState(id, state.Value()); err != nil {
+	if e, err = s.repo.UpdateState(id, state.String()); err != nil {
 		return nil, err
 	}
 
@@ -202,31 +203,31 @@ func (s *EventService) ExtractPayloadInfo(event *model.Event) (*dto.EventPayload
 	}
 
 	switch event.Name {
-	case api.EventNameUpdateCreated.Value():
+	case constant.EventNameUpdateCreated.String():
 		var p api.EventPayloadUpdateCreatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateCreatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
 		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateDeleted.Value():
+	case constant.EventNameUpdateDeleted.String():
 		var p api.EventPayloadUpdateDeletedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateDeletedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
 		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateUpdatedState.Value():
+	case constant.EventNameUpdateUpdatedState.String():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
 		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateUpdatedVersion.Value():
+	case constant.EventNameUpdateUpdatedVersion.String():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
 		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
-	case api.EventNameUpdateUpdated.Value():
+	case constant.EventNameUpdateUpdated.String():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)

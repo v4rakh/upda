@@ -2,7 +2,7 @@ package service
 
 import (
 	"encoding/json"
-	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/dto"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
@@ -37,7 +37,7 @@ func (s *ActionService) Get(id string) (*model.Action, error) {
 	return e, nil
 }
 
-func (s *ActionService) Create(label string, t api.ActionType, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool) (*model.Action, error) {
+func (s *ActionService) Create(label string, t constant.ActionType, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool) (*model.Action, error) {
 	if label == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -48,7 +48,7 @@ func (s *ActionService) Create(label string, t api.ActionType, matchEvent *strin
 
 	var err error
 	var e *model.Action
-	if e, err = s.repo.Create(label, t.Value(), matchEvent, matchHost, matchApplication, matchProvider, payload, enabled); err != nil {
+	if e, err = s.repo.Create(label, t.String(), matchEvent, matchHost, matchApplication, matchProvider, payload, enabled); err != nil {
 		return nil, err
 	} else {
 		zap.L().Sugar().Info("Created action")
@@ -56,7 +56,7 @@ func (s *ActionService) Create(label string, t api.ActionType, matchEvent *strin
 	}
 }
 
-func (s *ActionService) IsValidPayload(t api.ActionType, payload interface{}) (bool, error) {
+func (s *ActionService) IsValidPayload(t constant.ActionType, payload interface{}) (bool, error) {
 	if t == "" {
 		return false, service_error.ErrValidationNotBlank
 	}
@@ -65,7 +65,7 @@ func (s *ActionService) IsValidPayload(t api.ActionType, payload interface{}) (b
 	}
 
 	var err error
-	if api.ActionTypeShoutrrr == t {
+	if constant.ActionTypeShoutrrr == t {
 		var pb []byte
 		if pb, err = json.Marshal(payload); err != nil {
 			return false, err
@@ -185,7 +185,7 @@ func (s *ActionService) UpdateMatchHost(id string, matchHost *string) (*model.Ac
 	return e, nil
 }
 
-func (s *ActionService) UpdateTypeAndPayload(id string, t api.ActionType, payload interface{}) (*model.Action, error) {
+func (s *ActionService) UpdateTypeAndPayload(id string, t constant.ActionType, payload interface{}) (*model.Action, error) {
 	if id == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -204,7 +204,7 @@ func (s *ActionService) UpdateTypeAndPayload(id string, t api.ActionType, payloa
 		return nil, service_error.NewServiceError(service_error.ErrCodeIllegalArgument, validationErr)
 	}
 
-	if e, err = s.repo.UpdateTypeAndPayload(id, t.Value(), payload); err != nil {
+	if e, err = s.repo.UpdateTypeAndPayload(id, t.String(), payload); err != nil {
 		return nil, err
 	}
 

@@ -3,6 +3,7 @@ package handler
 import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"github.com/gin-gonic/gin"
@@ -31,10 +32,10 @@ func (h *UpdateHandler) Paginate(c *gin.Context) {
 
 	s, stateQueryContainsAtLeastOne := c.GetQueryArray("state")
 
-	states := make([]api.UpdateState, 0)
+	states := make([]constant.UpdateState, 0)
 	if stateQueryContainsAtLeastOne {
 		for _, state := range s {
-			states = append(states, api.UpdateState(state))
+			states = append(states, constant.UpdateState(state))
 		}
 	}
 
@@ -105,7 +106,7 @@ func (h *UpdateHandler) UpdateState(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.UpdateState(pathParams.ID, api.UpdateState(req.State)); err != nil {
+	if e, err = h.service.UpdateState(pathParams.ID, constant.UpdateState(req.State)); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

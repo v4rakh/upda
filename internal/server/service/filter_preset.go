@@ -1,7 +1,7 @@
 package service
 
 import (
-	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
@@ -18,14 +18,14 @@ func NewFilterPresetService(r repository.FilterPresetRepository) *FilterPresetSe
 	}
 }
 
-func (s *FilterPresetService) GetByType(t api.FilterPresetType) ([]*model.FilterPreset, error) {
+func (s *FilterPresetService) GetByType(t constant.FilterPresetType) ([]*model.FilterPreset, error) {
 	if t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
-	return s.repo.FindByType(t.Value())
+	return s.repo.FindByType(t.String())
 }
 
-func (s *FilterPresetService) Create(t api.FilterPresetType, label string, parameters string, color *string) (*model.FilterPreset, error) {
+func (s *FilterPresetService) Create(t constant.FilterPresetType, label string, parameters string, color *string) (*model.FilterPreset, error) {
 	if t == "" || label == "" || parameters == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -33,7 +33,7 @@ func (s *FilterPresetService) Create(t api.FilterPresetType, label string, param
 	var e *model.FilterPreset
 	var err error
 
-	if e, err = s.repo.Create(t.Value(), label, parameters, color); err != nil {
+	if e, err = s.repo.Create(t.String(), label, parameters, color); err != nil {
 		return nil, err
 	}
 

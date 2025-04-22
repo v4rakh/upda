@@ -2,6 +2,7 @@ package handler
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"github.com/gin-gonic/gin"
@@ -83,7 +84,7 @@ func (h *WebhookHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.Create(req.Label, api.WebhookType(req.Type), req.IgnoreHost); err != nil {
+	if e, err = h.service.Create(req.Label, constant.WebhookType(req.Type), req.IgnoreHost); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

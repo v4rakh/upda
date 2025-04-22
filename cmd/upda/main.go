@@ -194,9 +194,9 @@ func webhookCreate(_ context.Context, cmd *cli.Command) error {
 
 	// validate type
 	t := cmd.Args().Get(1)
-	validTypes := []string{api.WebhookTypeGeneric.Value(), api.WebhookTypeDiun.Value()}
+	validTypes := []string{constant.WebhookTypeGeneric.String(), constant.WebhookTypeDiun.String()}
 	if t == "" {
-		t = api.WebhookTypeGeneric.Value()
+		t = constant.WebhookTypeGeneric.String()
 	}
 
 	if !str.FindInSlice(validTypes, t) {
