@@ -2,6 +2,9 @@
 
 package constant
 
+// ENUM(basic_single, basic_credentials)
+type ConfigAuthMode string
+
 // ENUM(pending, approved, ignored)
 type UpdateState string
 

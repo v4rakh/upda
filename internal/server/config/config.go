@@ -14,7 +14,6 @@ import (
 	migratepostgres "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	_ "github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/sethvargo/go-envconfig"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -29,9 +28,6 @@ import (
 
 const (
 	EnvSecret = "SECRET"
-
-	AuthModeBasicSingle      = "basic_single"
-	AuthModeBasicCredentials = "basic_credentials"
 )
 
 //go:embed migrations_postgres/*.sql
@@ -82,17 +78,17 @@ type Database struct {
 
 type EmbeddedWebInterface struct {
 	Enabled          bool   `env:"EMBEDDED_WEB_INTERFACE_ENABLED,default=true"`
-	ApiUrl           string `env:"EMBEDDED_WEB_INTERFACE_API_URL,default=upda" validate:"required_if=Enabled true"`
+	ApiUrl           string `env:"EMBEDDED_WEB_INTERFACE_API_URL,default=http://localhost:8080" validate:"required_if=Enabled true"`
 	Title            string `env:"EMBEDDED_WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
 	DarkThemeEnabled bool   `env:"EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED,default=false"`
 	FooterEnabled    bool   `env:"EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED,default=true"`
 }
 
 type Auth struct {
-	AuthMethod           string            `env:"AUTH_MODE,default=basic_single" validate:"required,oneof=basic_single basic_credentials"`
-	BasicAuthUser        string            `env:"BASIC_AUTH_USER" validate:"required_if=AuthMethod basic_single"`
-	BasicAuthPassword    string            `env:"BASIC_AUTH_PASSWORD" validate:"required_if=AuthMethod basic_single"`
-	BasicAuthCredentials map[string]string `env:"BASIC_AUTH_CREDENTIALS,separator=|,delimiter=;" validate:"required_if=AuthMethod basic_credentials"`
+	AuthMethod           constant.ConfigAuthMode `env:"AUTH_MODE,default=basic_single" validate:"required,oneof=basic_single basic_credentials"`
+	BasicAuthUser        string                  `env:"BASIC_AUTH_USER" validate:"required_if=AuthMethod basic_single"`
+	BasicAuthPassword    string                  `env:"BASIC_AUTH_PASSWORD" validate:"required_if=AuthMethod basic_single"`
+	BasicAuthCredentials map[string]string       `env:"BASIC_AUTH_CREDENTIALS,separator=|,delimiter=;" validate:"required_if=AuthMethod basic_credentials"`
 }
 
 type Task struct {

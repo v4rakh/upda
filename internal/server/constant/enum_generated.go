@@ -178,6 +178,84 @@ func (x *ActionType) UnmarshalText(text []byte) error {
 }
 
 const (
+	// ConfigAuthModeBasicSingle is a ConfigAuthMode of type basic_single.
+	ConfigAuthModeBasicSingle ConfigAuthMode = "basic_single"
+	// ConfigAuthModeBasicCredentials is a ConfigAuthMode of type basic_credentials.
+	ConfigAuthModeBasicCredentials ConfigAuthMode = "basic_credentials"
+)
+
+var ErrInvalidConfigAuthMode = fmt.Errorf("not a valid ConfigAuthMode, try [%s]", strings.Join(_ConfigAuthModeNames, ", "))
+
+var _ConfigAuthModeNames = []string{
+	string(ConfigAuthModeBasicSingle),
+	string(ConfigAuthModeBasicCredentials),
+}
+
+// ConfigAuthModeNames returns a list of possible string values of ConfigAuthMode.
+func ConfigAuthModeNames() []string {
+	tmp := make([]string, len(_ConfigAuthModeNames))
+	copy(tmp, _ConfigAuthModeNames)
+	return tmp
+}
+
+// ConfigAuthModeValues returns a list of the values for ConfigAuthMode
+func ConfigAuthModeValues() []ConfigAuthMode {
+	return []ConfigAuthMode{
+		ConfigAuthModeBasicSingle,
+		ConfigAuthModeBasicCredentials,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigAuthMode) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigAuthMode) IsValid() bool {
+	_, err := ParseConfigAuthMode(string(x))
+	return err == nil
+}
+
+var _ConfigAuthModeValue = map[string]ConfigAuthMode{
+	"basic_single":      ConfigAuthModeBasicSingle,
+	"basic_credentials": ConfigAuthModeBasicCredentials,
+}
+
+// ParseConfigAuthMode attempts to convert a string to a ConfigAuthMode.
+func ParseConfigAuthMode(name string) (ConfigAuthMode, error) {
+	if x, ok := _ConfigAuthModeValue[name]; ok {
+		return x, nil
+	}
+	return ConfigAuthMode(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigAuthMode)
+}
+
+// MustParseConfigAuthMode converts a string to a ConfigAuthMode, and panics if is not valid.
+func MustParseConfigAuthMode(name string) ConfigAuthMode {
+	val, err := ParseConfigAuthMode(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigAuthMode) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigAuthMode) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigAuthMode(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
 	// EventNameUpdateCreated is a EventName of type update_created.
 	EventNameUpdateCreated EventName = "update_created"
 	// EventNameUpdateUpdated is a EventName of type update_updated.

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/handler"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
@@ -172,11 +173,11 @@ Object.defineProperty(window, 'runtime_config', {
 
 	var authMethodHandler gin.HandlerFunc
 
-	if config.AuthModeBasicSingle == cfg.Auth.AuthMethod {
+	if constant.ConfigAuthModeBasicSingle == cfg.Auth.AuthMethod {
 		authMethodHandler = gin.BasicAuth(gin.Accounts{
 			cfg.Auth.BasicAuthUser: cfg.Auth.BasicAuthPassword,
 		})
-	} else if config.AuthModeBasicCredentials == cfg.Auth.AuthMethod {
+	} else if constant.ConfigAuthModeBasicCredentials == cfg.Auth.AuthMethod {
 		authMethodHandler = gin.BasicAuth(cfg.Auth.BasicAuthCredentials)
 	} else {
 		zap.L().Fatal("No valid auth mode found")
