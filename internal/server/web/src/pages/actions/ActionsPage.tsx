@@ -7,7 +7,7 @@ import { useGetActionsQuery } from '../../api/actionsApi';
 import ActionFilterQueryParamNames from '../../constants/api/actionFilterQueryParamNames';
 import ActionOrder from '../../constants/api/actionOrder';
 import DateTimeStyle from '../../constants/dateTimeStyle';
-import { PAGE_DEFAULT, PAGE_DEFAULT_OPTIONS, PAGE_SIZE_DEFAULT } from '../../constants/pagination';
+import { TABLE_PAGE_DEFAULT, TABLE_PAGE_DEFAULT_OPTIONS, TABLE_PAGE_SIZE_DEFAULT } from '../../constants/pagination';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
 import { ActionResponse, ActionsRequestParams, ActionType } from '../../types';
 import useActionsFilterQueryParams from '../../use/useActionsFilterQueryParams';
@@ -198,12 +198,12 @@ const ActionsPage = () => {
 				<Table
 					onChange={onTableChange}
 					pagination={{
-						pageSizeOptions: PAGE_DEFAULT_OPTIONS,
+						pageSizeOptions: TABLE_PAGE_DEFAULT_OPTIONS,
 						position: ['bottomCenter'],
 						showSizeChanger: true,
-						pageSize: data?.data.pageSize || PAGE_SIZE_DEFAULT,
+						pageSize: data?.data.pageSize || TABLE_PAGE_SIZE_DEFAULT,
 						total: data?.data.totalElements,
-						current: page || PAGE_DEFAULT
+						current: page || TABLE_PAGE_DEFAULT
 					}}
 					expandable={{
 						expandedRowRender: (record) => <ItemAction e={record} />

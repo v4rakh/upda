@@ -1,5 +1,5 @@
 import WebhookFilterQueryParamNames from '../constants/api/webhookFilterQueryParamNames';
-import { PAGE_DEFAULT, PAGE_SIZE_DEFAULT } from '../constants/pagination';
+import { CARD_PAGE_DEFAULT, CARD_PAGE_SIZE_DEFAULT } from '../constants/pagination';
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 
@@ -15,10 +15,10 @@ const useWebhooksFilterQueryParams = () => {
 		order: replaceNullValue(queryParams.get(WebhookFilterQueryParamNames.ORDER)),
 		page: queryParams.get(WebhookFilterQueryParamNames.PAGE)
 			? parseInt(queryParams.get(WebhookFilterQueryParamNames.PAGE) as string)
-			: PAGE_DEFAULT,
+			: CARD_PAGE_DEFAULT,
 		pageSize: queryParams.get(WebhookFilterQueryParamNames.PAGE_SIZE)
 			? parseInt(queryParams.get(WebhookFilterQueryParamNames.PAGE_SIZE) as string)
-			: PAGE_SIZE_DEFAULT
+			: CARD_PAGE_SIZE_DEFAULT
 	};
 };
 

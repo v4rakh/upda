@@ -1,5 +1,5 @@
 import ActionInvocationFilterQueryParamNames from '../constants/api/actionInvocationFilterQueryParamNames';
-import { PAGE_DEFAULT, PAGE_SIZE_DEFAULT } from '../constants/pagination';
+import { TABLE_PAGE_DEFAULT, TABLE_PAGE_SIZE_DEFAULT } from '../constants/pagination';
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 
@@ -15,10 +15,10 @@ const useActionInvocationsFilterQueryParams = () => {
 		order: replaceNullValue(queryParams.get(ActionInvocationFilterQueryParamNames.ORDER)),
 		page: queryParams.get(ActionInvocationFilterQueryParamNames.PAGE)
 			? parseInt(queryParams.get(ActionInvocationFilterQueryParamNames.PAGE) as string)
-			: PAGE_DEFAULT,
+			: TABLE_PAGE_DEFAULT,
 		pageSize: queryParams.get(ActionInvocationFilterQueryParamNames.PAGE_SIZE)
 			? parseInt(queryParams.get(ActionInvocationFilterQueryParamNames.PAGE_SIZE) as string)
-			: PAGE_SIZE_DEFAULT
+			: TABLE_PAGE_SIZE_DEFAULT
 	};
 };
 

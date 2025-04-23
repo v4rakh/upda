@@ -3,7 +3,7 @@ import UpdatePageFilter from './UpdatePageFilter';
 import { useGetUpdatesQuery } from '../../api/updatesApi';
 import FilterPreset from '../../components/FilterPresets';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
-import { PAGE_DEFAULT, PAGE_DEFAULT_OPTIONS, PAGE_SIZE_DEFAULT } from '../../constants/pagination';
+import { CARD_PAGE_DEFAULT, CARD_PAGE_DEFAULT_OPTIONS, CARD_PAGE_SIZE_DEFAULT } from '../../constants/pagination';
 import { UpdatesRequestParams } from '../../types';
 import { FilterPresetType } from '../../types/filterPreset';
 import { useResponsiveGridSize } from '../../use/useResponsiveGridSize';
@@ -25,7 +25,7 @@ const DEFAULT_POLLING_INTERVAL = 10000;
 const UpdatesPage: FC = () => {
 	const [t] = useTranslation('updates');
 
-	const { gridSize } = useResponsiveGridSize({});
+	const { gridSize } = useResponsiveGridSize({ xxl: 4, xl: 3, lg: 2, md: 2, sm: 1, xs: 1 });
 
 	const [pollingInterval, setPollingInterval] = useState<number>(0);
 	const [queryParams, setSearchQueryParams] = useSearchParams();
@@ -132,10 +132,10 @@ const UpdatesPage: FC = () => {
 							pagination={{
 								position: 'bottom',
 								align: 'center',
-								pageSize: data?.data.pageSize || PAGE_SIZE_DEFAULT,
-								pageSizeOptions: PAGE_DEFAULT_OPTIONS,
+								pageSize: data?.data.pageSize || CARD_PAGE_SIZE_DEFAULT,
+								pageSizeOptions: CARD_PAGE_DEFAULT_OPTIONS,
 								total: data?.data.totalElements || 0,
-								current: page || PAGE_DEFAULT,
+								current: page || CARD_PAGE_DEFAULT,
 								onChange: onPaginationChange,
 								showSizeChanger: true
 							}}
@@ -144,7 +144,7 @@ const UpdatesPage: FC = () => {
 									{ xs: 8, sm: 16, md: 24, lg: 32 },
 									{ xs: 8, sm: 16, md: 24, lg: 32 }
 								],
-								column: gridSize
+								column: data.data.content.length <= gridSize ? data.data.content.length : gridSize
 							}}
 							dataSource={data.data.content}
 							renderItem={(e) => (

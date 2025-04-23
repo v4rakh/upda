@@ -1,5 +1,10 @@
 import UpdateFilterQueryParamNames from '../constants/api/updateFilterQueryParamNames';
-import { PAGE_DEFAULT, PAGE_SIZE_DEFAULT } from '../constants/pagination';
+import {
+	CARD_PAGE_DEFAULT,
+	CARD_PAGE_SIZE_DEFAULT,
+	TABLE_PAGE_DEFAULT,
+	TABLE_PAGE_SIZE_DEFAULT
+} from '../constants/pagination';
 import { parseInt } from 'lodash';
 import { useSearchParams } from 'react-router';
 import { replaceEmptyValue, replaceNullValue } from '../utils/queryParamsHelper';
@@ -25,10 +30,10 @@ const useUpdatesFilterQueryParams = (): UseUpdatesFilterQueryParams => {
 		order: replaceNullValue(queryParams.get(UpdateFilterQueryParamNames.ORDER)),
 		page: queryParams.get(UpdateFilterQueryParamNames.PAGE)
 			? parseInt(queryParams.get(UpdateFilterQueryParamNames.PAGE) as string)
-			: PAGE_DEFAULT,
+			: CARD_PAGE_DEFAULT,
 		pageSize: queryParams.get(UpdateFilterQueryParamNames.PAGE_SIZE)
 			? parseInt(queryParams.get(UpdateFilterQueryParamNames.PAGE_SIZE) as string)
-			: PAGE_SIZE_DEFAULT
+			: CARD_PAGE_SIZE_DEFAULT
 	};
 };
 

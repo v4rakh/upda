@@ -1,8 +1,7 @@
 import { useLargestScreenSize } from './useLargestScreenSize';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 export interface UseResponsiveGridSizeProps {
-	initialSize?: number;
 	xxl?: number;
 	xl?: number;
 	lg?: number;
@@ -16,7 +15,6 @@ export interface UseResponsiveGridSize {
 }
 
 export const useResponsiveGridSize = ({
-	initialSize = 3,
 	xxl = 6,
 	xl = 4,
 	lg = 3,
@@ -25,32 +23,25 @@ export const useResponsiveGridSize = ({
 	xs = 1
 }: UseResponsiveGridSizeProps): UseResponsiveGridSize => {
 	const { largest } = useLargestScreenSize();
-	const [gridSize, setGridSize] = useState<number>(initialSize);
 
-	useEffect(() => {
+	const determineGridSize = useCallback(() => {
 		switch (largest) {
 			case 'xxl':
-				setGridSize(xxl);
-				break;
+				return xxl;
 			case 'xl':
-				setGridSize(xl);
-				break;
+				return xl;
 			case 'lg':
-				setGridSize(lg);
-				break;
+				return lg;
 			case 'md':
-				setGridSize(md);
-				break;
+				return md;
 			case 'sm':
-				setGridSize(sm);
-				break;
+				return sm;
 			case 'xs':
-				setGridSize(xs);
-				break;
+				return xs;
 		}
 	}, [largest]);
 
 	return {
-		gridSize
+		gridSize: determineGridSize()
 	};
 };

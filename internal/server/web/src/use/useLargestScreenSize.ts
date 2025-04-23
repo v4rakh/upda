@@ -1,13 +1,12 @@
 import { Breakpoint, ScreenMap } from 'antd/es/_util/responsiveObserver';
 import useBreakpoint from 'antd/es/grid/hooks/useBreakpoint';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 export interface UseLargestScreenSize {
 	largest: Breakpoint;
 }
 
 export const useLargestScreenSize = (): UseLargestScreenSize => {
-	const [largest, setLargest] = useState<Breakpoint>('xs');
 	const screens = useBreakpoint();
 
 	const findLargestScreen = useCallback((s: ScreenMap): Breakpoint => {
@@ -26,11 +25,7 @@ export const useLargestScreenSize = (): UseLargestScreenSize => {
 		}
 	}, []);
 
-	useEffect(() => {
-		setLargest(findLargestScreen(screens));
-	}, [screens]);
-
 	return {
-		largest
+		largest: findLargestScreen(screens)
 	};
 };
