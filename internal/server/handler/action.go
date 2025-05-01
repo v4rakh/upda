@@ -36,7 +36,7 @@ func (h *ActionHandler) Paginate(c *gin.Context) {
 
 	for _, e := range actions {
 		data = append(data, &api.ActionResponse{
-			ID:               e.ID,
+			ID:               e.ID.String(),
 			Label:            e.Label,
 			Type:             e.Type,
 			MatchEvent:       e.MatchEvent,
@@ -75,7 +75,7 @@ func (h *ActionHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) Create(c *gin.Context) {
@@ -94,7 +94,7 @@ func (h *ActionHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdateLabel(c *gin.Context) {
@@ -120,7 +120,7 @@ func (h *ActionHandler) UpdateLabel(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdateMatchEvent(c *gin.Context) {
@@ -146,7 +146,7 @@ func (h *ActionHandler) UpdateMatchEvent(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdateMatchHost(c *gin.Context) {
@@ -172,7 +172,7 @@ func (h *ActionHandler) UpdateMatchHost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdateMatchApplication(c *gin.Context) {
@@ -198,7 +198,7 @@ func (h *ActionHandler) UpdateMatchApplication(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdateMatchProvider(c *gin.Context) {
@@ -224,7 +224,7 @@ func (h *ActionHandler) UpdateMatchProvider(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdatePayload(c *gin.Context) {
@@ -250,7 +250,7 @@ func (h *ActionHandler) UpdatePayload(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) UpdateEnabled(c *gin.Context) {
@@ -276,7 +276,7 @@ func (h *ActionHandler) UpdateEnabled(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID, e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionSingleResponse(e.ID.String(), e.Label, e.Type, e.MatchEvent, e.MatchHost, e.MatchApplication, e.MatchProvider, e.Payload, e.Enabled, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionHandler) Delete(c *gin.Context) {

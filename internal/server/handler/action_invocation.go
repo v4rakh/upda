@@ -70,7 +70,7 @@ func (h *ActionInvocationHandler) Paginate(c *gin.Context) {
 
 	for _, e := range actionInvocations {
 		data = append(data, &api.ActionInvocationResponse{
-			ID:         e.ID,
+			ID:         e.ID.String(),
 			RetryCount: e.RetryCount,
 			State:      e.State,
 			Message:    e.Message,
@@ -106,7 +106,7 @@ func (h *ActionInvocationHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewActionInvocationSingleResponse(e.ID, e.RetryCount, e.State, e.Message, e.ActionID, e.EventID, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewActionInvocationSingleResponse(e.ID.String(), e.RetryCount, e.State, e.Message, e.ActionID, e.EventID, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ActionInvocationHandler) Delete(c *gin.Context) {

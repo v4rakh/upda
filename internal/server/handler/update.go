@@ -49,7 +49,7 @@ func (h *UpdateHandler) Paginate(c *gin.Context) {
 
 	for _, e := range updates {
 		data = append(data, &api.UpdateResponse{
-			ID:          e.ID,
+			ID:          e.ID.String(),
 			Application: e.Application,
 			Provider:    e.Provider,
 			Host:        e.Host,
@@ -85,7 +85,7 @@ func (h *UpdateHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewUpdateSingleResponse(e.ID, e.Application, e.Provider, e.Host, e.Version, e.State, e.CreatedAt, e.UpdatedAt, e.Metadata))
+	c.JSON(http.StatusOK, api.NewUpdateSingleResponse(e.ID.String(), e.Application, e.Provider, e.Host, e.Version, e.State, e.CreatedAt, e.UpdatedAt, e.Metadata))
 }
 
 func (h *UpdateHandler) UpdateState(c *gin.Context) {
@@ -111,7 +111,7 @@ func (h *UpdateHandler) UpdateState(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewUpdateSingleResponse(e.ID, e.Application, e.Provider, e.Host, e.Version, e.State, e.CreatedAt, e.UpdatedAt, e.Metadata))
+	c.JSON(http.StatusOK, api.NewUpdateSingleResponse(e.ID.String(), e.Application, e.Provider, e.Host, e.Version, e.State, e.CreatedAt, e.UpdatedAt, e.Metadata))
 }
 
 func (h *UpdateHandler) Delete(c *gin.Context) {

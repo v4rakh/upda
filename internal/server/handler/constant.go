@@ -30,7 +30,7 @@ func (h *ConstantHandler) GetAll(c *gin.Context) {
 
 	for _, e := range constants {
 		data = append(data, &api.ConstantResponse{
-			ID:        e.ID,
+			ID:        e.ID.String(),
 			Key:       e.Key,
 			Value:     e.Value,
 			CreatedAt: e.CreatedAt,
@@ -57,7 +57,7 @@ func (h *ConstantHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewConstantSingleResponse(e.ID, e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewConstantSingleResponse(e.ID.String(), e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ConstantHandler) UpdateValue(c *gin.Context) {
@@ -82,7 +82,7 @@ func (h *ConstantHandler) UpdateValue(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewConstantSingleResponse(e.ID, e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewConstantSingleResponse(e.ID.String(), e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ConstantHandler) Get(c *gin.Context) {
@@ -101,7 +101,7 @@ func (h *ConstantHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewConstantSingleResponse(e.ID, e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewConstantSingleResponse(e.ID.String(), e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *ConstantHandler) Delete(c *gin.Context) {

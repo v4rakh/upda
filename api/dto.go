@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/google/uuid"
 	"time"
 )
 
@@ -234,7 +233,7 @@ func NewInfoResponse(name string, version string, tz string) *InfoResponse {
 }
 
 type UpdateResponse struct {
-	ID          uuid.UUID   `json:"id"`
+	ID          string      `json:"id"`
 	Application string      `json:"application"`
 	Provider    string      `json:"provider"`
 	Host        string      `json:"host"`
@@ -249,7 +248,7 @@ type UpdateSingleResponse struct {
 	Data UpdateResponse `json:"data"`
 }
 
-func NewUpdateSingleResponse(id uuid.UUID, application string, provider string, host string, version string, state string, createdAt time.Time, updatedAt time.Time, metadata interface{}) *UpdateSingleResponse {
+func NewUpdateSingleResponse(id string, application string, provider string, host string, version string, state string, createdAt time.Time, updatedAt time.Time, metadata interface{}) *UpdateSingleResponse {
 	e := new(UpdateSingleResponse)
 	e.Data.ID = id
 	e.Data.Application = application
@@ -290,7 +289,7 @@ func NewUpdatePageResponse(content []*UpdateResponse, page int, pageSize int, or
 }
 
 type WebhookResponse struct {
-	ID         uuid.UUID `json:"id"`
+	ID         string    `json:"id"`
 	Label      string    `json:"label"`
 	Type       string    `json:"type"`
 	IgnoreHost bool      `json:"ignoreHost"`
@@ -303,7 +302,7 @@ type WebhookSingleResponse struct {
 	Data WebhookResponse `json:"data"`
 }
 
-func NewWebhookSingleResponse(id uuid.UUID, label string, t string, ignoreHost bool, token string, createdAt time.Time, updatedAt time.Time) *WebhookSingleResponse {
+func NewWebhookSingleResponse(id string, label string, t string, ignoreHost bool, token string, createdAt time.Time, updatedAt time.Time) *WebhookSingleResponse {
 	e := new(WebhookSingleResponse)
 	e.Data.ID = id
 	e.Data.Label = label
@@ -338,7 +337,7 @@ func NewWebhookPageResponse(content []*WebhookResponse, page int, pageSize int, 
 }
 
 type EventResponse struct {
-	ID        uuid.UUID   `json:"id"`
+	ID        string      `json:"id"`
 	Name      string      `json:"name"`
 	CreatedAt time.Time   `json:"createdAt"`
 	UpdatedAt time.Time   `json:"updatedAt"`
@@ -349,7 +348,7 @@ type EventSingleResponse struct {
 	Data EventResponse `json:"data"`
 }
 
-func NewEventSingleResponse(id uuid.UUID, name string, createdAt time.Time, updatedAt time.Time, payload interface{}) *EventSingleResponse {
+func NewEventSingleResponse(id string, name string, createdAt time.Time, updatedAt time.Time, payload interface{}) *EventSingleResponse {
 	e := new(EventSingleResponse)
 	e.Data.ID = id
 	e.Data.Name = name
@@ -369,23 +368,23 @@ type EventWindowResponse struct {
 }
 
 type EventPayloadUpdateCreatedDto struct {
-	ID          uuid.UUID `json:"id,omitempty"`
-	Application string    `json:"application,omitempty"`
-	Provider    string    `json:"provider,omitempty"`
-	Host        string    `json:"host,omitempty"`
-	Version     string    `json:"version,omitempty"`
-	State       string    `json:"state,omitempty"`
+	ID          string `json:"id,omitempty"`
+	Application string `json:"application,omitempty"`
+	Provider    string `json:"provider,omitempty"`
+	Host        string `json:"host,omitempty"`
+	Version     string `json:"version,omitempty"`
+	State       string `json:"state,omitempty"`
 }
 
 type EventPayloadUpdateUpdatedDto struct {
-	ID           uuid.UUID `json:"id,omitempty"`
-	Application  string    `json:"application,omitempty"`
-	Provider     string    `json:"provider,omitempty"`
-	Host         string    `json:"host,omitempty"`
-	VersionPrior string    `json:"versionPrior,omitempty"`
-	Version      string    `json:"version,omitempty"`
-	StatePrior   string    `json:"statePrior,omitempty"`
-	State        string    `json:"state,omitempty"`
+	ID           string `json:"id,omitempty"`
+	Application  string `json:"application,omitempty"`
+	Provider     string `json:"provider,omitempty"`
+	Host         string `json:"host,omitempty"`
+	VersionPrior string `json:"versionPrior,omitempty"`
+	Version      string `json:"version,omitempty"`
+	StatePrior   string `json:"statePrior,omitempty"`
+	State        string `json:"state,omitempty"`
 }
 
 type EventPayloadUpdateDeletedDto struct {
@@ -408,7 +407,7 @@ func NewEventWindowResponse(content []*EventResponse, size int, skip int, orderB
 }
 
 type SecretResponse struct {
-	ID        uuid.UUID `json:"id"`
+	ID        string    `json:"id"`
 	Key       string    `json:"key"`
 	Value     string    `json:"value,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
@@ -419,7 +418,7 @@ type SecretSingleResponse struct {
 	Data SecretResponse `json:"data"`
 }
 
-func NewSecretSingleResponse(id uuid.UUID, key string, value string, createdAt time.Time, updatedAt time.Time) *SecretSingleResponse {
+func NewSecretSingleResponse(id string, key string, value string, createdAt time.Time, updatedAt time.Time) *SecretSingleResponse {
 	e := new(SecretSingleResponse)
 	e.Data.ID = id
 	e.Data.Key = key
@@ -444,7 +443,7 @@ func NewSecretPageResponse(content []*SecretResponse) *SecretPageResponse {
 }
 
 type ConstantResponse struct {
-	ID        uuid.UUID `json:"id"`
+	ID        string    `json:"id"`
 	Key       string    `json:"key"`
 	Value     string    `json:"value,omitempty"`
 	CreatedAt time.Time `json:"createdAt"`
@@ -455,7 +454,7 @@ type ConstantSingleResponse struct {
 	Data ConstantResponse `json:"data"`
 }
 
-func NewConstantSingleResponse(id uuid.UUID, key string, value string, createdAt time.Time, updatedAt time.Time) *ConstantSingleResponse {
+func NewConstantSingleResponse(id string, key string, value string, createdAt time.Time, updatedAt time.Time) *ConstantSingleResponse {
 	e := new(ConstantSingleResponse)
 	e.Data.ID = id
 	e.Data.Key = key
@@ -480,7 +479,7 @@ func NewConstantPageResponse(content []*ConstantResponse) *ConstantPageResponse 
 }
 
 type ActionResponse struct {
-	ID               uuid.UUID   `json:"id"`
+	ID               string      `json:"id"`
 	Label            string      `json:"label"`
 	Type             string      `json:"type"`
 	MatchEvent       *string     `json:"matchEvent,omitempty"`
@@ -497,7 +496,7 @@ type ActionSingleResponse struct {
 	Data ActionResponse `json:"data"`
 }
 
-func NewActionSingleResponse(id uuid.UUID, label string, t string, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool, createdAt time.Time, updatedAt time.Time) *ActionSingleResponse {
+func NewActionSingleResponse(id string, label string, t string, matchEvent *string, matchHost *string, matchApplication *string, matchProvider *string, payload interface{}, enabled bool, createdAt time.Time, updatedAt time.Time) *ActionSingleResponse {
 	e := new(ActionSingleResponse)
 	e.Data.ID = id
 	e.Data.Label = label
@@ -552,7 +551,7 @@ func NewActionTestSingleResponse(success bool, message string) *ActionTestSingle
 }
 
 type ActionInvocationResponse struct {
-	ID         uuid.UUID `json:"id"`
+	ID         string    `json:"id"`
 	RetryCount int       `json:"retryCount"`
 	State      string    `json:"state"`
 	Message    *string   `json:"message,omitempty"`
@@ -566,7 +565,7 @@ type ActionInvocationSingleResponse struct {
 	Data ActionInvocationResponse `json:"data"`
 }
 
-func NewActionInvocationSingleResponse(id uuid.UUID, retryCount int, state string, message *string, actionId string, eventId string, createdAt time.Time, updatedAt time.Time) *ActionInvocationSingleResponse {
+func NewActionInvocationSingleResponse(id string, retryCount int, state string, message *string, actionId string, eventId string, createdAt time.Time, updatedAt time.Time) *ActionInvocationSingleResponse {
 	e := new(ActionInvocationSingleResponse)
 	e.Data.ID = id
 	e.Data.RetryCount = retryCount
@@ -602,7 +601,7 @@ func NewActionInvocationPageResponse(content []*ActionInvocationResponse, page i
 }
 
 type FilterPresetResponse struct {
-	ID         uuid.UUID `json:"id"`
+	ID         string    `json:"id"`
 	Type       string    `json:"type"`
 	Label      string    `json:"label"`
 	Parameters string    `json:"parameters"`
@@ -615,7 +614,7 @@ type FilterPresetSingleResponse struct {
 	Data FilterPresetResponse `json:"data"`
 }
 
-func NewFilterPresetSingleResponse(id uuid.UUID, t string, label string, parameters string, color *string, createdAt time.Time, updatedAt time.Time) *FilterPresetSingleResponse {
+func NewFilterPresetSingleResponse(id string, t string, label string, parameters string, color *string, createdAt time.Time, updatedAt time.Time) *FilterPresetSingleResponse {
 	e := new(FilterPresetSingleResponse)
 	e.Data.ID = id
 	e.Data.Type = t

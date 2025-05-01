@@ -36,7 +36,7 @@ func (h *WebhookHandler) Paginate(c *gin.Context) {
 
 	for _, e := range webhooks {
 		data = append(data, &api.WebhookResponse{
-			ID:         e.ID,
+			ID:         e.ID.String(),
 			Label:      e.Label,
 			Type:       e.Type,
 			IgnoreHost: e.IgnoreHost,
@@ -70,7 +70,7 @@ func (h *WebhookHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID, e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) Create(c *gin.Context) {
@@ -89,7 +89,7 @@ func (h *WebhookHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID, e.Label, e.Type, e.IgnoreHost, e.Token, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.Token, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) UpdateLabel(c *gin.Context) {
@@ -115,7 +115,7 @@ func (h *WebhookHandler) UpdateLabel(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID, e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) UpdateIgnoreHost(c *gin.Context) {
@@ -141,7 +141,7 @@ func (h *WebhookHandler) UpdateIgnoreHost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID, e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) Delete(c *gin.Context) {

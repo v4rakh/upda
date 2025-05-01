@@ -37,7 +37,7 @@ func (h *FilterPresetHandler) GetByType(c *gin.Context) {
 
 	for _, e := range filters {
 		data = append(data, &api.FilterPresetResponse{
-			ID:         e.ID,
+			ID:         e.ID.String(),
 			Type:       e.Type,
 			Label:      e.Label,
 			Parameters: e.Parameters,
@@ -66,7 +66,7 @@ func (h *FilterPresetHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewFilterPresetSingleResponse(e.ID, e.Type, e.Label, e.Parameters, e.Color, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewFilterPresetSingleResponse(e.ID.String(), e.Type, e.Label, e.Parameters, e.Color, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *FilterPresetHandler) Delete(c *gin.Context) {

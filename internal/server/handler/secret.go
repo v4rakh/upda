@@ -30,7 +30,7 @@ func (h *SecretHandler) GetAll(c *gin.Context) {
 
 	for _, e := range secrets {
 		data = append(data, &api.SecretResponse{
-			ID:        e.ID,
+			ID:        e.ID.String(),
 			Key:       e.Key,
 			CreatedAt: e.CreatedAt,
 			UpdatedAt: e.UpdatedAt,
@@ -56,7 +56,7 @@ func (h *SecretHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewSecretSingleResponse(e.ID, e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewSecretSingleResponse(e.ID.String(), e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *SecretHandler) UpdateValue(c *gin.Context) {
@@ -82,7 +82,7 @@ func (h *SecretHandler) UpdateValue(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewSecretSingleResponse(e.ID, e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewSecretSingleResponse(e.ID.String(), e.Key, e.Value, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *SecretHandler) Get(c *gin.Context) {
@@ -100,7 +100,7 @@ func (h *SecretHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewSecretSingleResponse(e.ID, e.Key, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewSecretSingleResponse(e.ID.String(), e.Key, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *SecretHandler) Delete(c *gin.Context) {

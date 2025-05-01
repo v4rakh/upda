@@ -35,7 +35,7 @@ func (h *EventHandler) Window(c *gin.Context) {
 
 	for _, e := range events {
 		data = append(data, &api.EventResponse{
-			ID:        e.ID,
+			ID:        e.ID.String(),
 			Name:      e.Name,
 			CreatedAt: e.CreatedAt,
 			UpdatedAt: e.UpdatedAt,
@@ -66,7 +66,7 @@ func (h *EventHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewEventSingleResponse(e.ID, e.Name, e.CreatedAt, e.UpdatedAt, e.Payload))
+	c.JSON(http.StatusOK, api.NewEventSingleResponse(e.ID.String(), e.Name, e.CreatedAt, e.UpdatedAt, e.Payload))
 }
 
 func (h *EventHandler) Delete(c *gin.Context) {

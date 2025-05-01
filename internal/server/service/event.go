@@ -29,7 +29,7 @@ func (s *EventService) CreateUpdateCreated(e *model.Update) *model.Event {
 	}
 
 	s.CreateWithWarnOnly(constant.EventNameUpdateCreated, &api.EventPayloadUpdateCreatedDto{
-		ID:          e.ID,
+		ID:          e.ID.String(),
 		Application: e.Application,
 		Provider:    e.Provider,
 		Host:        e.Host,
@@ -56,7 +56,7 @@ func (s *EventService) CreateUpdateUpdated(old *model.Update, new *model.Update)
 	}
 
 	s.CreateWithWarnOnly(eventName, &api.EventPayloadUpdateUpdatedDto{
-		ID:           new.ID,
+		ID:           new.ID.String(),
 		Application:  new.Application,
 		Provider:     new.Provider,
 		Host:         new.Host,
