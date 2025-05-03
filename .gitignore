@@ -10,6 +10,9 @@ bin/
 *.out
 go.work
 
+### Nix ###
+result
+
 ### GoLand/Intellij ###
 .idea/
 *.iml

@@ -43,13 +43,38 @@ Be aware that some are false positives and actually required.
 
 ### Getting started
 
-Please see the `Makefile` for all available commands.
+The most straight forward way to get started is by looking into available commands inside the `Makefile`.
 
-You can also use [direnv](https://github.com/direnv/direnv) to load the environment variables from `.env` file. Copy
-`.env.example` to `.env` and adjust the values accordingly.
+For the full setup, you need the following tools:
+
+- go (see minimum version in `go.mod`)
+- pnpm and node (see version constraints in `package.json`)
+- make to execute commands of the `Makefile`
+
+Though, when you're familiar with [direnv](https://github.com/direnv/direnv) or even the package
+manager [nix](https://nixos.org/), you can achieve a full and easy setup when you go into the project's directory.
+
+#### `direnv` / `nix-direnv`
+
+This project can optionally use [direnv](https://github.com/direnv/direnv) (
+or [nix-direnv](https://github.com/nix-community/nix-direnv) with `nix`) to automatically load environment variables
+from an `.env` file. Copy `.env.example` to `.env` and adjust the values accordingly.
 
 When you change directory into the project, the environment variables are automatically loaded after you've allowed
 `direnv` with `direnv allow`.
+
+#### Nix Flakes
+
+_In addition_, the project hosts a `flake.nix` and a `flake.lock` file. You can safely ignore them if you don't like to
+use this method of bootstrapping your environment to work with this application. This setup though allows to easily have
+an environment set up for this application by installing necessary required binaries without modifying your OS
+installation. This is done through the package manager [nix](https://nixos.org/) which automatically installs everything
+necessary under a _devShell_ (development shell). From shell which you can enter via `nix develop` inside the project's
+root directory, all the above tools are available.
+To automate it even further, [nix-direnv](https://github.com/nix-community/nix-direnv) recognises when you change
+directory (or open an IDE terminal) within this project (similar to `direnv` itself).
+
+**Keep in mind that the project itself is not available as flake.**
 
 ### Pre-requisites
 
