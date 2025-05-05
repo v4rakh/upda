@@ -1,33 +1,19 @@
 inputs:
-  loadImageServer:
-    description: "load image, so it's available after build and thus not automatically removed"
-    required: true
-    type: boolean
-  loadImageStandaloneWebInterface:
+  loadImage:
     description: "load image, so it's available after build and thus not automatically removed"
     required: true
     type: boolean
 runs:
   using: "composite"
   steps:
-    - name: OCI - [SERVER] build
+    - name: OCI - build
       uses: docker/build-push-action@v4
       with:
         push: false
         context: .
-        load: ${{ inputs.loadImageServer }}
+        load: ${{ inputs.loadImage }}
         no-cache: true
         build-args: |
           VERSION=${{ github.sha }}
         tags: |
           varakh/upda:${{ github.sha }}
-
-    - name: OCI - [STANDALONE_WEB_INTERFACE] build"
-      uses: docker/build-push-action@v4
-      with:
-        push: false
-        context: ./internal/server/web/
-        load: ${{ inputs.loadImageStandaloneWebInterface }}
-        no-cache: true
-        tags: |
-          varakh/upda-standalone-webinterface:${{ github.sha }}

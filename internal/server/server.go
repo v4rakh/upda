@@ -119,50 +119,25 @@ func Start(c context.Context) {
 	authHandler := handler.NewAuthHandler()
 
 	// embedded frontend
-	// in production mode, the frontend is embedded on / during compile time utilizing -tags prod
-	// if the prod tag is missing, development setup is used and a dummy frontend is shown on /
 	if cfg.EmbeddedWebInterface.Enabled {
-		var targetPath string
-		if cfg.App.Development {
-			targetPath = "web_dev"
-		} else {
-			targetPath = "web/build"
-		}
-		var embeddedFolder ginstatic.ServeFileSystem
-		if embeddedFolder, err = ginstatic.EmbedFolder(embeddedFiles, targetPath); err != nil {
-			zap.L().Sugar().Fatalf("Cannot serve embedded folder: %s", err.Error())
-		}
-		router.Use(ginstatic.Serve(fmt.Sprintf("%s", cfg.Server.BasePath), embeddedFolder))
-
 		if !cfg.App.Development {
-			embeddedFrontendGroup := router.Group(fmt.Sprintf("%s", cfg.Server.BasePath))
-			embeddedFrontendGroup.GET("/conf/runtime-config.js", func(c *gin.Context) {
-				runtimeConfig := `
-const runtime_config = Object.freeze({
-  VITE_BASE_PATH: '/',
-  VITE_API_URL: '%s',
-  VITE_TITLE: '%s',
-  VITE_ENABLE_DARK_THEME: %d,
-  VITE_ENABLE_FOOTER: %d
-});
-
-Object.defineProperty(window, 'runtime_config', {
-    value: runtime_config,
-    writable: false
-});
-	`
-				webDarkThemeEnabled := 0
-				if cfg.EmbeddedWebInterface.DarkThemeEnabled {
-					webDarkThemeEnabled = 1
-				}
-				webEnableFooter := 0
-				if cfg.EmbeddedWebInterface.FooterEnabled {
-					webEnableFooter = 1
-				}
-
-				c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(runtimeConfig, cfg.EmbeddedWebInterface.ApiUrl, cfg.EmbeddedWebInterface.Title, webDarkThemeEnabled, webEnableFooter)))
-			})
+			embeddedWebinterfaceHandler := handler.NewEmbeddedWebInterfaceHandler(cfg.EmbeddedWebInterface)
+			router.GET(fmt.Sprintf("%sui/conf/runtime-config.js", cfg.Server.BasePath), embeddedWebinterfaceHandler.GetConfig)
 		}
+
+		// in production mode, the frontend is embedded on SERVER_BASE_PATH during compile time utilizing -tags prod
+		// if the prod tag is missing, development setup is used and a dummy frontend is shown on SERVER_BASE_PATH
+		targetFSPath := "web/build"
+		if cfg.App.Development {
+			targetFSPath = "web_dev"
+		}
+		var embeddedWebinterfaceFolderFS ginstatic.ServeFileSystem
+		if embeddedWebinterfaceFolderFS, err = ginstatic.EmbedFolder(embeddedWebinterfaceFS, targetFSPath); err != nil {
+			zap.L().Sugar().Fatalf("Cannot serve embedded webinterface folder: %s", err.Error())
+		}
+
+		router.GET(cfg.Server.BasePath, middlewareRedirect("ui/"))
+		router.Use(middlewareFSRewrite(fmt.Sprintf("%sui", cfg.Server.BasePath), embeddedWebinterfaceFolderFS))
 	}
 
 	apiPublicGroup := router.Group(fmt.Sprintf("%s/api/v1", cfg.Server.BasePath))
@@ -273,7 +248,6 @@ Object.defineProperty(window, 'runtime_config', {
 	if err = srv.Shutdown(ctx); err != nil {
 		zap.L().Sugar().Fatalf("Shutdown failed, exited directly: %v", err)
 	}
-	// catching ctx.Done() for configured timeout
 	select {
 	case <-ctx.Done():
 		zap.L().Sugar().Infof("Shutdown timeout of '%v' expired, exiting...", cfg.Server.Timeout)

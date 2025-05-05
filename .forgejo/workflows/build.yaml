@@ -21,5 +21,4 @@ jobs:
       - uses: ./.forgejo/actions/oci-build
         name: OCI build
         with:
-          loadImageServer: false
-          loadImageStandaloneWebInterface: false
+          loadImage: false

@@ -94,7 +94,7 @@ start the frontend separately.
 
 If you like to have a look on the _production_ experience, the frontend needs to be build first, and you need to build
 the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
-the `Makefile` (additional `rm -rf` cmd).
+the `Makefile` (additional `rm -rf` cmd!).
 
 ### Windows hints
 

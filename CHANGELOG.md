@@ -2,6 +2,10 @@
 
 ## Rolling
 
+### 2025-05-05
+
+* ❗ **breaking**: allow sub-path deployments for embedded webinterface (don't ship standalone webinterface anymore)
+
 ### 2025-04-23
 
 * 🚀 Improve performance for card grids

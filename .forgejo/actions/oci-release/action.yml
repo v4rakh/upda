@@ -38,16 +38,3 @@ runs:
         tags: |
           git.myservermanager.com/varakh/upda:latest
           git.myservermanager.com/varakh/upda:${{ inputs.version }}
-
-    - name: "OCI - [STANDALONE_WEB_INTERFACE] build and push
-      uses: docker/build-push-action@v4
-      with:
-        push: true
-        context: ./internal/server/web/
-        load: false
-        no-cache: true
-        build-args: |
-          VERSION=${{ github.sha }}
-        tags: |
-          git.myservermanager.com/varakh/upda-standalone-webinterface:latest
-          git.myservermanager.com/varakh/upda-standalone-webinterface:${{ inputs.version }}

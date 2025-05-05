@@ -57,7 +57,6 @@ test-web-unit:
 
 run-server:
 	@$(GO) run -ldflags="$(LDFLAGS)" ${CMD_GO_FILES} server serve
-
 run-web:
 	@cd ${WEB_DIR}; $(PNPM) start
 

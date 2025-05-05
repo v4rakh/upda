@@ -66,18 +66,6 @@ reasonable defaults.
 | `TZ`                                        | The time zone (**recommended** to set it properly, background tasks depend on it). Defaults to `Etc/UTC`, can be any time zone according to _tz database_.                                                                                                                    |
 | `WEBHOOKS_TOKEN_LENGTH`                     | The length of the token. Defaults to `30`, positive number                                                                                                                                                                                                                    |
 
-The standalone web interface has the following configuration values (docker image only).
-
-| Variable                 | Purpose                                                                                                                                                     |
-|:-------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `NGINX_BASE_PATH`        | The NGINX base path for the application, must end with trailing slash. Defaults to `/`.                                                                     |
-| `NGINX_PORT`             | The NGINX exposed port. Defaults to `80`.                                                                                                                   |
-| `VITE_API_URL`           | The application's API URL. Not set.                                                                                                                         |
-| `VITE_BASE_PATH`         | The application's base path (depends on routing, default should do, otherwise align with `NGINX_BASE_PATH`), must end with trailing slash. Defaults to `/`. |
-| `VITE_ENABLE_DARK_THEME` | If dark theme is enabled, can be `0` = no or `1` = yes. Defaults to `0`.                                                                                    |
-| `VITE_ENABLE_FOOTER`     | If footer is enabled, can be `0` = no or `1` = yes. Defaults to `1`.                                                                                        |
-| `VITE_TITLE`             | The application's title. Defaults to `upda`.                                                                                                                |
-
 ## Database migration
 
 By default, _upda_ runs database migrations (`DB_MIGRATION_ENABLED`) to create the necessary database schema it uses.
