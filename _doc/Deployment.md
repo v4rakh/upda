@@ -1,14 +1,11 @@
 # Deployment
 
 _upda_ is a server application which embeds a web interface directly in its binary form (can be disabled). This makes it
-easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The `upda` binary is a
-command-line helper to quickly invoke webhooks or list tracked updates in your instance is also embedded into
-the docker image, but can also be downloaded for your operating system.
+easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The `upda` binary can manage the
+server and other is a helper commands to quickly invoke webhooks or list tracked updates in your instance.
 
 Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup on sub
 path of your existing domain), pick one of the below **deployment** options.
-
-Keep in mind that _upda_ does not support sub path deployments with the embedded web interface.
 
 The following sections outline how to deploy _upda_ in a containerized environment and also natively.
 
@@ -43,7 +40,7 @@ services:
         container_name: upda_app
         image: git.myservermanager.com/varakh/upda:latest
         environment:
-            - EMBEDDED_WEB_INTERFACE_API_URL=https://upda.domain.tld/api/v1/
+            - WEB_INTERFACE_API_URL=https://upda.domain.tld/api/v1/
             - TZ=Europe/Berlin
             - DB_POSTGRES_TZ=Europe/Berlin
             - DB_POSTGRES_HOST=db
@@ -85,7 +82,7 @@ volumes:
 
 Use the [deployment on a (sub)domain](#docker-compose-deployment-on-a-subdomain) as starting point and adapt your
 `docker-compose.yaml` file accordingly. Let's assume you like to deploy under the `/upda-app` base path, then add
-`SERVER_BASE_PATH=/upda-app/`. Make sure to adapt `EMBEDDED_WEB_INTERFACE_API_URL=https://domain.tld/upda-app/api/v1/`
+`SERVER_BASE_PATH=/upda-app/`. Make sure to adapt `WEB_INTERFACE_API_URL=https://domain.tld/upda-app/api/v1/`
 as well.
 
 Next, look into the fitting [reverse proxy setup](#reverse-proxy) or decide if you

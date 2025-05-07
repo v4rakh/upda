@@ -2,6 +2,11 @@
 
 ## Rolling
 
+### 2025-05-07
+
+* ❗**breaking**: Rename `EMBEDDED_WEB_INTERFACE_` environment variable prefix to `WEB_INTERFACE_` only
+* 🚀 Configure cache control for web interface with `WEB_INTERFACE_CC_` prefixed environment variables
+
 ### 2025-05-05
 
 * ❗ **breaking**: allow sub-path deployments for embedded webinterface (don't ship standalone webinterface anymore)

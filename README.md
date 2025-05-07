@@ -12,7 +12,7 @@ See **[official documentation](./_doc/Home.md)**.
 
 ## Development & contribution
 
-There's also an [embedded frontend](#embedded-frontend).
+There's also a [web interface](#web-interface).
 
 See [getting started](#getting-started) for setting up the development environment.
 
@@ -34,7 +34,7 @@ See [getting started](#getting-started) for setting up the development environme
     * Utils can throw any error
     * Repositories, handlers and services should always properly return `error` including any `init`-like function (
       best to avoid them and call in `newXXX`). **Do not abort with `Fatalf` or similar**
-    * `log.Fatalf` or `zap.L().Fatal` is allowed in `environment.go` or `app.go`
+    * `log.Fatalf` or `zap.L().Fatal` is allowed in `environment.go` or `server.go`
 * Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml).
 * Consider reading [Effective Go](https://go.dev/doc/effective_go)
 * Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
@@ -56,7 +56,7 @@ When you change directory into the project, the environment variables are automa
 Ensure to set the following environment variables for proper debug logs during development
 
 ```shell
-EMBEDDED_WEB_INTERFACE_ENABLED=false
+WEB_INTERFACE_ENABLED=false
 DEVELOPMENT=true
 LOGGING_ENCODING=console
 LOGGING_LEVEL=debug
@@ -84,12 +84,12 @@ docker run --name some-redis \
   redis redis-server --save 60 1 --loglevel warning
 ```
 
-### Embedded Frontend
+### Web interface
 
 _upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
 embedded into the GoLang binary itself.
 
-For _development_, no other steps are required. Simply follow the [frontend instructions](./server/web/README.md) and
+For _development_, no other steps are required. Simply follow the [frontend instructions](./internal/server/web/README.md) and
 start the frontend separately.
 
 If you like to have a look on the _production_ experience, the frontend needs to be build first, and you need to build

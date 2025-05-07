@@ -51,18 +51,21 @@ type Secret struct {
 }
 
 type Server struct {
-	Port                 int           `env:"SERVER_PORT,default=8080" validate:"gte=1"`
-	Listen               string        `env:"SERVER_LISTEN"`
-	BasePath             string        `env:"SERVER_BASE_PATH,default=/" validate:"required"`
-	TlsEnabled           bool          `env:"SERVER_TLS_ENABLED,default=false"`
-	TlsCertPath          string        `env:"SERVER_TLS_CERT_PATH"`
-	TlsKeyPath           string        `env:"SERVER_TLS_KEY_PATH"`
-	Timeout              time.Duration `env:"SERVER_TIMEOUT,default=1s" validate:"gte=0"`
-	CorsAllowCredentials bool          `env:"CORS_ALLOW_CREDENTIALS,default=true"`
-	CorsAllowOrigins     []string      `env:"CORS_ALLOW_ORIGINS,default=*"`
-	CorsAllowMethods     []string      `env:"CORS_ALLOW_METHODS,default=HEAD,GET,POST,PUT,PATCH,DELETE,OPTIONS"`
-	CorsAllowHeaders     []string      `env:"CORS_ALLOW_HEADERS,default=Authorization,Content-Type"`
-	CorsExposeHeaders    []string      `env:"CORS_EXPOSE_HEADERS,default=*"`
+	Port        int           `env:"SERVER_PORT,default=8080" validate:"gte=1"`
+	Listen      string        `env:"SERVER_LISTEN"`
+	BasePath    string        `env:"SERVER_BASE_PATH,default=/" validate:"required"`
+	TlsEnabled  bool          `env:"SERVER_TLS_ENABLED,default=false"`
+	TlsCertPath string        `env:"SERVER_TLS_CERT_PATH"`
+	TlsKeyPath  string        `env:"SERVER_TLS_KEY_PATH"`
+	Timeout     time.Duration `env:"SERVER_TIMEOUT,default=1s" validate:"gte=0"`
+}
+
+type Cors struct {
+	AllowCredentials bool     `env:"CORS_ALLOW_CREDENTIALS,default=true"`
+	AllowOrigins     []string `env:"CORS_ALLOW_ORIGINS,default=*"`
+	AllowMethods     []string `env:"CORS_ALLOW_METHODS,default=HEAD,GET,POST,PUT,PATCH,DELETE,OPTIONS"`
+	AllowHeaders     []string `env:"CORS_ALLOW_HEADERS,default=Authorization,Content-Type"`
+	ExposeHeaders    []string `env:"CORS_EXPOSE_HEADERS,default=*"`
 }
 
 type Database struct {
@@ -76,12 +79,28 @@ type Database struct {
 	PostgresPassword string `env:"DB_POSTGRES_PASSWORD" validate:"required_if=Type postgres"`
 }
 
-type EmbeddedWebInterface struct {
-	Enabled          bool   `env:"EMBEDDED_WEB_INTERFACE_ENABLED,default=true"`
-	ApiUrl           string `env:"EMBEDDED_WEB_INTERFACE_API_URL,default=http://localhost:8080" validate:"required_if=Enabled true"`
-	Title            string `env:"EMBEDDED_WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
-	DarkThemeEnabled bool   `env:"EMBEDDED_WEB_INTERFACE_DARK_THEME_ENABLED,default=false"`
-	FooterEnabled    bool   `env:"EMBEDDED_WEB_INTERFACE_FOOTER_ENABLED,default=true"`
+type Webinterface struct {
+	Enabled          bool   `env:"WEB_INTERFACE_ENABLED,default=true"`
+	ApiUrl           string `env:"WEB_INTERFACE_API_URL,default=http://localhost:8080" validate:"required_if=Enabled true"`
+	Title            string `env:"WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
+	DarkThemeEnabled bool   `env:"WEB_INTERFACE_DARK_THEME_ENABLED,default=false"`
+	FooterEnabled    bool   `env:"WEB_INTERFACE_FOOTER_ENABLED,default=true"`
+}
+
+type WebinterfaceCacheControl struct {
+	Enabled              bool           `env:"WEB_INTERFACE_CC_ENABLED,default=true"`
+	MustRevalidate       bool           `env:"WEB_INTERFACE_CC_MUST_REVALIDATE,default=true"`
+	NoCache              bool           `env:"WEB_INTERFACE_CC_NO_CACHE,default=false"`
+	NoStore              bool           `env:"WEB_INTERFACE_CC_NO_STORE,default=false"`
+	NoTransform          bool           `env:"WEB_INTERFACE_CC_NO_TRANSFORM,default=false"`
+	Public               bool           `env:"WEB_INTERFACE_CC_PUBLIC,default=true"`
+	Private              bool           `env:"WEB_INTERFACE_CC_PRIVATE,default=false"`
+	ProxyRevalidate      bool           `env:"WEB_INTERFACE_CC_PROXY_REVALIDATE,default=true"`
+	MaxAge               *time.Duration `env:"WEB_INTERFACE_CC_MAX_AGE,noinit,default=48h"`
+	SMaxAge              *time.Duration `env:"WEB_INTERFACE_CC_SMAX_AGE,noinit"`
+	Immutable            bool           `env:"WEB_INTERFACE_CC_IMMUTABLE,default=false"`
+	StaleWhileRevalidate *time.Duration `env:"WEB_INTERFACE_CC_STALE_WHILE_REVALIDATE,noinit"`
+	StaleIfError         *time.Duration `env:"WEB_INTERFACE_CC_STALE_IF_ERROR,noinit"`
 }
 
 type Auth struct {
@@ -133,16 +152,18 @@ type Prometheus struct {
 }
 
 type Configuration struct {
-	App                  *App
-	Auth                 *Auth
-	Database             *Database
-	EmbeddedWebInterface *EmbeddedWebInterface
-	Lock                 *Lock
-	Prometheus           *Prometheus
-	Secret               *Secret
-	Server               *Server
-	Task                 *Task
-	Webhook              *Webhook
+	App                      *App
+	Auth                     *Auth
+	Cors                     *Cors
+	Database                 *Database
+	Lock                     *Lock
+	Prometheus               *Prometheus
+	Secret                   *Secret
+	Server                   *Server
+	Task                     *Task
+	Webhook                  *Webhook
+	Webinterface             *Webinterface
+	WebinterfaceCacheControl *WebinterfaceCacheControl
 }
 
 func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
@@ -307,8 +328,8 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 
 	zap.L().Sugar().Infof("Configuration: App %+v", c.App)
 	zap.L().Sugar().Infof("Configuration: Auth ***REDACTED***")
+	zap.L().Sugar().Infof("Configuration: Cors %+v", c.Cors)
 	zap.L().Sugar().Infof("Configuration: Database ***REDACTED***")
-	zap.L().Sugar().Infof("Configuration: EmbeddedWebInterface %+v", c.EmbeddedWebInterface)
 	zap.L().Sugar().Infof("Configuration: Lock ***REDACTED***")
 	zap.L().Sugar().Infof("Configuration: Logging %+v", lc)
 	zap.L().Sugar().Infof("Configuration: Prometheus ***REDACTED***")
@@ -316,6 +337,8 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	zap.L().Sugar().Infof("Configuration: Server %+v", c.Server)
 	zap.L().Sugar().Infof("Configuration: Task %+v", c.Task)
 	zap.L().Sugar().Infof("Configuration: Webhook %+v", c.Webhook)
+	zap.L().Sugar().Infof("Configuration: Webinterface %+v", c.Webinterface)
+	zap.L().Sugar().Infof("Configuration: WebinterfaceCacheControl %+v", c.WebinterfaceCacheControl)
 
 	return &c, db
 }

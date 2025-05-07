@@ -41,7 +41,7 @@ func Start(c context.Context) {
 	router := gin.New()
 	router.Use(ginzap.Ginzap(zap.L(), time.RFC3339, false))
 	router.Use(ginzap.RecoveryWithZap(zap.L(), true))
-	router.Use(middlewareCors(cfg.Server))
+	router.Use(middlewareCors(cfg.Cors))
 	router.Use(middlewareAppName())
 	router.Use(middlewareAppVersion())
 	router.Use(middlewareErrorHandler())
@@ -118,26 +118,23 @@ func Start(c context.Context) {
 	healthHandler := handler.NewHealthHandler()
 	authHandler := handler.NewAuthHandler()
 
-	// embedded frontend
-	if cfg.EmbeddedWebInterface.Enabled {
-		if !cfg.App.Development {
-			embeddedWebinterfaceHandler := handler.NewEmbeddedWebInterfaceHandler(cfg.EmbeddedWebInterface)
-			router.GET(fmt.Sprintf("%sui/conf/runtime-config.js", cfg.Server.BasePath), embeddedWebinterfaceHandler.GetConfig)
-		}
+	// in production, the web interface is served on SERVER_BASE_PATH, build with go flag -tags prod is required
+	if cfg.Webinterface.Enabled && !cfg.App.Development {
+		cacheControl := middlewareCacheControl(cfg.WebinterfaceCacheControl)
+		webinterfaceHandler := handler.NewWebinterfaceHandler(cfg.Webinterface)
+		router.GET(fmt.Sprintf("%sui/conf/runtime-config.js", cfg.Server.BasePath), cacheControl, webinterfaceHandler.GetConfig)
 
-		// in production mode, the frontend is embedded on SERVER_BASE_PATH during compile time utilizing -tags prod
-		// if the prod tag is missing, development setup is used and a dummy frontend is shown on SERVER_BASE_PATH
 		targetFSPath := "web/build"
-		if cfg.App.Development {
-			targetFSPath = "web_dev"
-		}
-		var embeddedWebinterfaceFolderFS ginstatic.ServeFileSystem
-		if embeddedWebinterfaceFolderFS, err = ginstatic.EmbedFolder(embeddedWebinterfaceFS, targetFSPath); err != nil {
-			zap.L().Sugar().Fatalf("Cannot serve embedded webinterface folder: %s", err.Error())
+		var webinterfaceFolderFS ginstatic.ServeFileSystem
+		if webinterfaceFolderFS, err = ginstatic.EmbedFolder(webinterfaceFS, targetFSPath); err != nil {
+			zap.L().Sugar().Fatalf("Cannot serve webinterface folder: %s", err.Error())
 		}
 
 		router.GET(cfg.Server.BasePath, middlewareRedirect("ui/"))
-		router.Use(middlewareFSRewrite(fmt.Sprintf("%sui", cfg.Server.BasePath), embeddedWebinterfaceFolderFS))
+		if "/" != cfg.Server.BasePath {
+			router.GET("", middlewareRedirect(fmt.Sprintf("%sui/", cfg.Server.BasePath)))
+		}
+		router.Use(middlewareFSRewrite(fmt.Sprintf("%sui", cfg.Server.BasePath), webinterfaceFolderFS, &cacheControl))
 	}
 
 	apiPublicGroup := router.Group(fmt.Sprintf("%s/api/v1", cfg.Server.BasePath))

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-contrib/cors"
 	ginstatic "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"go.eigsys.de/gin-cachecontrol/v2"
 	"io"
 	"mime"
 	"net/http"
@@ -18,14 +19,38 @@ import (
 )
 
 // middlewareCors applies CORS configuration
-func middlewareCors(c *config.Server) gin.HandlerFunc {
+func middlewareCors(c *config.Cors) gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:     c.CorsAllowOrigins,
-		AllowMethods:     c.CorsAllowMethods,
-		AllowHeaders:     c.CorsAllowHeaders,
-		AllowCredentials: c.CorsAllowCredentials,
-		ExposeHeaders:    c.CorsExposeHeaders,
+		AllowOrigins:     c.AllowOrigins,
+		AllowMethods:     c.AllowMethods,
+		AllowHeaders:     c.AllowHeaders,
+		AllowCredentials: c.AllowCredentials,
+		ExposeHeaders:    c.ExposeHeaders,
 	})
+}
+
+// middlewareCacheControl applies cache control settings
+func middlewareCacheControl(c *config.WebinterfaceCacheControl) gin.HandlerFunc {
+	if !c.Enabled {
+		return cachecontrol.New(cachecontrol.NoCachePreset)
+	}
+
+	return cachecontrol.New(
+		cachecontrol.Config{
+			MustRevalidate:       c.MustRevalidate,
+			NoCache:              c.NoCache,
+			NoStore:              c.NoStore,
+			NoTransform:          c.NoTransform,
+			Public:               c.Public,
+			Private:              c.Private,
+			ProxyRevalidate:      c.ProxyRevalidate,
+			MaxAge:               c.MaxAge,
+			SMaxAge:              c.SMaxAge,
+			Immutable:            c.Immutable,
+			StaleWhileRevalidate: c.StaleWhileRevalidate,
+			StaleIfError:         c.StaleIfError,
+		},
+	)
 }
 
 // middlewareAppName adds custom HTTP header to each request
@@ -98,8 +123,8 @@ func middlewareAppErrorRecoveryHandler() gin.HandlerFunc {
 	}
 }
 
-// middlewareFSRewrite rewrites a path to a static file system
-func middlewareFSRewrite(basePath string, fs ginstatic.ServeFileSystem) gin.HandlerFunc {
+// middlewareFSRewrite rewrites a path to a static file system allowing to provide additional gin handlers to be applied on success
+func middlewareFSRewrite(basePath string, fs ginstatic.ServeFileSystem, handlerFuncs ...*gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := c.Request.URL.Path
 		if strings.HasPrefix(p, basePath) {
@@ -122,6 +147,13 @@ func middlewareFSRewrite(basePath string, fs ginstatic.ServeFileSystem) gin.Hand
 
 			c.Status(http.StatusOK)
 			c.Header(api.HeaderContentType, mime.TypeByExtension(filepath.Ext(relPath)))
+
+			for _, h := range handlerFuncs {
+				if h != nil {
+					i := *h
+					i(c)
+				}
+			}
 
 			if _, err = io.Copy(c.Writer, f); err != nil {
 				c.Status(http.StatusInternalServerError)
