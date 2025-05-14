@@ -59,6 +59,7 @@ Ensure to set the following environment variables for proper debug logs during d
 WEB_INTERFACE_ENABLED=false
 DEVELOPMENT=true
 LOGGING_ENCODING=console
+LOGGING_ENCODING_LEVEL_ENCODER=capitalcolor
 LOGGING_LEVEL=debug
 ```
 

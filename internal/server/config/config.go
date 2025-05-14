@@ -34,11 +34,20 @@ const (
 var migrationPostgresFS embed.FS
 
 type Logging struct {
-	Level       string `env:"LOGGING_LEVEL,default=info" validate:"required,oneof=debug info warn error dpanic panic fatal"`
-	Encoding    string `env:"LOGGING_ENCODING,default=json" validate:"required,oneof=json console"`
-	Directory   string `env:"LOGGING_DIRECTORY"`
-	Debug       bool   `env:"DEBUG,default=false"`
-	Development bool   `env:"DEVELOPMENT,default=false"`
+	Debug                   bool                              `env:"DEBUG,default=false"`
+	Development             bool                              `env:"DEVELOPMENT,default=false"`
+	Directory               string                            `env:"LOGGING_DIRECTORY"`
+	Encoding                constant.ConfigLogEncoding        `env:"LOGGING_ENCODING,default=json" validate:"required,oneof=json console"`
+	EncodingCallerEncoder   constant.ConfigLogCallerEncoder   `env:"LOGGING_ENCODING_CALLER_ENCODER,default=short" validate:"required,oneof=full short"`
+	EncodingDurationEncoder constant.ConfigLogDurationEncoder `env:"LOGGING_ENCODING_DURATION_ENCODER,default=seconds" validate:"required,oneof=seconds nanos millis string"`
+	EncodingLevelEncoder    constant.ConfigLogLevelEncoder    `env:"LOGGING_ENCODING_LEVEL_ENCODER,default=lowercase" validate:"required,oneof=lowercase lowercasecolor capital capitalcolor"`
+	EncodingLevelKey        string                            `env:"LOGGING_ENCODING_LEVEL_KEY,default=level" validate:"required_if=Encoding json"`
+	EncodingMessageKey      string                            `env:"LOGGING_ENCODING_MESSAGE_KEY,default=msg" validate:"required_if=Encoding json"`
+	EncodingStacktraceKey   string                            `env:"LOGGING_ENCODING_STACKTRACE_KEY,default=stacktrace" validate:"required_if=Encoding json"`
+	EncodingTimeEncoder     constant.ConfigLogTimeEncoder     `env:"LOGGING_ENCODING_TIME_ENCODER,default=rfc3339" validate:"required,oneof=epoch epochmillis epochnanos iso8601 rfc3339 rfc3339nano"`
+	EncodingTimeKey         string                            `env:"LOGGING_ENCODING_TIME_KEY,default=ts" validate:"required_if=Encoding json"`
+	Level                   string                            `env:"LOGGING_LEVEL,default=info" validate:"required,oneof=debug info warn error dpanic panic fatal"`
+	UTC                     bool                              `env:"LOGGING_UTC"`
 }
 
 type App struct {
@@ -157,6 +166,7 @@ type Configuration struct {
 	Cors                     *Cors
 	Database                 *Database
 	Lock                     *Lock
+	Logging                  *Logging
 	Prometheus               *Prometheus
 	Secret                   *Secret
 	Server                   *Server
@@ -172,10 +182,10 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	// bootstrap logging (configured independently and required before any other action)
 	var lc Logging
 	if err = envconfig.Process(ctx, &lc); err != nil {
-		zap.L().Sugar().Fatalf("Cannot load logging configuration from environment. Reason: %v", err)
+		log.Fatalf("Cannot load logging configuration from environment. Reason: %v", err)
 	}
 	if err = validate.ValidOrError(lc); err != nil {
-		zap.L().Sugar().Fatalf("Cannot validate logging configuration. Reason: %s", err.Error())
+		log.Fatalf("Cannot validate logging configuration. Reason: %s", err)
 	}
 
 	var level zap.AtomicLevel
@@ -184,10 +194,56 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	}
 
 	var loggingEncoderConfig zapcore.EncoderConfig
-	if "json" == lc.Encoding {
+	if constant.ConfigLogEncodingJson == lc.Encoding {
 		loggingEncoderConfig = zap.NewProductionEncoderConfig()
+		loggingEncoderConfig.MessageKey = lc.EncodingMessageKey
+		loggingEncoderConfig.LevelKey = lc.EncodingLevelKey
+		loggingEncoderConfig.TimeKey = lc.EncodingTimeKey
+		loggingEncoderConfig.StacktraceKey = lc.EncodingStacktraceKey
 	} else {
 		loggingEncoderConfig = zap.NewDevelopmentEncoderConfig()
+	}
+
+	var levelEncoders = map[constant.ConfigLogLevelEncoder]zapcore.LevelEncoder{
+		constant.ConfigLogLevelEncoderLowercase:      zapcore.LowercaseLevelEncoder,
+		constant.ConfigLogLevelEncoderLowercasecolor: zapcore.LowercaseColorLevelEncoder,
+		constant.ConfigLogLevelEncoderCapital:        zapcore.CapitalLevelEncoder,
+		constant.ConfigLogLevelEncoderCapitalcolor:   zapcore.CapitalColorLevelEncoder,
+	}
+	if enc, ok := levelEncoders[lc.EncodingLevelEncoder]; ok {
+		loggingEncoderConfig.EncodeLevel = enc
+	}
+
+	var timeEncoders = map[constant.ConfigLogTimeEncoder]zapcore.TimeEncoder{
+		constant.ConfigLogTimeEncoderEpoch:       zapcore.EpochTimeEncoder,
+		constant.ConfigLogTimeEncoderEpochmillis: zapcore.EpochMillisTimeEncoder,
+		constant.ConfigLogTimeEncoderEpochnanos:  zapcore.EpochNanosTimeEncoder,
+		constant.ConfigLogTimeEncoderIso8601:     zapcore.ISO8601TimeEncoder,
+		constant.ConfigLogTimeEncoderRfc3339:     zapcore.RFC3339TimeEncoder,
+		constant.ConfigLogTimeEncoderRfc3339nano: zapcore.RFC3339NanoTimeEncoder,
+	}
+	if enc, ok := timeEncoders[lc.EncodingTimeEncoder]; ok {
+		loggingEncoderConfig.EncodeTime = enc
+	}
+
+	var durationEncoders = map[constant.ConfigLogDurationEncoder]zapcore.DurationEncoder{
+		constant.ConfigLogDurationEncoderSeconds: zapcore.SecondsDurationEncoder,
+		constant.ConfigLogDurationEncoderNanos:   zapcore.NanosDurationEncoder,
+		constant.ConfigLogDurationEncoderMillis:  zapcore.MillisDurationEncoder,
+		constant.ConfigLogDurationEncoderString:  zapcore.StringDurationEncoder,
+	}
+	if enc, ok := durationEncoders[lc.EncodingDurationEncoder]; ok {
+		loggingEncoderConfig.EncodeDuration = enc
+	}
+
+	var callerEncoders = map[constant.ConfigLogCallerEncoder]zapcore.CallerEncoder{
+		constant.ConfigLogCallerEncoderFull:  zapcore.FullCallerEncoder,
+		constant.ConfigLogCallerEncoderShort: zapcore.ShortCallerEncoder,
+	}
+	if enc, ok := callerEncoders[lc.EncodingCallerEncoder]; ok {
+		loggingEncoderConfig.EncodeCaller = enc
+	} else {
+		loggingEncoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
 	}
 
 	logPaths := []string{"stderr"}
@@ -206,7 +262,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 		zapConfig = &zap.Config{
 			Level:            level,
 			Development:      lc.Development,
-			Encoding:         lc.Encoding,
+			Encoding:         lc.Encoding.String(),
 			EncoderConfig:    loggingEncoderConfig,
 			OutputPaths:      logPaths,
 			ErrorOutputPaths: logPaths,
@@ -219,7 +275,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 				Initial:    100,
 				Thereafter: 100,
 			},
-			Encoding:         lc.Encoding,
+			Encoding:         lc.Encoding.String(),
 			EncoderConfig:    loggingEncoderConfig,
 			OutputPaths:      logPaths,
 			ErrorOutputPaths: logPaths,

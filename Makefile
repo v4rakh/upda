@@ -88,4 +88,4 @@ build-server-windows-arm64:
 build-web:
 	@cd ${WEB_DIR}; $(PNPM) run build; rm -rf build/conf
 
-.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web checkstyle checkstyle-server checkstyle-web build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web run run-server run-web
+.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web checkstyle checkstyle-server checkstyle-web build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web run run-server run-web generate generate-server

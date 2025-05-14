@@ -256,6 +256,436 @@ func (x *ConfigAuthMode) UnmarshalText(text []byte) error {
 }
 
 const (
+	// ConfigLogCallerEncoderFull is a ConfigLogCallerEncoder of type full.
+	ConfigLogCallerEncoderFull ConfigLogCallerEncoder = "full"
+	// ConfigLogCallerEncoderShort is a ConfigLogCallerEncoder of type short.
+	ConfigLogCallerEncoderShort ConfigLogCallerEncoder = "short"
+)
+
+var ErrInvalidConfigLogCallerEncoder = fmt.Errorf("not a valid ConfigLogCallerEncoder, try [%s]", strings.Join(_ConfigLogCallerEncoderNames, ", "))
+
+var _ConfigLogCallerEncoderNames = []string{
+	string(ConfigLogCallerEncoderFull),
+	string(ConfigLogCallerEncoderShort),
+}
+
+// ConfigLogCallerEncoderNames returns a list of possible string values of ConfigLogCallerEncoder.
+func ConfigLogCallerEncoderNames() []string {
+	tmp := make([]string, len(_ConfigLogCallerEncoderNames))
+	copy(tmp, _ConfigLogCallerEncoderNames)
+	return tmp
+}
+
+// ConfigLogCallerEncoderValues returns a list of the values for ConfigLogCallerEncoder
+func ConfigLogCallerEncoderValues() []ConfigLogCallerEncoder {
+	return []ConfigLogCallerEncoder{
+		ConfigLogCallerEncoderFull,
+		ConfigLogCallerEncoderShort,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigLogCallerEncoder) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigLogCallerEncoder) IsValid() bool {
+	_, err := ParseConfigLogCallerEncoder(string(x))
+	return err == nil
+}
+
+var _ConfigLogCallerEncoderValue = map[string]ConfigLogCallerEncoder{
+	"full":  ConfigLogCallerEncoderFull,
+	"short": ConfigLogCallerEncoderShort,
+}
+
+// ParseConfigLogCallerEncoder attempts to convert a string to a ConfigLogCallerEncoder.
+func ParseConfigLogCallerEncoder(name string) (ConfigLogCallerEncoder, error) {
+	if x, ok := _ConfigLogCallerEncoderValue[name]; ok {
+		return x, nil
+	}
+	return ConfigLogCallerEncoder(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigLogCallerEncoder)
+}
+
+// MustParseConfigLogCallerEncoder converts a string to a ConfigLogCallerEncoder, and panics if is not valid.
+func MustParseConfigLogCallerEncoder(name string) ConfigLogCallerEncoder {
+	val, err := ParseConfigLogCallerEncoder(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigLogCallerEncoder) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigLogCallerEncoder) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigLogCallerEncoder(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
+	// ConfigLogDurationEncoderSeconds is a ConfigLogDurationEncoder of type seconds.
+	ConfigLogDurationEncoderSeconds ConfigLogDurationEncoder = "seconds"
+	// ConfigLogDurationEncoderNanos is a ConfigLogDurationEncoder of type nanos.
+	ConfigLogDurationEncoderNanos ConfigLogDurationEncoder = "nanos"
+	// ConfigLogDurationEncoderMillis is a ConfigLogDurationEncoder of type millis.
+	ConfigLogDurationEncoderMillis ConfigLogDurationEncoder = "millis"
+	// ConfigLogDurationEncoderString is a ConfigLogDurationEncoder of type string.
+	ConfigLogDurationEncoderString ConfigLogDurationEncoder = "string"
+)
+
+var ErrInvalidConfigLogDurationEncoder = fmt.Errorf("not a valid ConfigLogDurationEncoder, try [%s]", strings.Join(_ConfigLogDurationEncoderNames, ", "))
+
+var _ConfigLogDurationEncoderNames = []string{
+	string(ConfigLogDurationEncoderSeconds),
+	string(ConfigLogDurationEncoderNanos),
+	string(ConfigLogDurationEncoderMillis),
+	string(ConfigLogDurationEncoderString),
+}
+
+// ConfigLogDurationEncoderNames returns a list of possible string values of ConfigLogDurationEncoder.
+func ConfigLogDurationEncoderNames() []string {
+	tmp := make([]string, len(_ConfigLogDurationEncoderNames))
+	copy(tmp, _ConfigLogDurationEncoderNames)
+	return tmp
+}
+
+// ConfigLogDurationEncoderValues returns a list of the values for ConfigLogDurationEncoder
+func ConfigLogDurationEncoderValues() []ConfigLogDurationEncoder {
+	return []ConfigLogDurationEncoder{
+		ConfigLogDurationEncoderSeconds,
+		ConfigLogDurationEncoderNanos,
+		ConfigLogDurationEncoderMillis,
+		ConfigLogDurationEncoderString,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigLogDurationEncoder) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigLogDurationEncoder) IsValid() bool {
+	_, err := ParseConfigLogDurationEncoder(string(x))
+	return err == nil
+}
+
+var _ConfigLogDurationEncoderValue = map[string]ConfigLogDurationEncoder{
+	"seconds": ConfigLogDurationEncoderSeconds,
+	"nanos":   ConfigLogDurationEncoderNanos,
+	"millis":  ConfigLogDurationEncoderMillis,
+	"string":  ConfigLogDurationEncoderString,
+}
+
+// ParseConfigLogDurationEncoder attempts to convert a string to a ConfigLogDurationEncoder.
+func ParseConfigLogDurationEncoder(name string) (ConfigLogDurationEncoder, error) {
+	if x, ok := _ConfigLogDurationEncoderValue[name]; ok {
+		return x, nil
+	}
+	return ConfigLogDurationEncoder(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigLogDurationEncoder)
+}
+
+// MustParseConfigLogDurationEncoder converts a string to a ConfigLogDurationEncoder, and panics if is not valid.
+func MustParseConfigLogDurationEncoder(name string) ConfigLogDurationEncoder {
+	val, err := ParseConfigLogDurationEncoder(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigLogDurationEncoder) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigLogDurationEncoder) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigLogDurationEncoder(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
+	// ConfigLogEncodingJson is a ConfigLogEncoding of type json.
+	ConfigLogEncodingJson ConfigLogEncoding = "json"
+	// ConfigLogEncodingConsole is a ConfigLogEncoding of type console.
+	ConfigLogEncodingConsole ConfigLogEncoding = "console"
+)
+
+var ErrInvalidConfigLogEncoding = fmt.Errorf("not a valid ConfigLogEncoding, try [%s]", strings.Join(_ConfigLogEncodingNames, ", "))
+
+var _ConfigLogEncodingNames = []string{
+	string(ConfigLogEncodingJson),
+	string(ConfigLogEncodingConsole),
+}
+
+// ConfigLogEncodingNames returns a list of possible string values of ConfigLogEncoding.
+func ConfigLogEncodingNames() []string {
+	tmp := make([]string, len(_ConfigLogEncodingNames))
+	copy(tmp, _ConfigLogEncodingNames)
+	return tmp
+}
+
+// ConfigLogEncodingValues returns a list of the values for ConfigLogEncoding
+func ConfigLogEncodingValues() []ConfigLogEncoding {
+	return []ConfigLogEncoding{
+		ConfigLogEncodingJson,
+		ConfigLogEncodingConsole,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigLogEncoding) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigLogEncoding) IsValid() bool {
+	_, err := ParseConfigLogEncoding(string(x))
+	return err == nil
+}
+
+var _ConfigLogEncodingValue = map[string]ConfigLogEncoding{
+	"json":    ConfigLogEncodingJson,
+	"console": ConfigLogEncodingConsole,
+}
+
+// ParseConfigLogEncoding attempts to convert a string to a ConfigLogEncoding.
+func ParseConfigLogEncoding(name string) (ConfigLogEncoding, error) {
+	if x, ok := _ConfigLogEncodingValue[name]; ok {
+		return x, nil
+	}
+	return ConfigLogEncoding(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigLogEncoding)
+}
+
+// MustParseConfigLogEncoding converts a string to a ConfigLogEncoding, and panics if is not valid.
+func MustParseConfigLogEncoding(name string) ConfigLogEncoding {
+	val, err := ParseConfigLogEncoding(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigLogEncoding) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigLogEncoding) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigLogEncoding(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
+	// ConfigLogLevelEncoderLowercase is a ConfigLogLevelEncoder of type lowercase.
+	ConfigLogLevelEncoderLowercase ConfigLogLevelEncoder = "lowercase"
+	// ConfigLogLevelEncoderLowercasecolor is a ConfigLogLevelEncoder of type lowercasecolor.
+	ConfigLogLevelEncoderLowercasecolor ConfigLogLevelEncoder = "lowercasecolor"
+	// ConfigLogLevelEncoderCapital is a ConfigLogLevelEncoder of type capital.
+	ConfigLogLevelEncoderCapital ConfigLogLevelEncoder = "capital"
+	// ConfigLogLevelEncoderCapitalcolor is a ConfigLogLevelEncoder of type capitalcolor.
+	ConfigLogLevelEncoderCapitalcolor ConfigLogLevelEncoder = "capitalcolor"
+)
+
+var ErrInvalidConfigLogLevelEncoder = fmt.Errorf("not a valid ConfigLogLevelEncoder, try [%s]", strings.Join(_ConfigLogLevelEncoderNames, ", "))
+
+var _ConfigLogLevelEncoderNames = []string{
+	string(ConfigLogLevelEncoderLowercase),
+	string(ConfigLogLevelEncoderLowercasecolor),
+	string(ConfigLogLevelEncoderCapital),
+	string(ConfigLogLevelEncoderCapitalcolor),
+}
+
+// ConfigLogLevelEncoderNames returns a list of possible string values of ConfigLogLevelEncoder.
+func ConfigLogLevelEncoderNames() []string {
+	tmp := make([]string, len(_ConfigLogLevelEncoderNames))
+	copy(tmp, _ConfigLogLevelEncoderNames)
+	return tmp
+}
+
+// ConfigLogLevelEncoderValues returns a list of the values for ConfigLogLevelEncoder
+func ConfigLogLevelEncoderValues() []ConfigLogLevelEncoder {
+	return []ConfigLogLevelEncoder{
+		ConfigLogLevelEncoderLowercase,
+		ConfigLogLevelEncoderLowercasecolor,
+		ConfigLogLevelEncoderCapital,
+		ConfigLogLevelEncoderCapitalcolor,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigLogLevelEncoder) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigLogLevelEncoder) IsValid() bool {
+	_, err := ParseConfigLogLevelEncoder(string(x))
+	return err == nil
+}
+
+var _ConfigLogLevelEncoderValue = map[string]ConfigLogLevelEncoder{
+	"lowercase":      ConfigLogLevelEncoderLowercase,
+	"lowercasecolor": ConfigLogLevelEncoderLowercasecolor,
+	"capital":        ConfigLogLevelEncoderCapital,
+	"capitalcolor":   ConfigLogLevelEncoderCapitalcolor,
+}
+
+// ParseConfigLogLevelEncoder attempts to convert a string to a ConfigLogLevelEncoder.
+func ParseConfigLogLevelEncoder(name string) (ConfigLogLevelEncoder, error) {
+	if x, ok := _ConfigLogLevelEncoderValue[name]; ok {
+		return x, nil
+	}
+	return ConfigLogLevelEncoder(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigLogLevelEncoder)
+}
+
+// MustParseConfigLogLevelEncoder converts a string to a ConfigLogLevelEncoder, and panics if is not valid.
+func MustParseConfigLogLevelEncoder(name string) ConfigLogLevelEncoder {
+	val, err := ParseConfigLogLevelEncoder(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigLogLevelEncoder) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigLogLevelEncoder) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigLogLevelEncoder(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
+	// ConfigLogTimeEncoderEpoch is a ConfigLogTimeEncoder of type epoch.
+	ConfigLogTimeEncoderEpoch ConfigLogTimeEncoder = "epoch"
+	// ConfigLogTimeEncoderEpochmillis is a ConfigLogTimeEncoder of type epochmillis.
+	ConfigLogTimeEncoderEpochmillis ConfigLogTimeEncoder = "epochmillis"
+	// ConfigLogTimeEncoderEpochnanos is a ConfigLogTimeEncoder of type epochnanos.
+	ConfigLogTimeEncoderEpochnanos ConfigLogTimeEncoder = "epochnanos"
+	// ConfigLogTimeEncoderIso8601 is a ConfigLogTimeEncoder of type iso8601.
+	ConfigLogTimeEncoderIso8601 ConfigLogTimeEncoder = "iso8601"
+	// ConfigLogTimeEncoderRfc3339 is a ConfigLogTimeEncoder of type rfc3339.
+	ConfigLogTimeEncoderRfc3339 ConfigLogTimeEncoder = "rfc3339"
+	// ConfigLogTimeEncoderRfc3339nano is a ConfigLogTimeEncoder of type rfc3339nano.
+	ConfigLogTimeEncoderRfc3339nano ConfigLogTimeEncoder = "rfc3339nano"
+)
+
+var ErrInvalidConfigLogTimeEncoder = fmt.Errorf("not a valid ConfigLogTimeEncoder, try [%s]", strings.Join(_ConfigLogTimeEncoderNames, ", "))
+
+var _ConfigLogTimeEncoderNames = []string{
+	string(ConfigLogTimeEncoderEpoch),
+	string(ConfigLogTimeEncoderEpochmillis),
+	string(ConfigLogTimeEncoderEpochnanos),
+	string(ConfigLogTimeEncoderIso8601),
+	string(ConfigLogTimeEncoderRfc3339),
+	string(ConfigLogTimeEncoderRfc3339nano),
+}
+
+// ConfigLogTimeEncoderNames returns a list of possible string values of ConfigLogTimeEncoder.
+func ConfigLogTimeEncoderNames() []string {
+	tmp := make([]string, len(_ConfigLogTimeEncoderNames))
+	copy(tmp, _ConfigLogTimeEncoderNames)
+	return tmp
+}
+
+// ConfigLogTimeEncoderValues returns a list of the values for ConfigLogTimeEncoder
+func ConfigLogTimeEncoderValues() []ConfigLogTimeEncoder {
+	return []ConfigLogTimeEncoder{
+		ConfigLogTimeEncoderEpoch,
+		ConfigLogTimeEncoderEpochmillis,
+		ConfigLogTimeEncoderEpochnanos,
+		ConfigLogTimeEncoderIso8601,
+		ConfigLogTimeEncoderRfc3339,
+		ConfigLogTimeEncoderRfc3339nano,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigLogTimeEncoder) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigLogTimeEncoder) IsValid() bool {
+	_, err := ParseConfigLogTimeEncoder(string(x))
+	return err == nil
+}
+
+var _ConfigLogTimeEncoderValue = map[string]ConfigLogTimeEncoder{
+	"epoch":       ConfigLogTimeEncoderEpoch,
+	"epochmillis": ConfigLogTimeEncoderEpochmillis,
+	"epochnanos":  ConfigLogTimeEncoderEpochnanos,
+	"iso8601":     ConfigLogTimeEncoderIso8601,
+	"rfc3339":     ConfigLogTimeEncoderRfc3339,
+	"rfc3339nano": ConfigLogTimeEncoderRfc3339nano,
+}
+
+// ParseConfigLogTimeEncoder attempts to convert a string to a ConfigLogTimeEncoder.
+func ParseConfigLogTimeEncoder(name string) (ConfigLogTimeEncoder, error) {
+	if x, ok := _ConfigLogTimeEncoderValue[name]; ok {
+		return x, nil
+	}
+	return ConfigLogTimeEncoder(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigLogTimeEncoder)
+}
+
+// MustParseConfigLogTimeEncoder converts a string to a ConfigLogTimeEncoder, and panics if is not valid.
+func MustParseConfigLogTimeEncoder(name string) ConfigLogTimeEncoder {
+	val, err := ParseConfigLogTimeEncoder(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigLogTimeEncoder) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigLogTimeEncoder) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigLogTimeEncoder(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
 	// EventNameUpdateCreated is a EventName of type update_created.
 	EventNameUpdateCreated EventName = "update_created"
 	// EventNameUpdateUpdated is a EventName of type update_updated.

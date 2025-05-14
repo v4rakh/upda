@@ -19,7 +19,6 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
-	"time"
 )
 
 func Start(c context.Context) {
@@ -39,7 +38,7 @@ func Start(c context.Context) {
 
 	// app init (router, services, handlers)
 	router := gin.New()
-	router.Use(ginzap.Ginzap(zap.L(), time.RFC3339, false))
+	router.Use(ginzap.Ginzap(zap.L(), "", cfg.Logging.UTC))
 	router.Use(ginzap.RecoveryWithZap(zap.L(), true))
 	router.Use(middlewareCors(cfg.Cors))
 	router.Use(middlewareAppName())

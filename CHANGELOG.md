@@ -2,6 +2,10 @@
 
 ## Rolling
 
+### 2025-05-15
+
+* 🚀 Add more logging options
+
 ### 2025-05-07
 
 * ❗**breaking**: Rename `EMBEDDED_WEB_INTERFACE_` environment variable prefix to `WEB_INTERFACE_` only
