@@ -19,4 +19,4 @@ runs:
         tag: ${{ inputs.version }}
         direction: upload
         release-dir: bin
-        release-notes: "Release of version '${{ inputs.version }}'. Look into the CHANGELOG.md file for a complete list of changes."
+        release-notes: "Release of version '${{ inputs.version }}'."
