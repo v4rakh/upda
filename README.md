@@ -90,7 +90,8 @@ docker run --name some-redis \
 _upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
 embedded into the GoLang binary itself.
 
-For _development_, no other steps are required. Simply follow the [frontend instructions](./internal/server/web/README.md) and
+For _development_, no other steps are required. Simply follow
+the [frontend instructions](./internal/server/web/README.md) and
 start the frontend separately.
 
 If you like to have a look on the _production_ experience, the frontend needs to be build first, and you need to build
@@ -156,12 +157,12 @@ docker).
 The main branch is `master`. It's protected and only eligible users can push to it. Merge requests to protected branches
 are safe-guarded: they need review or at least a successful pipeline run to be merged.
 
-- Merge request branches should start with `feat/`, `fix/`, or `chore/`
+- Merge request branches should start with `feat/`, `fix/`, `refactor/`, `chore/`, or `ci/`
 - Merge requests should be squashed and the source branch should be deleted
 - Merge request commits should have a meaningful commit message
 - Merge request titles should have a meaningful title which is taken as commit message once merged
     - should be prefixed with `feat: ...`, `fix(...): ...`, where the contents inside the bracket should be _one word_
-      which topic/component is touched
+      which topic/component is touched (conventional commits)
     - should reflect a breaking change by adding a `!` before the colon, e.g., `fix(deps)!: ...`
     - should include more verbose information in the body of the git commit message (merge request description)
 
@@ -172,7 +173,6 @@ feat(security)!: add OpenID Connect authentication
 - This new mode is the default, which might break existing installations
 ```
 
-- Merge requests should contain an entry inside the `CHANGELOG.md` with a date to provide more information if needed
 - Merge requests should contain documentation changes, so that code and documentation stays in sync
 
 ### Pipeline workflow
@@ -187,14 +187,22 @@ thus your code cannot be merged.
 
 ### Release preparation & workflow
 
-Releases are done by triggering the "release" pipeline workflow **manually** on `master`.
+Follow these steps to release the application
 
-This application uses _rolling_ releases, which means that a release resets the `latest` tag and in addition adds a date
-as git tag when it was published. The latest tag is automatically replaced to newer git commits once release pipeline
-finished.
+* Trigger the pipeline for a commit on the `master`
+    * When asked, enter a version number which should align with semantic versioning
+    * The pipeline creates a git tag and a release in the VCS management system
+    * Wait until the release pipeline succeeded
+* (_optional_) Generate the changelog
+    * Got into the git repository, make sure to fetch (including just created tag)
+    * Requires [git-cliff](https://git-cliff.org/) being installed
+    * Invoke from last but one release git tag to the most recent release tag (just created) with
+      `git-cliff OLDTAG..NEWTAG`, e.g., `git-cliff 6.0.0..6.1.0`
+    * This prints markdown to your terminal.
+    * Copy the markdown and edit the release in the VCS management system
 
-There's no additional preparation needed. `master` is always the latest working state and should be in "release-able"
-state any time.
+There's no additional preparation needed before invoking the release pipeline on `master` as it should always represent
+a working state at any time.
 
 ### Dependency updates
 
