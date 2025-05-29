@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/go-redsync/redsync/v4"
 	redsyncgoredis "github.com/go-redsync/redsync/v4/redis/goredis/v9"
@@ -26,11 +27,10 @@ func NewLockRedisService(lc *config.Lock) (LockService, error) {
 
 	var err error
 	var redisOptions *redis.Options
-	redisOptions, err = redis.ParseURL(lc.RedisUrl)
-
-	if err != nil {
+	if redisOptions, err = redis.ParseURL(lc.RedisUrl); err != nil {
 		return nil, fmt.Errorf("lock service: cannot parse REDIS URL '%s' to set up locking: %s", lc.RedisUrl, err)
 	}
+	redisOptions.ClientName = fmt.Sprintf("%s-lock", constant.AppName)
 
 	c := redis.NewClient(redisOptions)
 	if err = c.Ping(context.Background()).Err(); err != nil {

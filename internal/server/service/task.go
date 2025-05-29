@@ -63,11 +63,11 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 
 	if lc.RedisEnabled {
 		var redisOptions *redis.Options
-		redisOptions, err = redis.ParseURL(lc.RedisUrl)
-
-		if err != nil {
+		if redisOptions, err = redis.ParseURL(lc.RedisUrl); err != nil {
 			return nil, fmt.Errorf("cannot parse REDIS URL '%s' to set up locking for scheduler: %s", lc.RedisUrl, err)
 		}
+		redisOptions.ClientName = fmt.Sprintf("%s-task", constant.AppName)
+
 		redisClient := redis.NewClient(redisOptions)
 
 		var locker gocron.Locker
