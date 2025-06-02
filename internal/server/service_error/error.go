@@ -17,6 +17,7 @@ var (
 	ErrResourceAccessDenied            = NewServiceError(ErrCodeForbidden, errors.New("resource access denied"))
 	ErrResourceConflict                = NewServiceError(ErrCodeConflict, errors.New("resource already exists"))
 	ErrDatabaseRowsExpected            = NewServiceDatabaseError(errors.New("action failed, expected affected rows, but got none"))
+	ErrUnauthorized                    = NewServiceError(ErrCodeUnauthorized, errors.New("unauthorized"))
 )
 
 type ErrorCode string

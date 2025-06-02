@@ -1,7 +1,7 @@
 import Update from './Update';
 import UpdatePageFilter from './UpdatePageFilter';
 import { useGetUpdatesQuery } from '../../api/updatesApi';
-import FilterPreset from '../../components/FilterPresets';
+import FilterPreset from '../../components/filter-presets/FilterPresets';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
 import { CARD_PAGE_DEFAULT, CARD_PAGE_DEFAULT_OPTIONS, CARD_PAGE_SIZE_DEFAULT } from '../../constants/pagination';
 import { UpdatesRequestParams } from '../../types';

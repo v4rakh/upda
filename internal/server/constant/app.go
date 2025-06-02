@@ -1,5 +1,6 @@
 package constant
 
 const (
-	AppName = "upda"
+	AppName           = "upda"
+	GinContextSession = "SESSION"
 )

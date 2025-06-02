@@ -171,6 +171,10 @@ In addition, you can view an Update's details by clicking on the small info icon
 
 ![img](./img/updates_detail.png)
 
+In this page, you can also add comments, e.g., something you like to document for further updates of this application.
+
+![img](./img/updates_detail_comment.png)
+
 ## Manage filter presets
 
 _upda_ allows to manage filter presets which are a set of filters you can set a label on. To create, start filtering

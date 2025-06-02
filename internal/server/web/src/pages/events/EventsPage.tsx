@@ -18,7 +18,7 @@ const EventsPage: FC = () => {
 	const [trigger, result] = useLazyGetEventsQuery();
 
 	const [events, setEvents] = useState<EventResponse[] | undefined>(undefined);
-	const [hasNext, setHasMore] = useState<boolean>(false);
+	const [hasMore, setHasMore] = useState<boolean>(false);
 
 	const fetchData = useCallback(
 		async (s: number, o: number) => {
@@ -38,15 +38,9 @@ const EventsPage: FC = () => {
 		}
 	}, [events, fetchData, size, skip]);
 
-	const removeEvent = useCallback(
-		(id: string) => {
-			if (events) {
-				const removed = filter(events, (e) => e.id !== id);
-				setEvents(removed);
-			}
-		},
-		[events]
-	);
+	const removeEvent = useCallback((id: string) => {
+		setEvents((prevEvents) => filter(prevEvents, (e) => e.id !== id));
+	}, []);
 
 	const invokeReload = useCallback(() => {
 		setHasMore(false);
@@ -104,7 +98,7 @@ const EventsPage: FC = () => {
 				<Row justify="center" align="middle">
 					<Col xs={24} sm={16}>
 						<Timeline
-							pending={hasNext}
+							pending={hasMore}
 							pendingDot={
 								<Button
 									size="small"

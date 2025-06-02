@@ -202,6 +202,49 @@
   "auth": {
     "loading": "Loading..."
   },
+  "comment_create": {
+    "content": "Content",
+    "content_required": "Content is required",
+    "create": "Create new comment",
+    "error_bad_request": "Invalid input. Unable to create comment.",
+    "error_default": "Unable to create comment. Please make sure your device has network connection.",
+    "error_forbidden": "Forbidden to create comment.",
+    "error_unable": "Unable to create comment. Please refresh this page.",
+    "error_unauthorized": "Unable to create comment. Please refresh this page.",
+    "submit": "Submit"
+  },
+  "comment_delete": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "delete_title": "Are you sure to delete? Cannot be undone.",
+    "error_default": "Unable to delete comment. Please make sure your device has network connection.",
+    "error_forbidden": "Forbidden to delete comment.",
+    "error_unable": "Resource cannot be found. Unable to delete comment. Please refresh the page.",
+    "error_unauthorized": "Unable to delete comment. Please refresh this page.",
+    "help_delete": "Delete"
+  },
+  "comment_edit": {
+    "content": "Content",
+    "content_required": "Content is required",
+    "create": "Create new comment",
+    "error_bad_request": "Invalid input. Unable to update comment.",
+    "error_default": "Unable to update comment. Please make sure your device has network connection.",
+    "error_forbidden": "Forbidden to update comment.",
+    "error_unable": "Unable to update comment. Please refresh this page.",
+    "error_unauthorized": "Unable to update comment. Please refresh this page.",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "comments": {
+    "error_bad_request_get": "Invalid input. Unable to retrieve comments.",
+    "error_default_get": "Unable to retrieve comments. Please make sure your device has network connection.",
+    "error_forbidden_get": "Forbidden to retrieve comments.",
+    "error_unauthorized_get": "Unable to retrieve comments. Please refresh this page.",
+    "load_more": "Load more",
+    "no_data": "No comments yet.",
+    "reload_tooltip": "Reload comments",
+    "title": "Comments"
+  },
   "common": {
     "404": "The page you've requested doesn't exist.",
     "404_title": "Not found.",

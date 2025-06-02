@@ -25,6 +25,8 @@ tags:
     description: Action invocations endpoints
   - name: filter-presets
     description: Filter presets endpoints
+  - name: comments
+    description: Comments endpoints
   - name: application
     description: Application related endpoints
   - name: auth
@@ -302,6 +304,239 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UpdateSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /comments/{updateId}:
+    get:
+      tags:
+        - comments
+      security:
+        - basicAuth: [ ]
+      summary: Finds all comments by an update
+      description: Finds comments by an update
+      operationId: findCommentsByUpdateId
+      parameters:
+        - name: updateId
+          in: path
+          description: the update id
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: the page
+          required: false
+          schema:
+            type: number
+            default: 1
+        - name: pageSize
+          in: query
+          description: the page size
+          required: false
+          schema:
+            type: number
+            default: 5
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPageResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - comments
+      security:
+        - basicAuth: [ ]
+      summary: Creates comment
+      description: Creates a comment. The current user is set as author.
+      operationId: createComment
+      parameters:
+        - name: updateId
+          in: path
+          description: the update id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Creates a comment
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/comments/{id}/content':
+    patch:
+      tags:
+        - comments
+      security:
+        - basicAuth: [ ]
+      summary: Modifies comment's content by ID
+      description: Modifies comment's content by ID. All authenticated users can modify any comment.
+      operationId: patchCommentContentById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies a comment
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyCommentContentRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/comments/{id}':
+    delete:
+      tags:
+        - comments
+      security:
+        - basicAuth: [ ]
+      summary: Deletes a comment by ID
+      description: Deletes a comment by ID. All authenticated users can delete any comment.
+      operationId: deleteCommentById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
         '400':
           description: Bad request
           content:
@@ -2657,6 +2892,42 @@ components:
               type: number
             totalPages:
               type: number
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          type: string
+        content:
+          type: string
+        updateId:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    CommentSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/CommentResponse'
+    CommentPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/CommentResponse'
+            page:
+              type: number
+            pageSize:
+              type: number
     WebhookSingleResponse:
       type: object
       properties:
@@ -3270,6 +3541,13 @@ components:
           type: string
         value:
           type: string
+    CreateCommentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
     CreateConstantRequest:
       type: object
       required:
@@ -3311,6 +3589,13 @@ components:
         - value
       properties:
         value:
+          type: string
+    ModifyCommentContentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
           type: string
     ModifyActionLabelRequest:
       type: object

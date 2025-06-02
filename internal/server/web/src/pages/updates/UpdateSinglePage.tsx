@@ -1,6 +1,7 @@
 import UpdateMetadata from './UpdateMetadata';
 import UpdateStateTag from './UpdateStateTag';
 import { useGetUpdateByIdQuery } from '../../api/updatesApi';
+import Comments from '../../components/comments/Comments';
 import ApiErrorCodes from '../../constants/apiErrorCodes';
 import AppPathParamNames from '../../constants/appPathParamNames';
 import AppPaths from '../../constants/appPaths';
@@ -104,6 +105,8 @@ const UpdateSinglePage: FC = (): ReactNode => {
 							<UpdateMetadata metadata={data.data.metadata} />
 						</Descriptions.Item>
 					</Descriptions>
+
+					{updateId && <Comments updateId={updateId} />}
 				</>
 			)}
 		</>

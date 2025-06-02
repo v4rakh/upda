@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// BeforeCreate creates a new UUID
 func (u *Update) BeforeCreate(tx *gorm.DB) (err error) {
 	u.ID = uuid.New()
 	return
@@ -90,6 +91,7 @@ type Webhook struct {
 	UpdatedAt  time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
+// BeforeCreate creates a new UUID
 func (e *Event) BeforeCreate(tx *gorm.DB) (err error) {
 	e.ID = uuid.New()
 	return
@@ -165,6 +167,7 @@ type Secret struct {
 	UpdatedAt time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
+// BeforeCreate creates a new UUID
 func (e *Action) BeforeCreate(tx *gorm.DB) (err error) {
 	e.ID = uuid.New()
 	return
@@ -185,6 +188,7 @@ type Action struct {
 	UpdatedAt        time.Time      `gorm:"time;autoUpdateTime;not null"`
 }
 
+// BeforeCreate creates a new UUID
 func (e *ActionInvocation) BeforeCreate(tx *gorm.DB) (err error) {
 	e.ID = uuid.New()
 	return
@@ -213,6 +217,7 @@ type Constant struct {
 	UpdatedAt time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
+// BeforeCreate creates a new UUID
 func (e *Constant) BeforeCreate(tx *gorm.DB) (err error) {
 	e.ID = uuid.New()
 	return
@@ -229,7 +234,25 @@ type FilterPreset struct {
 	UpdatedAt  time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
+// BeforeCreate creates a new UUID
 func (e *FilterPreset) BeforeCreate(tx *gorm.DB) (err error) {
 	e.ID = uuid.New()
 	return
+}
+
+// BeforeCreate creates a new UUID
+func (e *Comment) BeforeCreate(tx *gorm.DB) (err error) {
+	e.ID = uuid.New()
+	return
+}
+
+// Comment entity holding information for comments
+type Comment struct {
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
+	Author    string    `gorm:"not null"`
+	Content   string    `gorm:"not null"`
+	CreatedAt time.Time `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt time.Time `gorm:"time;autoUpdateTime;not null"`
+	Update    Update    `gorm:"foreignKey:UpdateID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	UpdateID  string    `gorm:"not null"`
 }

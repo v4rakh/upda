@@ -65,8 +65,8 @@ func (h *UpdateHandler) Paginate(c *gin.Context) {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
-
 	totalPages := (totalElements + int64(queryParams.PageSize) - 1) / int64(queryParams.PageSize)
+
 	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewUpdatePageResponse(data, queryParams.Page, queryParams.PageSize, queryParams.OrderBy, queryParams.Order, totalElements, totalPages)))
 }
 

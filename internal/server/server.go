@@ -67,6 +67,7 @@ func Start(c context.Context) {
 	actionRepo := repository.NewActionDbRepo(db)
 	actionInvocationRepo := repository.NewActionInvocationDbRepo(db)
 	filterPresetRepo := repository.NewFilterPresetDbRepo(db)
+	commentRepo := repository.NewCommentDbRepo(db)
 
 	var lockService service.LockService
 
@@ -90,6 +91,7 @@ func Start(c context.Context) {
 	actionService := service.NewActionService(actionRepo, eventService)
 	actionInvocationService := service.NewActionInvocationService(actionInvocationRepo, actionService, eventService, secretService, constantService)
 	filterPresetService := service.NewFilterPresetService(filterPresetRepo)
+	commentService := service.NewCommentService(commentRepo)
 
 	var taskService *service.TaskService
 
@@ -112,6 +114,7 @@ func Start(c context.Context) {
 	actionHandler := handler.NewActionHandler(actionService)
 	actionInvocationHandler := handler.NewActionInvocationHandler(actionService, actionInvocationService)
 	filterPresetHandler := handler.NewFilterPresetHandler(filterPresetService)
+	commentHandler := handler.NewCommentHandler(updateService, commentService)
 
 	infoHandler := handler.NewInfoHandler(cfg.App)
 	healthHandler := handler.NewHealthHandler()
@@ -155,6 +158,7 @@ func Start(c context.Context) {
 	}
 
 	apiAuthGroup := router.Group(fmt.Sprintf("%sapi/v1", cfg.Server.BasePath), authMethodHandler)
+	apiAuthGroup.Use(middlewareSessionProvider())
 
 	apiAuthGroup.GET("/login", authHandler.Login)
 
@@ -206,6 +210,11 @@ func Start(c context.Context) {
 	apiAuthGroup.GET("/filter-presets/:type", filterPresetHandler.GetByType)
 	apiAuthGroup.POST("/filter-presets", middlewareEnforceJsonContentType(), filterPresetHandler.Create)
 	apiAuthGroup.DELETE("/filter-presets/:id", filterPresetHandler.Delete)
+
+	apiAuthGroup.GET("/comments/:updateId", commentHandler.GetAllByUpdateId)
+	apiAuthGroup.POST("/comments/:updateId", middlewareEnforceJsonContentType(), commentHandler.Create)
+	apiAuthGroup.PATCH("/comments/:id/content", middlewareEnforceJsonContentType(), commentHandler.UpdateContent)
+	apiAuthGroup.DELETE("/comments/:id", commentHandler.Delete)
 
 	serverAddress := fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port)
 	srv := &http.Server{

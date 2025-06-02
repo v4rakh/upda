@@ -1,6 +1,6 @@
-import { useCreateFilterPresetMutation } from '../api/filterPresetsApi';
-import { CreateFilterPresetRequest, FilterPresetType } from '../types/filterPreset';
-import { useNotification } from '../use/useNotification';
+import { useCreateFilterPresetMutation } from '../../api/filterPresetsApi';
+import { CreateFilterPresetRequest, FilterPresetType } from '../../types/filterPreset';
+import { useNotification } from '../../use/useNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, ColorPicker, Form, Input } from 'antd';
 import { Color } from 'antd/lib/color-picker';

@@ -53,6 +53,10 @@ type CreateFilterPresetRequest struct {
 	Color      *string `json:"color"`
 }
 
+type CreateCommentRequest struct {
+	Content string `json:"content" binding:"required,min=1"`
+}
+
 type ModifySecretValueRequest struct {
 	Value string `json:"value" binding:"required,min=1"`
 }
@@ -88,6 +92,10 @@ type ModifyActionTypeAndPayloadRequest struct {
 
 type ModifyActionEnabledRequest struct {
 	Enabled bool `json:"enabled"`
+}
+
+type ModifyCommentContentRequest struct {
+	Content string `json:"content" binding:"required,min=1"`
 }
 
 type TestActionRequest struct {
@@ -169,6 +177,11 @@ type EventWindowRequest struct {
 	OrderBy string `form:"orderBy,default=created_at" binding:"oneof=id name created_at updated_at"`
 }
 
+type PaginateCommentRequest struct {
+	PageSize int `form:"pageSize,default=5" binding:"numeric,gte=1"`
+	Page     int `form:"page,default=1" binding:"numeric,gte=1"`
+}
+
 // uri parameters
 
 type FilterPresetUriRequest struct {
@@ -177,6 +190,10 @@ type FilterPresetUriRequest struct {
 
 type IDUriRequest struct {
 	ID string `uri:"id" binding:"required,uuid4"`
+}
+
+type UpdateIDUriRequest struct {
+	ID string `uri:"updateId" binding:"required,uuid4"`
 }
 
 // Responses
@@ -637,5 +654,51 @@ type FilterPresetDataPageResponse struct {
 func NewFilterPresetPageResponse(content []*FilterPresetResponse) *FilterPresetPageResponse {
 	e := new(FilterPresetPageResponse)
 	e.Content = content
+	return e
+}
+
+type CommentResponse struct {
+	ID        string    `json:"id"`
+	Author    string    `json:"author"`
+	Content   string    `json:"content"`
+	UpdateID  string    `json:"updateId"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type CommentSingleResponse struct {
+	Data CommentResponse `json:"data"`
+}
+
+func NewCommentSingleResponse(id string, author string, content string, updateId string, createdAt time.Time, updatedAt time.Time) *CommentSingleResponse {
+	e := new(CommentSingleResponse)
+	e.Data.ID = id
+	e.Data.Author = author
+	e.Data.Content = content
+	e.Data.UpdateID = updateId
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type CommentPageResponse struct {
+	Content       []*CommentResponse `json:"content"`
+	Page          int                `json:"page"`
+	PageSize      int                `json:"pageSize"`
+	TotalElements int64              `json:"totalElements"`
+	TotalPages    int64              `json:"totalPages"`
+}
+
+type CommentDataPageResponse struct {
+	Data *CommentDataPageResponse `json:"data"`
+}
+
+func NewCommentPageResponse(content []*CommentResponse, page int, pageSize int, totalElements int64, totalPages int64) *CommentPageResponse {
+	e := new(CommentPageResponse)
+	e.Content = content
+	e.Page = page
+	e.PageSize = pageSize
+	e.TotalElements = totalElements
+	e.TotalPages = totalPages
 	return e
 }

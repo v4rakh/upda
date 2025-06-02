@@ -5,6 +5,7 @@ enum ApiTags {
 	Webhooks = 'Webhooks',
 	Secrets = 'Secrets',
 	Constants = 'Constants',
+	Comments = 'Comments',
 	Actions = 'Actions',
 	ActionInvocations = 'ActionInvocations',
 	Events = 'Events',

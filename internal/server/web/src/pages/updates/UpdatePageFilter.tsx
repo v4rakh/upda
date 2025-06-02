@@ -1,5 +1,5 @@
-import CreateFilterPreset from '../../components/CreateFilterPreset';
-import FilterResetButton from '../../components/FilterResetButton';
+import CreateFilterPreset from '../../components/filter-presets/CreateFilterPreset';
+import FilterResetButton from '../../components/filter-presets/FilterResetButton';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
 import UpdateOrder from '../../constants/api/updateOrder';
 import UpdateOrderBy from '../../constants/api/updateOrderBy';

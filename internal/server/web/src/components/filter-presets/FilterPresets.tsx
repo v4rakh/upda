@@ -1,7 +1,7 @@
 import FilterResetButton from './FilterResetButton';
-import { useDeleteFilterPresetMutation, useGetFilterPresetsByTypeQuery } from '../api/filterPresetsApi';
-import { FilterPresetResponse, FilterPresetType } from '../types/filterPreset';
-import { useNotification } from '../use/useNotification';
+import { useDeleteFilterPresetMutation, useGetFilterPresetsByTypeQuery } from '../../api/filterPresetsApi';
+import { FilterPresetResponse, FilterPresetType } from '../../types/filterPreset';
+import { useNotification } from '../../use/useNotification';
 import { Flex, Skeleton, Tag } from 'antd';
 import { map } from 'lodash';
 import { ReactNode, useCallback, useEffect } from 'react';
