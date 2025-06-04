@@ -101,7 +101,8 @@ services:
         # ...
         environment:
             - LOCK_REDIS_ENABLED=true
-            - LOCK_REDIS_URL=redis://redis:6379/0
+            - LOCK_REDIS_HOST=redis
+            - LOCK_REDIS_PORT=6379
             # ...
 
     redis:
