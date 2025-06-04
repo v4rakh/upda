@@ -78,14 +78,14 @@ type Cors struct {
 }
 
 type Database struct {
-	Type             string `env:"DB_TYPE,default=postgres" validate:"required,oneof=postgres"`
-	MigrationEnabled bool   `env:"DB_MIGRATION_ENABLED,default=true"`
-	PostgresHost     string `env:"DB_POSTGRES_HOST,default=localhost" validate:"required_if=Type postgres"`
-	PostgresPort     int    `env:"DB_POSTGRES_PORT,default=5432" validate:"required_if=Type postgres"`
-	PostgresName     string `env:"DB_POSTGRES_NAME" validate:"required_if=Type postgres"`
-	PostgresTimeZone string `env:"DB_POSTGRES_TZ,default=Etc/UTC" validate:"required_if=Type postgres"`
-	PostgresUser     string `env:"DB_POSTGRES_USER" validate:"required_if=Type postgres"`
-	PostgresPassword string `env:"DB_POSTGRES_PASSWORD" validate:"required_if=Type postgres"`
+	Type             constant.ConfigDatabaseType `env:"DB_TYPE,default=postgres" validate:"required,oneof=postgres"`
+	MigrationEnabled bool                        `env:"DB_MIGRATION_ENABLED,default=true"`
+	PostgresHost     string                      `env:"DB_POSTGRES_HOST,default=localhost" validate:"required_if=Type postgres"`
+	PostgresPort     int                         `env:"DB_POSTGRES_PORT,default=5432" validate:"required_if=Type postgres"`
+	PostgresName     string                      `env:"DB_POSTGRES_NAME" validate:"required_if=Type postgres"`
+	PostgresTimeZone string                      `env:"DB_POSTGRES_TZ,default=Etc/UTC" validate:"required_if=Type postgres"`
+	PostgresUser     string                      `env:"DB_POSTGRES_USER" validate:"required_if=Type postgres"`
+	PostgresPassword string                      `env:"DB_POSTGRES_PASSWORD" validate:"required_if=Type postgres"`
 }
 
 type Webinterface struct {
@@ -145,8 +145,16 @@ type Task struct {
 }
 
 type Lock struct {
-	RedisEnabled bool   `env:"LOCK_REDIS_ENABLED,default=false"`
-	RedisUrl     string `env:"LOCK_REDIS_URL" validate:"required_if=RedisEnabled true"`
+	RedisEnabled        bool          `env:"LOCK_REDIS_ENABLED,default=false"`
+	RedisHost           string        `env:"LOCK_REDIS_HOST,default=localhost" validate:"required_if=RedisEnabled true"`
+	RedisPort           int           `env:"LOCK_REDIS_PORT,default=6379" validate:"required_if=RedisEnabled true,numeric,gte=1"`
+	RedisDbName         int           `env:"LOCK_REDIS_DB_NAME,default=0" validate:"numeric,gte=0"`
+	RedisUsername       string        `env:"LOCK_REDIS_USERNAME"`
+	RedisPassword       string        `env:"LOCK_REDIS_PASSWORD"`
+	RedisTaskTries      int           `env:"LOCK_REDIS_TASK_LOCK_TRIES,default=1" validate:"required_if=RedisEnabled true,numeric,gte=1"`
+	RedisTaskLockAtMost time.Duration `env:"LOCK_REDIS_TASK_LOCK_AT_MOST,default=30s" validate:"required_if=RedisEnabled true,gte=0"`
+	RedisTaskRetryDelay time.Duration `env:"LOCK_REDIS_TASK_RETRY_DELAY,default=5s" validate:"required_if=RedisEnabled true,gte=0"`
+	RedisUrl            string
 }
 
 type Webhook struct {
@@ -314,7 +322,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 
 	zap.L().Sugar().Infof("Using database type '%s'", c.Database.Type)
 
-	if "postgres" == c.Database.Type {
+	if constant.ConfigDatabaseTypePostgres == c.Database.Type {
 		host := c.Database.PostgresHost
 		port := c.Database.PostgresPort
 		dbUser := c.Database.PostgresUser
@@ -380,6 +388,15 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 		}
 
 		zap.L().Info("Applied all necessary database migration steps successfully")
+	}
+
+	// custom defaults and validation
+	if c.Lock.RedisEnabled {
+		if c.Lock.RedisUsername != "" && c.Lock.RedisPassword != "" {
+			c.Lock.RedisUrl = fmt.Sprintf("redis://%s:%s@%s:%d/%d", c.Lock.RedisUsername, c.Lock.RedisPassword, c.Lock.RedisHost, c.Lock.RedisPort, c.Lock.RedisDbName)
+		} else {
+			c.Lock.RedisUrl = fmt.Sprintf("redis://%s:%d/%d", c.Lock.RedisHost, c.Lock.RedisPort, c.Lock.RedisDbName)
+		}
 	}
 
 	zap.L().Sugar().Infof("Configuration: App %+v", c.App)

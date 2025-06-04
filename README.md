@@ -151,14 +151,14 @@ Example:
 context := c.Request.Context()
 
 var err error
-var lock appLock
+var lock Lock
 
-if lock, err = h.lockService.lockWithOptions(context, "TEST-LOCK", withAppLockOptionExpiry(5*time.Minute), withAppLockOptionInfiniteRetries(), withAppLockOptionRetryDelay(5*time.Second)); err != nil {
+if lock, err = h.lockService.lockWithOptions(context, "TEST-LOCK", withLockOptionExpiry(5*time.Minute), withLockOptionInfiniteRetries(), withLockOptionRetryDelay(5*time.Second)); err != nil {
     _ = c.AbortWithError(errToHttpStatus(err), err)
     return
 }
 # defer to avoid leakage
-defer func(lock appLock) {
+defer func(lock Lock) {
     _ = lock.unlock(context)
 }(lock)
 

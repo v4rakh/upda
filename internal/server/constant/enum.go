@@ -17,6 +17,9 @@ type ConfigLogDurationEncoder string
 // ENUM(full, short)
 type ConfigLogCallerEncoder string
 
+// ENUM(postgres)
+type ConfigDatabaseType string
+
 // ENUM(basic_single, basic_credentials)
 type ConfigAuthMode string
 

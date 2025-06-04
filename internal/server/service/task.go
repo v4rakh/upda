@@ -71,7 +71,7 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 		redisClient := redis.NewClient(redisOptions)
 
 		var locker gocron.Locker
-		if locker, err = redislock.NewRedisLocker(redisClient, redislock.WithTries(1), redislock.WithExpiry(30*time.Second), redislock.WithRetryDelay(5*time.Second)); err != nil {
+		if locker, err = redislock.NewRedisLocker(redisClient, redislock.WithTries(lc.RedisTaskTries), redislock.WithExpiry(lc.RedisTaskLockAtMost), redislock.WithRetryDelay(lc.RedisTaskRetryDelay)); err != nil {
 			return nil, fmt.Errorf("cannot set up REDIS locker for scheduler: %s", err)
 		}
 

@@ -256,6 +256,79 @@ func (x *ConfigAuthMode) UnmarshalText(text []byte) error {
 }
 
 const (
+	// ConfigDatabaseTypePostgres is a ConfigDatabaseType of type postgres.
+	ConfigDatabaseTypePostgres ConfigDatabaseType = "postgres"
+)
+
+var ErrInvalidConfigDatabaseType = fmt.Errorf("not a valid ConfigDatabaseType, try [%s]", strings.Join(_ConfigDatabaseTypeNames, ", "))
+
+var _ConfigDatabaseTypeNames = []string{
+	string(ConfigDatabaseTypePostgres),
+}
+
+// ConfigDatabaseTypeNames returns a list of possible string values of ConfigDatabaseType.
+func ConfigDatabaseTypeNames() []string {
+	tmp := make([]string, len(_ConfigDatabaseTypeNames))
+	copy(tmp, _ConfigDatabaseTypeNames)
+	return tmp
+}
+
+// ConfigDatabaseTypeValues returns a list of the values for ConfigDatabaseType
+func ConfigDatabaseTypeValues() []ConfigDatabaseType {
+	return []ConfigDatabaseType{
+		ConfigDatabaseTypePostgres,
+	}
+}
+
+// String implements the Stringer interface.
+func (x ConfigDatabaseType) String() string {
+	return string(x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x ConfigDatabaseType) IsValid() bool {
+	_, err := ParseConfigDatabaseType(string(x))
+	return err == nil
+}
+
+var _ConfigDatabaseTypeValue = map[string]ConfigDatabaseType{
+	"postgres": ConfigDatabaseTypePostgres,
+}
+
+// ParseConfigDatabaseType attempts to convert a string to a ConfigDatabaseType.
+func ParseConfigDatabaseType(name string) (ConfigDatabaseType, error) {
+	if x, ok := _ConfigDatabaseTypeValue[name]; ok {
+		return x, nil
+	}
+	return ConfigDatabaseType(""), fmt.Errorf("%s is %w", name, ErrInvalidConfigDatabaseType)
+}
+
+// MustParseConfigDatabaseType converts a string to a ConfigDatabaseType, and panics if is not valid.
+func MustParseConfigDatabaseType(name string) ConfigDatabaseType {
+	val, err := ParseConfigDatabaseType(name)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+// MarshalText implements the text marshaller method.
+func (x ConfigDatabaseType) MarshalText() ([]byte, error) {
+	return []byte(string(x)), nil
+}
+
+// UnmarshalText implements the text unmarshaller method.
+func (x *ConfigDatabaseType) UnmarshalText(text []byte) error {
+	tmp, err := ParseConfigDatabaseType(string(text))
+	if err != nil {
+		return err
+	}
+	*x = tmp
+	return nil
+}
+
+const (
 	// ConfigLogCallerEncoderFull is a ConfigLogCallerEncoder of type full.
 	ConfigLogCallerEncoderFull ConfigLogCallerEncoder = "full"
 	// ConfigLogCallerEncoderShort is a ConfigLogCallerEncoder of type short.
