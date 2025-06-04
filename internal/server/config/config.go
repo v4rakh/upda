@@ -66,7 +66,7 @@ type Server struct {
 	TlsEnabled  bool          `env:"SERVER_TLS_ENABLED,default=false"`
 	TlsCertPath string        `env:"SERVER_TLS_CERT_PATH"`
 	TlsKeyPath  string        `env:"SERVER_TLS_KEY_PATH"`
-	Timeout     time.Duration `env:"SERVER_TIMEOUT,default=1s" validate:"gte=0"`
+	Timeout     time.Duration `env:"SERVER_TIMEOUT,default=10s" validate:"gte=0"`
 }
 
 type Cors struct {
@@ -163,6 +163,9 @@ type Webhook struct {
 
 type Prometheus struct {
 	Enabled            bool   `env:"PROMETHEUS_ENABLED,default=false"`
+	Port               int    `env:"PROMETHEUS_PORT,default=8080" validate:"required_if=Enabled true,gte=1"`
+	Listen             string `env:"PROMETHEUS_LISTEN"`
+	BasePath           string `env:"PROMETHEUS_BASE_PATH,default=/" validate:"required_if=Enabled true"`
 	Path               string `env:"PROMETHEUS_METRICS_PATH,default=/metrics" validate:"required_if=Enabled true"`
 	SecureTokenEnabled bool   `env:"PROMETHEUS_SECURE_TOKEN_ENABLED,default=true"`
 	SecureToken        string `env:"PROMETHEUS_SECURE_TOKEN" validate:"required_if=Enabled true SecureTokenEnabled true"`

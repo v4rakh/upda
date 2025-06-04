@@ -35,32 +35,31 @@ type PrometheusService struct {
 	router           *gin.Engine
 	prometheus       *ginprom.Prometheus
 	prometheusConfig *config.Prometheus
-	serverConfig     *config.Server
 }
 
-func NewPrometheusService(r *gin.Engine, pc *config.Prometheus, sc *config.Server) *PrometheusService {
+func NewPrometheusService(e *gin.Engine, c *config.Prometheus) *PrometheusService {
 	var p *ginprom.Prometheus
 
-	if !pc.Enabled {
+	if !c.Enabled {
 		return &PrometheusService{
 			prometheus:       p,
-			prometheusConfig: pc,
+			prometheusConfig: c,
 		}
 	}
 
-	path := fmt.Sprintf("%s%s", sc.BasePath, pc.Path)
-	if pc.SecureTokenEnabled {
+	path := fmt.Sprintf("%s%s", c.BasePath, c.Path)
+	if c.SecureTokenEnabled {
 		p = ginprom.New(
-			ginprom.Engine(r),
+			ginprom.Engine(e),
 			ginprom.Namespace(""),
 			ginprom.Subsystem(""),
 			ginprom.Path(path),
 			ginprom.Ignore(path),
-			ginprom.Token(pc.SecureToken),
+			ginprom.Token(c.SecureToken),
 		)
 	} else {
 		p = ginprom.New(
-			ginprom.Engine(r),
+			ginprom.Engine(e),
 			ginprom.Namespace(""),
 			ginprom.Subsystem(""),
 			ginprom.Ignore(path),
@@ -70,7 +69,7 @@ func NewPrometheusService(r *gin.Engine, pc *config.Prometheus, sc *config.Serve
 
 	return &PrometheusService{
 		prometheus:       p,
-		prometheusConfig: pc,
+		prometheusConfig: c,
 	}
 }
 

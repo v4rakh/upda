@@ -19,7 +19,8 @@ scrape_configs:
     bearer_token: 'VALUE_OF_PROMETHEUS_SECURE_TOKEN'
 ```
 
-Custom exposed metrics are exposed under the `upda_` namespace.
+Prometheus can also be spawned independently of the main application server by setting `PROMETHEUS_PORT` to a different
+port than `SERVER_PORT`.
 
 There are two type of [Grafana](https://grafana.com) dashboards:
 

@@ -112,8 +112,8 @@ func middlewareErrorHandler() gin.HandlerFunc {
 	}
 }
 
-// middlewareAppErrorRecoveryHandler recovers from panics, returning a 500 error
-func middlewareAppErrorRecoveryHandler() gin.HandlerFunc {
+// middlewareErrorRecoveryHandler recovers from panics, returning a 500 error
+func middlewareErrorRecoveryHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
