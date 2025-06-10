@@ -1,5 +1,5 @@
 VERSION ?= rolling
-LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/server/constant.AppVersion=$(VERSION)'
+LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/app.Version=$(VERSION)'
 
 GO ?= GO111MODULE=on CGO_ENABLED=0 go
 GO_TEST ?= CGO_ENABLED=1 go

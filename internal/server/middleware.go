@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
+	"git.myservermanager.com/varakh/upda/internal/app"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/dto"
@@ -57,7 +58,7 @@ func middlewareCacheControl(c *config.WebinterfaceCacheControl) gin.HandlerFunc 
 // middlewareAppName adds custom HTTP header to each request
 func middlewareAppName() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(api.HeaderAppName, constant.AppName)
+		c.Header(api.HeaderAppName, app.Name)
 		c.Next()
 	}
 }
@@ -65,7 +66,7 @@ func middlewareAppName() gin.HandlerFunc {
 // middlewareAppVersion adds custom HTTP header to each request
 func middlewareAppVersion() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header(api.HeaderAppVersion, constant.AppVersion)
+		c.Header(api.HeaderAppVersion, app.Version)
 		c.Next()
 	}
 }

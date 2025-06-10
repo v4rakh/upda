@@ -6,6 +6,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"git.myservermanager.com/varakh/upda/internal/app"
 	"git.myservermanager.com/varakh/upda/internal/file"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/validate"
@@ -259,7 +260,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 
 	logPaths := []string{"stderr"}
 	if lc.Directory != "" {
-		logFile := filepath.Join(lc.Directory, fmt.Sprintf("%s.log", constant.AppName))
+		logFile := filepath.Join(lc.Directory, fmt.Sprintf("%s.log", app.Name))
 
 		if err = file.CreateFileWithParent(logFile); err != nil {
 			log.Fatalf("Log file '%s' cannot be created: %v", lc.Directory, err)

@@ -3,32 +3,10 @@ package service
 import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
-)
-
-const (
-	metricUpdatesTotal     = "upda_updates_all"
-	metricUpdatesTotalHelp = "amount of all updates"
-
-	metricUpdatesPending     = "upda_updates_pending"
-	metricUpdatesPendingHelp = "amount of all updates in pending state"
-
-	metricUpdatesIgnored     = "upda_updates_ignored"
-	metricUpdatesIgnoredHelp = "amount of all updates in ignored state"
-
-	metricUpdatesApproved     = "upda_updates_approved"
-	metricUpdatesApprovedHelp = "amount of all updates in approved state"
-
-	metricWebhooks     = "upda_webhooks"
-	metricWebhooksHelp = "amount of all webhooks"
-
-	metricEvents     = "upda_events"
-	metricEventsHelp = "amount of all events"
-
-	metricActions     = "upda_actions"
-	metricActionsHelp = "amount of all actions"
 )
 
 type PrometheusService struct {
@@ -82,25 +60,25 @@ func (s *PrometheusService) Init() error {
 		return nil
 	}
 
-	if err := s.RegisterGaugeNoLabels(metricUpdatesTotal, metricUpdatesTotalHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricUpdatesTotal, constant.MetricUpdatesTotalHelp); err != nil {
 		return err
 	}
-	if err := s.RegisterGaugeNoLabels(metricUpdatesPending, metricUpdatesPendingHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricUpdatesPending, constant.MetricUpdatesPendingHelp); err != nil {
 		return err
 	}
-	if err := s.RegisterGaugeNoLabels(metricUpdatesIgnored, metricUpdatesIgnoredHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricUpdatesIgnored, constant.MetricUpdatesIgnoredHelp); err != nil {
 		return err
 	}
-	if err := s.RegisterGaugeNoLabels(metricUpdatesApproved, metricUpdatesApprovedHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricUpdatesApproved, constant.MetricUpdatesApprovedHelp); err != nil {
 		return err
 	}
-	if err := s.RegisterGaugeNoLabels(metricWebhooks, metricWebhooksHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricWebhooks, constant.MetricWebhooksHelp); err != nil {
 		return err
 	}
-	if err := s.RegisterGaugeNoLabels(metricEvents, metricEventsHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricEvents, constant.MetricEventsHelp); err != nil {
 		return err
 	}
-	if err := s.RegisterGaugeNoLabels(metricActions, metricActionsHelp); err != nil {
+	if err := s.RegisterGaugeNoLabels(constant.MetricActions, constant.MetricActionsHelp); err != nil {
 		return err
 	}
 

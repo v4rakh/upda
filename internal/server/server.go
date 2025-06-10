@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"git.myservermanager.com/varakh/upda/internal/app"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/handler"
@@ -12,6 +13,7 @@ import (
 	ginstatic "github.com/gin-contrib/static"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/urfave/cli/v3"
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"net/http"
@@ -21,11 +23,22 @@ import (
 	"syscall"
 )
 
-func Start(c context.Context) {
+var ServeCmd = &cli.Command{
+	Name:  "serve",
+	Usage: "Starts the server and keeps it running",
+	Action: func(ctx context.Context, _ *cli.Command) error {
+		start(ctx)
+		return nil
+	},
+}
+
+func start(c context.Context) {
 	var err error
 
 	// configuration init
 	cfg, db := config.LoadFromEnvironment(c)
+
+	zap.L().Sugar().Infof("Starting %s %s", app.Name, app.Version)
 
 	// adhere to GOMAXPROCS, but silence default output
 	_, _ = maxprocs.Set(maxprocs.Logger(nil))

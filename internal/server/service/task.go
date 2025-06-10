@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"git.myservermanager.com/varakh/upda/internal/app"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"github.com/go-co-op/gocron-redis-lock/v2"
@@ -69,7 +70,7 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 		if redisOptions, err = redis.ParseURL(lc.RedisUrl); err != nil {
 			return nil, fmt.Errorf("cannot parse REDIS URL '%s' to set up locking for scheduler: %s", lc.RedisUrl, err)
 		}
-		redisOptions.ClientName = fmt.Sprintf("%s-task", constant.AppName)
+		redisOptions.ClientName = fmt.Sprintf("%s-task", app.Name)
 
 		redisClient := redis.NewClient(redisOptions)
 
@@ -287,7 +288,7 @@ func (s *TaskService) configurePrometheusRefreshTask() error {
 	runnable := func() {
 		updates, updatesError := s.updateService.GetAll()
 
-		if updatesError = s.prometheusService.SetGaugeNoLabels(metricUpdatesTotal, float64(len(updates))); updatesError != nil {
+		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesTotal, float64(len(updates))); updatesError != nil {
 			zap.L().Sugar().Errorf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
 		}
 
@@ -305,34 +306,34 @@ func (s *TaskService) configurePrometheusRefreshTask() error {
 			}
 		}
 
-		if updatesError = s.prometheusService.SetGaugeNoLabels(metricUpdatesPending, float64(pendingTotal)); updatesError != nil {
+		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesPending, float64(pendingTotal)); updatesError != nil {
 			zap.L().Sugar().Errorf("Could not refresh updates pending prometheus metric. Reason: %s", updatesError.Error())
 		}
-		if updatesError = s.prometheusService.SetGaugeNoLabels(metricUpdatesIgnored, float64(ignoredTotal)); updatesError != nil {
+		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesIgnored, float64(ignoredTotal)); updatesError != nil {
 			zap.L().Sugar().Errorf("Could not refresh updates ignored prometheus metric. Reason: %s", updatesError.Error())
 		}
-		if updatesError = s.prometheusService.SetGaugeNoLabels(metricUpdatesApproved, float64(ackTotal)); updatesError != nil {
+		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesApproved, float64(ackTotal)); updatesError != nil {
 			zap.L().Sugar().Errorf("Could not refresh updates approved prometheus metric. Reason: %s", updatesError.Error())
 		}
 
 		var webhooksTotal int64
 		var webhooksError error
 		webhooksTotal, webhooksError = s.webhookService.Count()
-		if webhooksError = s.prometheusService.SetGaugeNoLabels(metricWebhooks, float64(webhooksTotal)); webhooksError != nil {
+		if webhooksError = s.prometheusService.SetGaugeNoLabels(constant.MetricWebhooks, float64(webhooksTotal)); webhooksError != nil {
 			zap.L().Sugar().Errorf("Could not refresh webhooks prometheus metric. Reason: %s", webhooksError.Error())
 		}
 
 		var eventsTotal int64
 		var eventsError error
 		eventsTotal, eventsError = s.eventService.Count()
-		if eventsError = s.prometheusService.SetGaugeNoLabels(metricEvents, float64(eventsTotal)); eventsError != nil {
+		if eventsError = s.prometheusService.SetGaugeNoLabels(constant.MetricEvents, float64(eventsTotal)); eventsError != nil {
 			zap.L().Sugar().Errorf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
 		}
 
 		var actionsTotal int64
 		var actionsError error
 		actionsTotal, actionsError = s.actionService.Count()
-		if actionsError = s.prometheusService.SetGaugeNoLabels(metricActions, float64(actionsTotal)); actionsError != nil {
+		if actionsError = s.prometheusService.SetGaugeNoLabels(constant.MetricActions, float64(actionsTotal)); actionsError != nil {
 			zap.L().Sugar().Errorf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
 		}
 	}
