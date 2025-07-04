@@ -25,7 +25,7 @@ require (
 	go.eigsys.de/gin-cachecontrol/v2 v2.3.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.27.0
-	gorm.io/datatypes v1.2.5
+	gorm.io/datatypes v1.2.6
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.30.0
 	moul.io/zapgorm2 v1.3.0
