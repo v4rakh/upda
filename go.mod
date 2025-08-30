@@ -19,7 +19,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.12.1
 	github.com/sethvargo/go-envconfig v1.3.0
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.38.0
 	github.com/urfave/cli/v3 v3.4.1
 	go.eigsys.de/gin-cachecontrol/v2 v2.3.0
@@ -27,7 +27,7 @@ require (
 	go.uber.org/zap v1.27.0
 	gorm.io/datatypes v1.2.6
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gorm v1.30.1
+	gorm.io/gorm v1.30.2
 	moul.io/zapgorm2 v1.3.0
 )
 
