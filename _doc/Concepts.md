@@ -2,14 +2,8 @@
 
 The following section goes into a deeper look into upda's internals.
 
-1. Create a webhook in upda.
-2. Use the webhook's URL in a 3rd party application to start tracking an update or use `upda` to report an update via
-   command-line.
-3. Enjoy visualization and state management of tracked updates in one place.
-4. Optionally, define _Actions_ for tracked updates as they arrive
-
-_upda_ retrieves new updates when webhooks of upda are invoked, e.g., [duin](https://crazymax.dev/diun/) invokes it or
-any other application which can reach the instance. Tracked updates are unique for the
+_upda_ retrieves new updates when webhooks of _upda_ are invoked, e.g., [duin](https://crazymax.dev/diun/) invokes it or
+any other application/script which can reach the instance. Tracked updates are unique for the
 attributes `(application,provider,host)` which means that subsequent updates for an identical _application_, _provider_
 and _host_ simply updates the `version` and `metadata` attributes for that tracked _update_ (regardless if the version
 or metadata payload _actually_ changed - reasoning behind this is to get reflected metadata updates independent if

@@ -24,8 +24,8 @@ port than `SERVER_PORT`.
 
 There are two type of [Grafana](https://grafana.com) dashboards:
 
-* [upda specific with custom metrics and](./upda.json)
-* [general Go resource and HTTP request/response](./go_ginprom.json)
+* [upda specific with custom metrics and](./grafana/upda.json)
+* [general Go resource and HTTP request/response](./grafana/go_ginprom.json)
 
 > Instead of importing the dashboard directly with Grafana, create a new Dashboard from scratch, directly go into
 > Settings and inside the JSON Model, replace all contents with the contents of either of the above files. This keeps

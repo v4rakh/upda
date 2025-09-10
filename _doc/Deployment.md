@@ -2,7 +2,8 @@
 
 _upda_ is a server application which embeds a web interface directly in its binary form (can be disabled). This makes it
 easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The `upda` binary can manage the
-server and other is a helper commands to quickly invoke webhooks or list tracked updates in your instance.
+server and is at the same time a command-line utility to quickly invoke webhooks or list tracked updates in your
+instance.
 
 Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup on sub
 path of your existing domain), pick one of the below **deployment** options.

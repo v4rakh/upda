@@ -1,6 +1,7 @@
 # README
 
-upda - **Up**date **Da**shboard in Go.
+**Up**date **Da**shboard (upda) written in Go. A centralized tool for tracking and managing updates across various
+systems, applications, and container images.
 
 The main git repository is hosted at
 _[https://git.myservermanager.com/varakh/upda](https://git.myservermanager.com/varakh/upda)_.
@@ -10,9 +11,7 @@ Contributions are very welcome, please see [Development & contribution](#develop
 
 ## [Official documentation](./_doc/Home.md)
 
-Please head over to the documentation for setup, usage, and operation.
-
-This README mainly focuses on development instead.
+Please head over to the documentation for setup, usage, and operation. This section mainly focuses on development.
 
 ## Development & contribution
 

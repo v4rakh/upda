@@ -100,6 +100,6 @@ The following table describe available configuration values.
 By default, _upda_ runs database migrations (`DB_MIGRATION_ENABLED`) to create the necessary database schema it uses.
 You can disable this behavior by setting it to `false` which might be useful if you have multiple instances running and
 only one should (regularly) update the database schema. Please make sure that this instance has the highest priority
-when updating _upda_ and it should also start before all other (updated) instances start. If you have multiple instance
+when updating _upda,_ and it should also start before all other (updated) instances start. If you have multiple instance
 and keep the default that all instances run migrations, some instances might fail to start as they apply locking when
 migrating database schema and conflict with other instances while migration is being executed.

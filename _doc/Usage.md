@@ -39,21 +39,22 @@ notif:
         method: POST
         headers:
             content-type: application/json
-            X-Webhook-Token: <the token from webhook creation in upda>
+            x-webhook-token: <the token from webhook creation in upda>
         timeout: 10s
 ```
 
-Expected payload is derived from the _type_ of the webhook which has been created in _upda_.
+Expected payload is derived from the _type_ of the webhook which has been created in _upda_. There are is a ready to use
+diun webhook type which works out of the box for diun's notif feature. A generic webhook example is used in
+the [GitHub release checker](./contrib/github-public-release-checker) script.
 
-In addition, a webhook in _upda_ can be set to ignore the host. Please read more on that in
-the [Concepts](./Concepts.md)
-section.
+Furthermore, a webhook in _upda_ can be set to ignore the host. Please read more on that in
+the [Concepts](./Concepts.md) section.
 
 ## Actions
 
 Actions can be used to invoke arbitrary third party tools when an _event_ occurs, e.g., an update has been created or
 modified. An action is triggered when its conditions are met, which means that the action's definition (event name,
-host, application, provider) fits the change which happend in _upda_.
+host, application, provider) fits the change which happened in _upda_.
 
 Actions have types. Different types require different payload to set them up. [shoutrrr](#shoutrrr) is supported as
 action type, which can send notifications to a variety of services like Gotify, Ntfy, Teams, OpsGenie and many more.
@@ -78,7 +79,7 @@ Supported events for Actions are the following:
 All actions support the usage of `<TAG NAME>KEY<TAG NAME>` in their action specific payload. In general, `<CONST>` tags
 are evaluated first, meaning that they can contain other tags as shortcuts.
 
-Available tags(`<TAG NAME>`) are
+Available tags, they're defined like `<TAG_NAME>, are
 
 * `<CONST>CONST_KEY</CONST>` which can be configured on the _Constants_ page,
 * `<SECRET>SECRET_KEY</SECRET>` which can be configured on the _Secrets_ page, and
@@ -151,7 +152,8 @@ In addition, you can have multiple URL fields, e.g., for sending a mail and a pu
 
 ### History of actions
 
-Whenever new updates come in, are changed or an update's state changes, _upda_ enqueues all matching Actions.
+Whenever new updates come in, are changed or an update's state changes, _upda_ enqueues all
+matching [Actions](#actions).
 
 If you head over to the Action History tab, you see pending, currently running, successful or error invocations of
 actions.
@@ -160,8 +162,8 @@ actions.
 
 ## Manage updates
 
-Once Update are in _upda_, you can filter them by state, application or other properties to only see pending Updates for
-example.
+Once updates are in _upda_, you can filter them by state, application or other properties to only see pending Updates
+for example.
 
 Furthermore, you can change their state to be ignored (see [Concepts](./Concepts.md)) or delete them.
 
