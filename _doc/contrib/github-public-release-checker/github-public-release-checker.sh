@@ -26,16 +26,8 @@ for REPO in "${REPOS[@]}"; do
         echo "[$REPO] New release detected: $LATEST_TAG"
         echo "$LATEST_TAG" >"$LAST_RELEASE_FILE"
         HOSTNAME=$(hostname)
-        JSON_PAYLOAD=$(
-            cat <<EOF
-        {
-        "application": "$REPO",
-        "host": "$HOSTNAME",
-        "version": "$LATEST_TAG"
-        }
-EOF
-        )
-        upda webhook send "$JSON_PAYLOAD"
+        # use environment for URL, webhook ID and webhook's token
+        upda webhook send --application "$REPO" --application-version "$LATEST_TAG" --host "$HOSTNAME"
     else
         echo "[$REPO] No new release. Latest is $LATEST_TAG"
     fi
