@@ -8,13 +8,15 @@ Other repositories are mirrors and pull requests, issues, and planning are manag
 
 Contributions are very welcome, please see [Development & contribution](#development--contribution).
 
-See **[official documentation](./_doc/Home.md)**.
+## [Official documentation](./_doc/Home.md)
+
+Please head over to the documentation for setup, usage, and operation.
+
+This README mainly focuses on development instead.
 
 ## Development & contribution
 
-There's also a [web interface](#web-interface).
-
-See [getting started](#getting-started) for setting up the development environment.
+Head over to the [getting started](#getting-started) for setting up the development environment first.
 
 ### Guidelines
 
