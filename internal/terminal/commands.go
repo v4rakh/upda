@@ -120,6 +120,7 @@ var (
 			userFlag,
 			passwordFlag,
 			rawFlag,
+			timeoutFlag,
 		},
 		ArgsUsage: "<label> [<type (generic|diun, default: generic)>] [<ignore-host (true|false, default: false)>]",
 		Action:    webhookCreate,
@@ -132,6 +133,7 @@ var (
 			urlFlag,
 			webhookIdFlag,
 			webhookTokenFlag,
+			timeoutFlag,
 		},
 		ArgsUsage: "<json payload>",
 		Action:    webhookSend,
@@ -146,6 +148,7 @@ var (
 			passwordFlag,
 			updatePageSizeFlag,
 			rawFlag,
+			timeoutFlag,
 		},
 		Action: updateShow,
 	}
