@@ -24,12 +24,17 @@ const (
 	envWebhookId    = "UPDA_WEBHOOK_ID"
 	envWebhookToken = "UPDA_WEBHOOK_TOKEN"
 
-	flagUrl            = "url"
-	flagUser           = "user"
-	flagPass           = "pass"
-	flagWebhookId      = "webhook-id"
-	flagWebhookToken   = "webhook-token"
-	flagUpdatePageSize = "page-size"
+	flagUrl                = "url"
+	flagUser               = "user"
+	flagPass               = "pass"
+	flagUpdatePageSize     = "page-size"
+	flagWebhookId          = "webhook-id"
+	flagWebhookToken       = "webhook-token"
+	flagWebhookApplication = "application"
+	flagWebhookHost        = "host"
+	flagWebhookProvider    = "provider"
+	flagWebhookVersion     = "application-version"
+	flagWebhookMetadata    = "metadata"
 
 	flagRaw     = "raw"
 	flagTimeout = "timeout"
@@ -39,14 +44,19 @@ const (
 )
 
 var (
-	raw            bool
-	timeout        time.Duration
-	serverUrl      string
-	user           string
-	password       string
-	webhookId      string
-	webhookToken   string
-	updatePageSize int
+	raw                bool
+	timeout            time.Duration
+	serverUrl          string
+	user               string
+	password           string
+	updatePageSize     int
+	webhookId          string
+	webhookToken       string
+	webhookApplication string
+	webhookHost        string
+	webhookProvider    string
+	webhookVersion     string
+	webhookMetadata    map[string]string
 
 	rawFlag = &cli.BoolFlag{
 		Name:        flagRaw,
@@ -87,6 +97,14 @@ var (
 		Sources:     cli.EnvVars(envPassword),
 		Destination: &password,
 	}
+	updatePageSizeFlag = &cli.IntFlag{
+		Name:        flagUpdatePageSize,
+		Usage:       "update show page size",
+		Value:       10000,
+		Required:    false,
+		Aliases:     []string{"ps"},
+		Destination: &updatePageSize,
+	}
 	webhookIdFlag = &cli.StringFlag{
 		Name:        flagWebhookId,
 		Usage:       "webhook id",
@@ -103,13 +121,34 @@ var (
 		Sources:     cli.EnvVars(envWebhookToken),
 		Destination: &webhookToken,
 	}
-	updatePageSizeFlag = &cli.IntFlag{
-		Name:        flagUpdatePageSize,
-		Usage:       "update show page size",
-		Value:       10000,
+	webhookApplicationFlag = &cli.StringFlag{
+		Name:        flagWebhookApplication,
+		Usage:       "Application name",
 		Required:    false,
-		Aliases:     []string{"ps"},
-		Destination: &updatePageSize,
+		Destination: &webhookApplication,
+	}
+	webhookHostFlag = &cli.StringFlag{
+		Name:        flagWebhookHost,
+		Usage:       "Host",
+		Required:    false,
+		Destination: &webhookHost,
+	}
+	webhookProviderFlag = &cli.StringFlag{
+		Name:        flagWebhookProvider,
+		Usage:       "Provider",
+		Required:    false,
+		Destination: &webhookProvider,
+	}
+	webhookVersionFlag = &cli.StringFlag{
+		Name:        flagWebhookVersion,
+		Usage:       "Version",
+		Required:    false,
+		Destination: &webhookVersion,
+	}
+	webhookMetadataFlag = &cli.StringMapFlag{
+		Name:        flagWebhookMetadata,
+		Usage:       "Metadata to add, you can provide multiple --metadata",
+		Destination: &webhookMetadata,
 	}
 
 	WebhookCreateCmd = &cli.Command{
@@ -128,14 +167,19 @@ var (
 
 	WebhookSendCmd = &cli.Command{
 		Name:  "send",
-		Usage: "Sends data to a webhook",
+		Usage: "Sends data to a webhook, prefers the flag based approach, if not all required properties given, tries to parse 1st argument as JSON",
 		Flags: []cli.Flag{
 			urlFlag,
 			webhookIdFlag,
 			webhookTokenFlag,
+			webhookApplicationFlag,
+			webhookHostFlag,
+			webhookProviderFlag,
+			webhookVersionFlag,
+			webhookMetadataFlag,
 			timeoutFlag,
 		},
-		ArgsUsage: "<json payload>",
+		ArgsUsage: "[<full json payload if no --application --host --application-version has been provided>]",
 		Action:    webhookSend,
 	}
 
@@ -223,16 +267,46 @@ func webhookSend(_ context.Context, cmd *cli.Command) error {
 		return cli.Exit(err, 1)
 	}
 
-	if !cmd.Args().Present() || cmd.Args().Len() < 1 {
-		return cli.Exit(errors.New("args required - try 'webhook send help'"), 1)
-	}
-	// validate payload is valid json
-	payloadArg := cmd.Args().First()
-	if payloadArg == "" {
-		return cli.Exit(errors.New("payload cannot be blank"), 1)
-	}
-	if !json.Valid([]byte(payloadArg)) {
-		return cli.Exit(errors.New("payload is not valid JSON"), 1)
+	application := cmd.String(flagWebhookApplication)
+	host := cmd.String(flagWebhookHost)
+	applicationVersion := cmd.String(flagWebhookVersion)
+
+	var payload interface{}
+
+	if application != "" && host != "" && applicationVersion != "" {
+		structuredPayload := api.WebhookGenericRequest{}
+		structuredPayload.Application = application
+		structuredPayload.Host = host
+		structuredPayload.Version = applicationVersion
+
+		provider := cmd.String(flagWebhookProvider)
+		metaData := cmd.StringMap(flagWebhookMetadata)
+
+		if provider != "" {
+			structuredPayload.Provider = provider
+		}
+
+		if metaData != nil && len(metaData) > 0 {
+			structuredPayload.Metadata = metaData
+		}
+
+		payload = structuredPayload
+	} else {
+		// no flags given, fallback to plain JSON argument
+		if !cmd.Args().Present() || cmd.Args().Len() < 1 {
+			return cli.Exit(errors.New("args required - try 'webhook send help'"), 1)
+		}
+
+		// validate payload is valid json
+		unstructuredPayload := cmd.Args().First()
+		if unstructuredPayload == "" {
+			return cli.Exit(errors.New("payload cannot be blank"), 1)
+		}
+		if !json.Valid([]byte(unstructuredPayload)) {
+			return cli.Exit(errors.New("payload is not valid JSON"), 1)
+		}
+
+		payload = unstructuredPayload
 	}
 
 	var errorRes api.ErrorResponse
@@ -241,7 +315,7 @@ func webhookSend(_ context.Context, cmd *cli.Command) error {
 	res, err := client.R().
 		SetHeader(api.HeaderContentType, api.HeaderContentTypeApplicationJson).
 		SetHeader(api.HeaderWebhookToken, cmd.String(flagWebhookToken)).
-		SetBody(payloadArg).
+		SetBody(payload).
 		SetError(&errorRes).
 		Post(url)
 
