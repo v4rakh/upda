@@ -12,7 +12,9 @@ import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
 import { CheckOutlined, CloseOutlined, DeleteOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Popconfirm, Row, Space, Switch, Tag, Tooltip, Typography } from 'antd';
-import { FC, ReactNode, useCallback, useEffect } from 'react';
+import parse from 'html-react-parser';
+import linkifyHtml from 'linkify-html';
+import { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -94,6 +96,18 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 		},
 		[entity.id, entity.label, modifyLabel]
 	);
+
+	const commandPreview = useMemo(() => {
+		return (
+			<Text code copyable>
+				{parse(
+					linkifyHtml(
+						`upda webhook send --url ${window.location.protocol}//${window.location.host} --webhook-id ${entity.id} --webhook-token "$TOKEN" --application "Test Application" --application-version "3.0.23"`
+					)
+				)}
+			</Text>
+		);
+	}, [entity.id]);
 
 	const buttons = [];
 	const delAction = (
@@ -237,6 +251,16 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 										locale
 									)}
 								</Text>
+							</Space>
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							<Space>
+								<Text type="secondary" ellipsis>
+									{t('preview_cli')}
+								</Text>
+								{commandPreview}
 							</Space>
 						</Col>
 					</Row>

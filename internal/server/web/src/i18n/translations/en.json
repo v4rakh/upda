@@ -224,6 +224,7 @@
     "help_delete": "Delete"
   },
   "comment_edit": {
+    "cancel": "Cancel",
     "content": "Content",
     "content_required": "Content is required",
     "create": "Create new comment",
@@ -232,8 +233,7 @@
     "error_forbidden": "Forbidden to update comment.",
     "error_unable": "Unable to update comment. Please refresh this page.",
     "error_unauthorized": "Unable to update comment. Please refresh this page.",
-    "submit": "Submit",
-    "cancel": "Cancel"
+    "submit": "Submit"
   },
   "comments": {
     "error_bad_request_get": "Invalid input. Unable to retrieve comments.",
@@ -537,6 +537,7 @@
     "help_delete": "Delete",
     "ignore_host": "Ignore host",
     "label": "Label",
+    "preview_cli": "CLI",
     "type": "Type",
     "type_diun": "Diun",
     "type_generic": "Generic",
