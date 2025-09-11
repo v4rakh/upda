@@ -16,12 +16,14 @@ func CreateFileWithParent(file string) error {
 	var err error
 	parentDir := filepath.Dir(file)
 
+	// #nosec G301
 	if err = os.MkdirAll(parentDir, os.ModePerm); err != nil {
 		return errors.New(fmt.Sprintf("cannot create parent directory '%v': %v", parentDir, fmt.Errorf("%w", err)))
 	}
 
 	if _, err = os.Stat(file); errors.Is(err, os.ErrNotExist) {
 		var f *os.File
+		// #nosec G304
 		f, err = os.Create(file)
 		defer func(f *os.File) {
 			_ = f.Close()
@@ -41,6 +43,7 @@ func CreateDirectoryRecursively(dir string) error {
 	}
 
 	var err error
+	// #nosec G301
 	if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 		return errors.New(fmt.Sprintf("cannot create parent directory '%v': %v", dir, fmt.Errorf("%w", err)))
 	}

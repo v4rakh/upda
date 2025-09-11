@@ -60,6 +60,15 @@ run-server:
 run-web:
 	@cd ${WEB_DIR}; $(PNPM) start
 
+audit: audit-web audit-server
+
+audit-web:
+	@cd ${WEB_DIR}; $(PNPM) audit -P;
+
+audit-server:
+	@$(GO) install github.com/securego/gosec/v2/cmd/gosec@latest
+	@$$(go env GOPATH)/bin/gosec -severity medium -confidence medium ./...
+
 build: build-web build-server-all
 
 build-server:
@@ -88,4 +97,4 @@ build-server-windows-arm64:
 build-web:
 	@cd ${WEB_DIR}; $(PNPM) run build; rm -rf build/conf
 
-.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web checkstyle checkstyle-server checkstyle-web build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web run run-server run-web generate generate-server
+.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web checkstyle checkstyle-server checkstyle-web build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web run run-server run-web generate generate-server audit audit-web audit-server

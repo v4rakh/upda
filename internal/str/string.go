@@ -50,6 +50,7 @@ func RandomString(n int) string {
 	}
 	b := make([]byte, n)
 	for i := 0; i < n; {
+		// #nosec G404
 		if idx := int(rand.Int63() & letterIdxMask); idx < len(letterBytes) {
 			b[i] = letterBytes[idx]
 			i++
