@@ -38,10 +38,10 @@ type Logging struct {
 	Debug                   bool                              `env:"DEBUG,default=false"`
 	Development             bool                              `env:"DEVELOPMENT,default=false"`
 	Directory               string                            `env:"LOGGING_DIRECTORY"`
-	Encoding                constant.ConfigLogEncoding        `env:"LOGGING_ENCODING,default=json" validate:"required,oneof=json console"`
+	Encoding                constant.ConfigLogEncoding        `env:"LOGGING_ENCODING,default=console" validate:"required,oneof=json console"`
 	EncodingCallerEncoder   constant.ConfigLogCallerEncoder   `env:"LOGGING_ENCODING_CALLER_ENCODER,default=short" validate:"required,oneof=full short"`
 	EncodingDurationEncoder constant.ConfigLogDurationEncoder `env:"LOGGING_ENCODING_DURATION_ENCODER,default=seconds" validate:"required,oneof=seconds nanos millis string"`
-	EncodingLevelEncoder    constant.ConfigLogLevelEncoder    `env:"LOGGING_ENCODING_LEVEL_ENCODER,default=lowercase" validate:"required,oneof=lowercase lowercasecolor capital capitalcolor"`
+	EncodingLevelEncoder    constant.ConfigLogLevelEncoder    `env:"LOGGING_ENCODING_LEVEL_ENCODER,default=capital" validate:"required,oneof=lowercase lowercasecolor capital capitalcolor"`
 	EncodingLevelKey        string                            `env:"LOGGING_ENCODING_LEVEL_KEY,default=level" validate:"required_if=Encoding json"`
 	EncodingMessageKey      string                            `env:"LOGGING_ENCODING_MESSAGE_KEY,default=msg" validate:"required_if=Encoding json"`
 	EncodingStacktraceKey   string                            `env:"LOGGING_ENCODING_STACKTRACE_KEY,default=stacktrace" validate:"required_if=Encoding json"`
