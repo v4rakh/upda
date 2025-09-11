@@ -14,7 +14,11 @@ const AppFooter = () => {
 			<Layout.Footer style={{ textAlign: 'center' }}>
 				<Space>
 					<Text>&copy; {new Date().getFullYear()}</Text>
-					<Text>{t('version', { version: data?.data.version || t('unknown') })}</Text>
+					<Text>
+						{t('version', {
+							version: data?.data.version ? data?.data.version.slice(0, 7) : t('unknown')
+						})}
+					</Text>
 				</Space>
 			</Layout.Footer>
 		);

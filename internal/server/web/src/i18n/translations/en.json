@@ -512,8 +512,8 @@
     "version": "Version"
   },
   "version": {
-    "unknown": "unknown",
-    "version": "Version {{version}}"
+    "unknown": "",
+    "version": "{{version}}"
   },
   "webhook": {
     "cancel": "Cancel",
