@@ -9,16 +9,14 @@ import { CommentResponse, CommentSingleResponse, CommentsRequestParams } from '.
 import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { DownOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Avatar, Button, Flex, List, Tooltip, Typography } from 'antd';
+import { Avatar, Button, Flex, List, Result, Skeleton, Tooltip } from 'antd';
 import { filter, map, unionBy } from 'lodash';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type CommentProps = {
 	updateId: string;
 };
-
-const { Title } = Typography;
 
 const Comments = ({ updateId }: CommentProps): ReactNode => {
 	const [t] = useTranslation('comments');
@@ -79,34 +77,35 @@ const Comments = ({ updateId }: CommentProps): ReactNode => {
 		setComments(undefined);
 	}, []);
 
-	const onLoadMore = useCallback(() => {
+	const onLoadMore = useCallback(async () => {
 		if (hasMore) {
 			const nextPage = page + 1;
 			setPage(nextPage);
-			fetchData(updateId, nextPage);
+			await fetchData(updateId, nextPage);
 		}
 	}, [fetchData, hasMore, page, updateId]);
 
-	const loadMore = hasMore ? (
-		<div
-			style={{
-				textAlign: 'center'
-			}}>
-			<Button
-				size="small"
-				type="link"
-				onClick={onLoadMore}
-				icon={<DownOutlined />}
-				loading={result.isLoading || result.isFetching}
-				disabled={result.isLoading || result.isFetching}>
-				{t('load_more')}
-			</Button>
-		</div>
-	) : null;
+	const loadMore = useMemo(() => {
+		return hasMore ? (
+			<div
+				style={{
+					textAlign: 'center'
+				}}>
+				<Button
+					size="small"
+					type="link"
+					onClick={onLoadMore}
+					icon={<DownOutlined />}
+					loading={result.isLoading || result.isFetching}
+					disabled={result.isLoading || result.isFetching}>
+					{t('load_more')}
+				</Button>
+			</div>
+		) : null;
+	}, [hasMore, onLoadMore, result.isFetching, result.isLoading, t]);
 
 	return (
 		<>
-			<Title level={4}>{t('title')}</Title>
 			<CreateComment updateId={updateId} onCreateSuccess={invokeReload} />
 			<Flex justify="end" align="center">
 				<Tooltip title={t('reload_tooltip')} placement="bottom">
@@ -119,39 +118,49 @@ const Comments = ({ updateId }: CommentProps): ReactNode => {
 					/>
 				</Tooltip>
 			</Flex>
-			<List
-				itemLayout="vertical"
-				loading={result.isFetching}
-				locale={{ emptyText: t('no_data') }}
-				size="large"
-				loadMore={loadMore}
-				dataSource={comments}
-				renderItem={(comment) => (
-					<List.Item
-						extra={
-							<DeleteComment
-								onDeleteSuccess={() => removeComment(comment.id)}
-								key={`delete_${comment.id}`}
-								id={comment.id}
+			{result.isLoading ||
+				(result.isFetching && (
+					<Skeleton
+						loading={result.isLoading || result.isFetching}
+						active={result.isLoading || result.isFetching}
+					/>
+				))}
+			{result.isError && <Result status="error" title={t('error_default_loading')} />}
+			{result.isSuccess && (
+				<List
+					itemLayout="vertical"
+					loading={result.isLoading || result.isFetching}
+					locale={{ emptyText: t('no_data') }}
+					size="large"
+					loadMore={result.isSuccess && loadMore}
+					dataSource={comments}
+					renderItem={(comment) => (
+						<List.Item
+							extra={
+								<DeleteComment
+									onDeleteSuccess={() => removeComment(comment.id)}
+									key={`delete_${comment.id}`}
+									id={comment.id}
+								/>
+							}>
+							<List.Item.Meta
+								avatar={
+									<Avatar draggable={false} size="large">
+										{comment.author}
+									</Avatar>
+								}
+								title={formatDateTimeWithTimeZone(
+									comment.updatedAt,
+									DateTimeStyle.LONG,
+									DateTimeStyle.MEDIUM,
+									locale
+								)}
 							/>
-						}>
-						<List.Item.Meta
-							avatar={
-								<Avatar draggable={false} size="large">
-									{comment.author}
-								</Avatar>
-							}
-							title={formatDateTimeWithTimeZone(
-								comment.updatedAt,
-								DateTimeStyle.LONG,
-								DateTimeStyle.MEDIUM,
-								locale
-							)}
-						/>
-						<EditableComment comment={comment} onEditSuccess={editComment} />
-					</List.Item>
-				)}
-			/>
+							<EditableComment comment={comment} onEditSuccess={editComment} />
+						</List.Item>
+					)}
+				/>
+			)}
 		</>
 	);
 };

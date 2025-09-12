@@ -2,6 +2,8 @@ package repository
 
 import (
 	"encoding/json"
+	"fmt"
+	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -10,8 +12,8 @@ import (
 
 type EventRepository interface {
 	Find(id string) (*model.Event, error)
-	Window(size int, skip int, orderBy string, order string) ([]*model.Event, error)
-	WindowHasNext(size int, skip int, orderBy string, order string) (bool, error)
+	Window(size int, skip int, orderBy string, order string, updateId *string) ([]*model.Event, error)
+	WindowHasNext(size int, skip int, orderBy string, order string, updateId *string) (bool, error)
 	Count(state ...string) (int64, error)
 	FindAllByState(limit int, state ...string) ([]*model.Event, error)
 	Create(name string, state string, payload interface{}) (*model.Event, error)
@@ -130,7 +132,7 @@ func (r *EventDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...
 	return res.RowsAffected, nil
 }
 
-func (r *EventDbRepo) Window(size int, skip int, orderBy string, order string) ([]*model.Event, error) {
+func (r *EventDbRepo) Window(size int, skip int, orderBy string, order string, updateId *string) ([]*model.Event, error) {
 	if size <= 0 {
 		return nil, service_error.ErrValidationSizeGreaterZero
 	}
@@ -142,14 +144,19 @@ func (r *EventDbRepo) Window(size int, skip int, orderBy string, order string) (
 	}
 
 	var e []*model.Event
-	if res := r.db.Order(orderBy + " " + order).Offset(skip).Limit(size).Find(&e); res.Error != nil {
+	if res := r.db.Debug().Model(&model.Event{}).
+		Scopes(CriterionEventUpdateID(updateId)).
+		Order(orderBy + " " + order).
+		Offset(skip).
+		Limit(size).
+		Find(&e); res.Error != nil {
 		return nil, service_error.NewServiceDatabaseError(res.Error)
 	}
 
 	return e, nil
 }
 
-func (r *EventDbRepo) WindowHasNext(size int, skip int, orderBy string, order string) (bool, error) {
+func (r *EventDbRepo) WindowHasNext(size int, skip int, orderBy string, order string, updateId *string) (bool, error) {
 	if orderBy == "" {
 		orderBy = "created_at"
 	}
@@ -159,7 +166,7 @@ func (r *EventDbRepo) WindowHasNext(size int, skip int, orderBy string, order st
 
 	var e []*model.Event
 
-	if res := r.db.Order(orderBy + " " + order).Offset(skip + size).Find(&e); res.Error != nil {
+	if res := r.db.Model(&model.Event{}).Scopes(CriterionEventUpdateID(updateId)).Order(orderBy + " " + order).Offset(skip + size).Find(&e); res.Error != nil {
 		return false, service_error.NewServiceDatabaseError(res.Error)
 	}
 
@@ -176,7 +183,7 @@ func (r *EventDbRepo) FindAllByState(limit int, state ...string) ([]*model.Event
 
 	var e []*model.Event
 
-	if res := r.db.Model(&model.Event{}).Scopes(AllGetEventCriterion(state)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
+	if res := r.db.Model(&model.Event{}).Scopes(CriterionEventState(state)).Order("created_at asc").Limit(limit).Find(&e); res.Error != nil {
 		return nil, service_error.NewServiceDatabaseError(res.Error)
 	}
 
@@ -186,7 +193,7 @@ func (r *EventDbRepo) FindAllByState(limit int, state ...string) ([]*model.Event
 func (r *EventDbRepo) Count(state ...string) (int64, error) {
 	var c int64
 
-	if res := r.db.Model(&model.Event{}).Scopes(AllGetEventCriterion(state)).Count(&c); res.Error != nil {
+	if res := r.db.Model(&model.Event{}).Scopes(CriterionEventState(state)).Count(&c); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
 
@@ -204,8 +211,20 @@ func CriterionEventState(states []string) func(db *gorm.DB) *gorm.DB {
 	}
 }
 
-func AllGetEventCriterion(states []string) func(db *gorm.DB) *gorm.DB {
+func CriterionEventUpdateID(updateId *string) func(db *gorm.DB) *gorm.DB {
+	if updateId == nil {
+		return func(db *gorm.DB) *gorm.DB {
+			return db
+		}
+	}
+
+	names := []string{constant.EventNameUpdateCreated.String(),
+		constant.EventNameUpdateUpdated.String(),
+		constant.EventNameUpdateUpdatedVersion.String(),
+		constant.EventNameUpdateUpdatedState.String(),
+		constant.EventNameUpdateDeleted.String()}
+
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Scopes(CriterionEventState(states))
+		return db.Where("name IN (?)", names).Where("payload @> ?", fmt.Sprintf(`{"id": "%s"}`, *updateId))
 	}
 }

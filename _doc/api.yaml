@@ -1025,6 +1025,13 @@ paths:
               - name
               - created_at
               - updated_at
+        - name: updateId
+          in: query
+          description: an optional updateId, filtering down only events matching the update
+          required: false
+          schema:
+            type: string
+            nullable: true
       responses:
         '200':
           description: Successful operation

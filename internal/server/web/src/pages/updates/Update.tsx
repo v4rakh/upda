@@ -1,5 +1,7 @@
+import UpdateFilterLink from './UpdateFilterLink';
 import UpdateStateTag from './UpdateStateTag';
 import { useDeleteUpdateMutation, useModifyUpdateStateMutation } from '../../api/updatesApi';
+import UpdateSearchIn from '../../constants/api/updateSearchIn';
 import AppPaths from '../../constants/appPaths';
 import DateTimeStyle from '../../constants/dateTimeStyle';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
@@ -17,7 +19,7 @@ import {
 	StopOutlined
 } from '@ant-design/icons';
 import { Badge, Button, Card, Col, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
-import { FC, ReactNode, useCallback, useEffect } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -231,7 +233,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 								<Text type="secondary" ellipsis>
 									{t('provider')}
 								</Text>
-								<Text>{entity.provider}</Text>
+								<UpdateFilterLink label={entity.provider} searchIn={UpdateSearchIn.PROVIDER} />
 							</Space>
 						</Col>
 					</Row>
@@ -241,7 +243,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 								<Text type="secondary" ellipsis>
 									{t('host')}
 								</Text>
-								<Text>{entity.host}</Text>
+								<UpdateFilterLink label={entity.host} searchIn={UpdateSearchIn.HOST} />
 							</Space>
 						</Col>
 					</Row>

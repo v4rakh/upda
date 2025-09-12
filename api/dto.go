@@ -171,10 +171,11 @@ type PaginateActionInvocationRequest struct {
 }
 
 type EventWindowRequest struct {
-	Size    int    `form:"size,default=10" binding:"numeric,gte=1"`
-	Skip    int    `form:"skip,default=0" binding:"numeric"`
-	Order   string `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy string `form:"orderBy,default=created_at" binding:"oneof=id name created_at updated_at"`
+	Size     int     `form:"size,default=10" binding:"numeric,gte=1"`
+	Skip     int     `form:"skip,default=0" binding:"numeric"`
+	Order    string  `form:"order,default=desc" binding:"oneof=asc desc"`
+	OrderBy  string  `form:"orderBy,default=created_at" binding:"oneof=id name created_at updated_at"`
+	UpdateID *string `form:"updateId"`
 }
 
 type PaginateCommentRequest struct {

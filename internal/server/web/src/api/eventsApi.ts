@@ -9,7 +9,7 @@ export const eventsApi = injectEndpoints({
 	endpoints: (build) => {
 		return {
 			getEvents: build.query<EventsResponse, EventsRequestParams>({
-				query: ({ size, skip, order, orderBy }) => {
+				query: ({ size, skip, order, orderBy, updateId }) => {
 					const params = new URLSearchParams();
 					if (size) {
 						params.append(EventFilterQueryParamNames.SIZE, `${size}`);
@@ -22,6 +22,9 @@ export const eventsApi = injectEndpoints({
 					}
 					if (orderBy) {
 						params.append(EventFilterQueryParamNames.ORDER_BY, `${orderBy}`);
+					}
+					if (updateId) {
+						params.append(EventFilterQueryParamNames.UPDATE_ID, `${updateId}`);
 					}
 					return { url: `events?${params.toString()}` };
 				},

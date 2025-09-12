@@ -147,12 +147,12 @@ func (s *EventService) CleanStale(time time.Time, state ...constant.EventState) 
 	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, constant.FromVariadicToStr(state...)...)
 }
 
-func (s *EventService) Window(size int, skip int, orderBy string, order string) ([]*model.Event, error) {
-	return s.repo.Window(size, skip, orderBy, order)
+func (s *EventService) Window(size int, skip int, orderBy string, order string, updateId *string) ([]*model.Event, error) {
+	return s.repo.Window(size, skip, orderBy, order, updateId)
 }
 
-func (s *EventService) WindowHasNext(size int, skip int, orderBy string, order string) (bool, error) {
-	return s.repo.WindowHasNext(size, skip, orderBy, order)
+func (s *EventService) WindowHasNext(size int, skip int, orderBy string, order string, updateId *string) (bool, error) {
+	return s.repo.WindowHasNext(size, skip, orderBy, order, updateId)
 }
 
 func (s *EventService) Count(state ...constant.EventState) (int64, error) {

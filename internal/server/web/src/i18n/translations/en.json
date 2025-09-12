@@ -238,12 +238,12 @@
   "comments": {
     "error_bad_request_get": "Invalid input. Unable to retrieve comments.",
     "error_default_get": "Unable to retrieve comments. Please make sure your device has network connection.",
+    "error_default_loading": "Unable to load comments. Please make sure your device has network connection.",
     "error_forbidden_get": "Forbidden to retrieve comments.",
     "error_unauthorized_get": "Unable to retrieve comments. Please refresh this page.",
     "load_more": "Load more",
     "no_data": "No comments yet.",
-    "reload_tooltip": "Reload comments",
-    "title": "Comments"
+    "reload_tooltip": "Reload comments"
   },
   "common": {
     "404": "The page you've requested doesn't exist.",
@@ -321,11 +321,11 @@
     "name": "Name"
   },
   "event_text": {
-    "update_created": "Update of application <b>{{application}}</b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> with version <b>{{version}}</b> has been created.",
-    "update_deleted": "Update of application <b>{{application}}</b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> with version <b>{{version}}</b> has been deleted.",
-    "update_updated": "Update of application <b>{{application}}</b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> has been changed (version or metadata). Version: <b>{{version}}</b> (was <b>{{versionPrior}}</b>).",
-    "update_updated_state": "Update of application <b>{{application}}</b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> changed its state to <b>{{state}}</b> (was <b>{{statePrior}}</b>).",
-    "update_updated_version": "Update of application <b>{{application}}</b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> has been changed its version to <b>{{version}}</b> (was <b>{{versionPrior}}</b>)."
+    "update_created": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> with version <b>{{version}}</b> has been created.",
+    "update_deleted": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> with version <b>{{version}}</b> has been deleted.",
+    "update_updated": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> has been changed (version or metadata). Version: <b>{{version}}</b> (was <b>{{versionPrior}}</b>).",
+    "update_updated_state": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> changed its state to <b>{{state}}</b> (was <b>{{statePrior}}</b>).",
+    "update_updated_version": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> has been changed its version to <b>{{version}}</b> (was <b>{{versionPrior}}</b>)."
   },
   "events": {
     "auto_refresh": "Auto Refresh",
@@ -499,14 +499,24 @@
   },
   "updates_single": {
     "application": "Application",
+    "comments": "Comments",
     "created": "Created",
     "default_loading_error_message": "Unable to load update. Please make sure your device has network connection.",
+    "details": "Details",
+    "error_default_modify_state": "Unable to modify update. Please make sure your device has network connection.",
+    "error_forbidden_modify_state": "Forbidden to modify update.",
+    "error_unable_modify_state": "Resource cannot be found. Unable to modify update. Please refresh the page.",
+    "error_unauthorized_modify_state": "Unable to modify update. Please refresh this page.",
+    "events": "Events",
+    "help_approve": "Approve",
+    "help_ignore": "Ignore",
+    "help_pending": "Reset to pending",
     "host": "Host",
     "metadata": "Metadata",
     "no_update": "No update found.",
     "provider": "Provider",
     "state": "State",
-    "title": "Update Details",
+    "title": "Update {{name}}",
     "title_parent": "Updates",
     "updated": "Updated",
     "version": "Version"

@@ -11,6 +11,7 @@ const useEventsFilterQueryParams = () => {
 	}, []);
 
 	return {
+		updateId: replaceNullValue(queryParams.get(EventFilterQueryParamNames.UPDATE_ID)),
 		orderBy: replaceNullValue(queryParams.get(EventFilterQueryParamNames.ORDER_BY)),
 		order: replaceNullValue(queryParams.get(EventFilterQueryParamNames.ORDER)),
 		size: queryParams.get(EventFilterQueryParamNames.SIZE)

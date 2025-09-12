@@ -21,6 +21,7 @@ export type EventsResponse = {
 export type EventsRequestParams = {
 	orderBy?: EventOrderBy;
 	order?: EventOrder;
+	updateId?: string;
 } & WindowedResponse;
 
 export interface EventResponse {

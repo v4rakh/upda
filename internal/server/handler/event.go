@@ -25,7 +25,7 @@ func (h *EventHandler) Window(c *gin.Context) {
 	}
 
 	var events []*model.Event
-	if events, err = h.service.Window(queryParams.Size, queryParams.Skip, queryParams.OrderBy, queryParams.Order); err != nil {
+	if events, err = h.service.Window(queryParams.Size, queryParams.Skip, queryParams.OrderBy, queryParams.Order, queryParams.UpdateID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
@@ -44,7 +44,7 @@ func (h *EventHandler) Window(c *gin.Context) {
 	}
 
 	var hasNext bool
-	if hasNext, err = h.service.WindowHasNext(queryParams.Size, queryParams.Skip, queryParams.OrderBy, queryParams.Order); err != nil {
+	if hasNext, err = h.service.WindowHasNext(queryParams.Size, queryParams.Skip, queryParams.OrderBy, queryParams.Order, queryParams.UpdateID); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
