@@ -144,7 +144,7 @@ func (r *EventDbRepo) Window(size int, skip int, orderBy string, order string, u
 	}
 
 	var e []*model.Event
-	if res := r.db.Debug().Model(&model.Event{}).
+	if res := r.db.Model(&model.Event{}).
 		Scopes(CriterionEventUpdateID(updateId)).
 		Order(orderBy + " " + order).
 		Offset(skip).
