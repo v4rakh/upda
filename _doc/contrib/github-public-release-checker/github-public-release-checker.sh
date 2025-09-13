@@ -27,7 +27,7 @@ for REPO in "${REPOS[@]}"; do
         echo "$LATEST_TAG" >"$LAST_RELEASE_FILE"
         HOSTNAME=$(hostname)
         # use environment for URL, webhook ID and webhook's token
-        upda webhook send --application "$REPO" --application-version "$LATEST_TAG" --host "$HOSTNAME"
+        upda webhook send --application "$REPO" --application-version "$LATEST_TAG" --host "$HOSTNAME" --metadata "hub_link=https://github.com/$REPO/releases"
     else
         echo "[$REPO] No new release. Latest is $LATEST_TAG"
     fi
