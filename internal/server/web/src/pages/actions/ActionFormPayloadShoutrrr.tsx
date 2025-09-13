@@ -1,19 +1,21 @@
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Alert, Button, Form, Input } from 'antd';
+import useActionAutoSuggestion from '../../use/useActionAutoSuggestion';
+import { MinusCircleOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Alert, Button, Flex, Form, FormInstance, Mentions } from 'antd';
 import parse from 'html-react-parser';
 import { FC, KeyboardEvent, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface ActionFormShoutrrrProps {
 	isLoading: boolean;
+	form: FormInstance;
 }
 
 const KEY_ENTER = 'Enter';
+const PREFIX_TRIGGER = ['<'];
 
-const { TextArea } = Input;
-
-const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): ReactNode => {
+const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading, form }): ReactNode => {
 	const [t] = useTranslation('action_form_shoutrrrr');
+	const { mentionOptions, reloadMentionOptions } = useActionAutoSuggestion();
 
 	// Prevents line breaks
 	const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -56,23 +58,33 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): 
 										}
 									]}
 									noStyle>
-									<TextArea
-										autoSize={{ minRows: 1, maxRows: 5 }}
-										showCount
-										allowClear
-										onKeyDown={handleKeyDown}
-										disabled={isLoading}
-										placeholder={t('urls_placeholder')}
-										variant="filled"
-										style={{ width: '90%' }}
-									/>
+									<Flex>
+										<Mentions
+											defaultValue={form.getFieldValue('urls')[index]}
+											onChange={(val) => {
+												const currentUrls = form.getFieldValue('urls');
+												currentUrls[index] = val;
+												form.setFieldValue('urls', currentUrls);
+											}}
+											split={''}
+											prefix={PREFIX_TRIGGER}
+											autoSize={{ minRows: 1, maxRows: 5 }}
+											allowClear
+											options={mentionOptions}
+											onKeyDown={handleKeyDown}
+											placeholder={t('urls_placeholder')}
+											disabled={isLoading}
+											variant="filled"
+										/>
+										<Button type="link" icon={<ReloadOutlined />} onClick={reloadMentionOptions} />
+										{!isLoading && fields.length > 1 ? (
+											<MinusCircleOutlined
+												style={{ marginLeft: '5%' }}
+												onClick={() => remove(field.name)}
+											/>
+										) : null}
+									</Flex>
 								</Form.Item>
-								{!isLoading && fields.length > 1 ? (
-									<MinusCircleOutlined
-										style={{ marginLeft: '5%' }}
-										onClick={() => remove(field.name)}
-									/>
-								) : null}
 							</Form.Item>
 						))}
 						<Form.Item>
@@ -93,16 +105,22 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading }): 
 					{ required: true, message: t('body_required') },
 					{ min: 1, message: t('body_size') }
 				]}>
-				<TextArea
-					autoSize={{ minRows: 1, maxRows: 5 }}
-					showCount
-					allowClear
-					// onKeyDown={handleKeyDown}
-					placeholder={t('body_placeholder')}
-					disabled={isLoading}
-					variant="filled"
-					style={{ width: '95%' }}
-				/>
+				<Flex>
+					<Mentions
+						defaultValue={form.getFieldValue('body')}
+						onChange={(val) => form.setFieldValue('body', val)}
+						split={''}
+						prefix={PREFIX_TRIGGER}
+						autoSize={{ minRows: 1, maxRows: 5 }}
+						allowClear
+						options={mentionOptions}
+						// onKeyDown={handleKeyDown}
+						placeholder={t('body_placeholder')}
+						disabled={isLoading}
+						variant="filled"
+					/>
+					<Button type="link" icon={<ReloadOutlined />} onClick={reloadMentionOptions} />
+				</Flex>
 			</Form.Item>
 		</>
 	);

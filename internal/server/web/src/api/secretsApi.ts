@@ -50,5 +50,10 @@ export const secretsApi = injectEndpoints({
 	}
 });
 
-export const { useGetSecretsQuery, useDeleteSecretMutation, useCreateSecretMutation, useModifyValueSecretMutation } =
-	secretsApi;
+export const {
+	useGetSecretsQuery,
+	useDeleteSecretMutation,
+	useCreateSecretMutation,
+	useModifyValueSecretMutation,
+	useLazyGetSecretsQuery
+} = secretsApi;

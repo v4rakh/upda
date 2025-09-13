@@ -69,7 +69,7 @@ const UpdateTypeAndPayloadAction: FC<UpdatePayloadActionProps> = ({ id, type, pa
 							initialValues={{ type, ...payload }}
 							layout="vertical">
 							<ActionFormType isLoading={isLoading} initialValue={typeValue} />
-							<ActionFormPayloadSwitch isLoading={isLoading} type={typeValue} />
+							<ActionFormPayloadSwitch isLoading={isLoading} type={typeValue} form={form} />
 							<Form.Item>
 								<Button type="primary" htmlType="submit" disabled={isLoading} loading={isLoading}>
 									{t('submit')}

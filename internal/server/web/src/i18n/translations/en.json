@@ -42,7 +42,7 @@
     "body_placeholder": "Update arrived on <VAR>HOST</VAR>. <CONST>CHEERS</CONST>",
     "body_required": "Body is required",
     "body_size": "Body must be at least one character long",
-    "global_help_banner": "One or more URL definition(s) according to the <b><a href=\"https://containrrr.dev/shoutrrr/latest/services/overview/\" target=\"_blank\">shoutrrr</a></b> documentation.<br/>You can also use the <code>&lt;CONST&gt;KEY&lt;CONST&gt;</code>, <code>&lt;VAR&gt;KEY&lt;VAR&gt;</code> and <code>&lt;SECRET&gt;KEY&lt;SECRET&gt;</code> syntax to inject dynamic content. Tags are replaced for <b>URL</b>s and the <b>body</b>.<br/><code>CONST</code> tags are replaced first meaning they can contain other tags.",
+    "global_help_banner": "One or more URL definition(s) according to the <b><a href=\"https://containrrr.dev/shoutrrr/latest/services/overview/\" target=\"_blank\">shoutrrr</a></b> documentation.<br/>You can also use the <code>&lt;CONST&gt;KEY&lt;CONST&gt;</code>, <code>&lt;VAR&gt;KEY&lt;VAR&gt;</code> and <code>&lt;SECRET&gt;KEY&lt;SECRET&gt;</code> syntax to inject dynamic content. Tags are replaced for <b>URL</b>s and the <b>body</b>.<br/><code>CONST</code> tags are replaced first meaning they can contain other tags. Auto-complete is enabled, just hit <code>&lt;</code>.",
     "type_label": "Type",
     "url": "URL",
     "url_help": "Define the URL. You can use the CONST, VAR and SECRETS syntax to inject dynamic content.",

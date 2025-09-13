@@ -124,7 +124,7 @@ const CreateAction = (): ReactNode => {
 									<Input placeholder={t('all')} variant="filled" />
 								</Form.Item>
 								<ActionFormType isLoading={isLoading} initialValue={ActionType.SHOUTRRR} />
-								<ActionFormPayloadSwitch isLoading={isLoading} type={type} />
+								<ActionFormPayloadSwitch isLoading={isLoading} type={type} form={form} />
 								<Form.Item
 									label={t('enabled_label')}
 									tooltip={t('enabled_help')}

@@ -57,5 +57,6 @@ export const {
 	useGetConstantsQuery,
 	useDeleteConstantMutation,
 	useCreateConstantMutation,
-	useModifyValueConstantMutation
+	useModifyValueConstantMutation,
+	useLazyGetConstantsQuery
 } = constantsApi;
