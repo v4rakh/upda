@@ -1,7 +1,7 @@
 #
 # Build image
 #
-FROM alpine:3.21 AS builder
+FROM alpine:3.22 AS builder
 LABEL maintainer="Varakh <varakh@varakh.de>"
 ARG VERSION="rolling-oci"
 
@@ -9,8 +9,6 @@ RUN apk --update upgrade && \
     apk add git && \
     apk add go gcc make && \
     apk add nodejs npm && \
-    # See https://stackoverflow.com/questions/34729748/installed-go-binary-not-found-in-path-on-alpine-linux-docker
-    mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2 && \
     rm -rf /var/cache/apk/*
 
 WORKDIR /app
@@ -21,14 +19,14 @@ RUN npm install --global pnpm@^10 && \
 #
 # Actual image
 #
-FROM alpine:3.21
+FROM alpine:3.22
 LABEL maintainer="Varakh <varakh@varakh.de>" \
     description="upda" \
     org.opencontainers.image.authors="Varakh" \
     org.opencontainers.image.vendor="Varakh" \
     org.opencontainers.image.title="upda" \
     org.opencontainers.image.description="upda" \
-    org.opencontainers.image.base.name="alpine:3.21"
+    org.opencontainers.image.base.name="alpine:3.22"
 
 ENV USER=appuser
 ENV GROUP=appuser
