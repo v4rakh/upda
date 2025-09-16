@@ -11,11 +11,10 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	ginstatic "github.com/gin-contrib/static"
-	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v3"
 	"go.uber.org/automaxprocs/maxprocs"
-	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
@@ -38,11 +37,11 @@ func start(c context.Context) {
 	// configuration init
 	cfg, db := config.LoadFromEnvironment(c)
 
-	zap.L().Sugar().Infof("Starting %s %s", app.Name, app.Version)
+	log.Info().Msgf("Starting %s %s", app.Name, app.Version)
 
 	// adhere to GOMAXPROCS, but silence default output
 	_, _ = maxprocs.Set(maxprocs.Logger(nil))
-	zap.L().Sugar().Debugf("GOMAXPROCS '%d'", runtime.GOMAXPROCS(0))
+	log.Debug().Msgf("GOMAXPROCS '%d'", runtime.GOMAXPROCS(0))
 
 	// set gin mode derived
 	if cfg.App.Development {
@@ -52,28 +51,27 @@ func start(c context.Context) {
 	}
 
 	corsMiddleware := middlewareCors(cfg.Cors)
-	zapMiddleware := ginzap.Ginzap(zap.L(), "", cfg.Logging.UTC)
-	recoveryMiddleware := ginzap.RecoveryWithZap(zap.L(), true)
-	errorMiddleware := middlewareErrorHandler()
-	errorRecoveryMiddleware := middlewareErrorRecoveryHandler()
+	loggingMiddleware := middlewareLogging(cfg.Logging)
+	recoveryMiddleware := middlewarePanicRecoveryHandler(cfg.Logging)
+	errorMiddleware := middlewareErrorTransformer()
 
 	// routers init
-	appRouter := newEngine(zapMiddleware, recoveryMiddleware, corsMiddleware, middlewareAppName(), middlewareAppVersion(), errorMiddleware, errorRecoveryMiddleware)
-	promRouter := newEngine(zapMiddleware, recoveryMiddleware, errorMiddleware, errorRecoveryMiddleware)
+	appRouter := newEngine(loggingMiddleware, recoveryMiddleware, corsMiddleware, middlewareAppName(), middlewareAppVersion(), errorMiddleware)
+	promRouter := newEngine(loggingMiddleware, recoveryMiddleware, errorMiddleware)
 
 	separatePromServer := cfg.Prometheus.Enabled && cfg.Prometheus.Port != cfg.Server.Port
 
 	var prometheusService *service.PrometheusService
 	if cfg.Prometheus.Enabled && separatePromServer {
 		prometheusService = service.NewPrometheusService(promRouter, cfg.Prometheus)
-		zap.L().Info("Starting separate Prometheus server")
+		log.Info().Msg("Starting separate Prometheus server")
 	} else if cfg.Prometheus.Enabled && !separatePromServer {
 		prometheusService = service.NewPrometheusService(appRouter, cfg.Prometheus)
-		zap.L().Info("Starting embedded Prometheus server")
+		log.Info().Msg("Starting embedded Prometheus server")
 	}
 	if cfg.Prometheus.Enabled {
 		if err = prometheusService.Init(); err != nil {
-			zap.L().Sugar().Fatalf("Prometheus service init failed: %s", err.Error())
+			log.Fatal().Msgf("Prometheus service init failed: %s", err.Error())
 		}
 		// always instrument tracking for the app router
 		appRouter.Use(prometheusService.GetProm().Instrument())
@@ -96,7 +94,7 @@ func start(c context.Context) {
 		lockService, e = service.NewLockRedisService(cfg.Lock)
 
 		if err != nil {
-			zap.L().Fatal("Failed to create lock service", zap.Error(e))
+			log.Fatal().Msgf("Failed to create lock service %+v", e)
 		}
 	} else {
 		lockService = service.NewLockMemService()
@@ -116,11 +114,11 @@ func start(c context.Context) {
 	var taskService *service.TaskService
 
 	if taskService, err = service.NewTaskService(updateService, eventService, webhookService, actionService, actionInvocationService, lockService, prometheusService, cfg.App, cfg.Task, cfg.Lock, cfg.Prometheus); err != nil {
-		zap.L().Sugar().Fatalf("Task service creation failed: %v", err)
+		log.Fatal().Msgf("Task service creation failed: %v", err)
 	}
 
 	if err = taskService.Init(); err != nil {
-		zap.L().Sugar().Fatalf("Task service initialization failed: %v", err)
+		log.Fatal().Msgf("Task service initialization failed: %v", err)
 	}
 
 	taskService.Start()
@@ -149,7 +147,7 @@ func start(c context.Context) {
 		targetFSPath := "web/build"
 		var webinterfaceFolderFS ginstatic.ServeFileSystem
 		if webinterfaceFolderFS, err = ginstatic.EmbedFolder(webinterfaceFS, targetFSPath); err != nil {
-			zap.L().Sugar().Fatalf("Cannot serve webinterface folder: %s", err.Error())
+			log.Fatal().Msgf("Cannot serve webinterface folder: %s", err.Error())
 		}
 
 		appRouter.GET(cfg.Server.BasePath, middlewareRedirect("ui/"))
@@ -174,7 +172,7 @@ func start(c context.Context) {
 	} else if constant.ConfigAuthModeBasicCredentials == cfg.Auth.AuthMethod {
 		authMethodHandler = gin.BasicAuth(cfg.Auth.BasicAuthCredentials)
 	} else {
-		zap.L().Fatal("No valid auth mode found")
+		log.Fatal().Msg("No valid auth mode found")
 	}
 
 	apiAuthGroup := appRouter.Group(fmt.Sprintf("%sapi/v1", cfg.Server.BasePath), authMethodHandler)
@@ -256,7 +254,7 @@ func start(c context.Context) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	zap.L().Info("Shutting down...")
+	log.Info().Msg("Shutting down...")
 
 	timeoutCtx, timeoutCancel := context.WithTimeout(c, cfg.Server.Timeout)
 	defer timeoutCancel()
@@ -271,16 +269,16 @@ func start(c context.Context) {
 
 	select {
 	case <-shutdownDone:
-		zap.L().Info("Exited")
+		log.Info().Msg("Exited")
 	case <-timeoutCtx.Done():
-		zap.L().Sugar().Infof("Shutdown timeout of '%v' expired, exiting forcefully...", cfg.Server.Timeout)
+		log.Info().Msgf("Shutdown timeout of '%v' expired, exiting forcefully...", cfg.Server.Timeout)
 		os.Exit(1)
 	}
 }
 
 func newServer(r *gin.Engine, address string) *http.Server {
 	if r == nil || address == "" {
-		zap.L().Fatal("Failed to create server, engine or address is nil")
+		log.Fatal().Msg("Failed to create server, engine or address is nil")
 		return nil
 	}
 
@@ -293,7 +291,7 @@ func newServer(r *gin.Engine, address string) *http.Server {
 func startServer(s *http.Server, cfg *config.Server) {
 	go func() {
 		var e error
-		zap.L().Sugar().Infof("Server listening on '%s'", s.Addr)
+		log.Info().Msgf("Server listening on '%s'", s.Addr)
 
 		if cfg.TlsEnabled {
 			e = s.ListenAndServeTLS(cfg.TlsCertPath, cfg.TlsKeyPath)
@@ -302,7 +300,7 @@ func startServer(s *http.Server, cfg *config.Server) {
 		}
 
 		if e != nil && !errors.Is(e, http.ErrServerClosed) {
-			zap.L().Sugar().Fatalf("Server cannot be started: %v", e)
+			log.Fatal().Msgf("Server cannot be started: %v", e)
 		}
 	}()
 }
@@ -313,10 +311,10 @@ func stopServer(ctx context.Context, s *http.Server) {
 	}
 
 	if err := s.Shutdown(ctx); err != nil {
-		zap.L().Sugar().Fatalf("Shutdown failed, exited directly: %v", err)
+		log.Fatal().Msgf("Shutdown failed, exited directly: %v", err)
 	}
 
-	zap.L().Sugar().Infof("Shutdown for '%s' complete", s.Addr)
+	log.Info().Msgf("Shutdown for '%s' complete", s.Addr)
 }
 
 func newEngine(middleware ...gin.HandlerFunc) *gin.Engine {

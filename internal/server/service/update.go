@@ -6,7 +6,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -51,13 +51,13 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 			return nil, err
 		}
 		s.eventService.CreateUpdateCreated(e)
-		zap.L().Sugar().Infof("Created update '%v'", e)
+		log.Info().Msgf("Created update '%v'", e)
 	} else {
 		old := e
 		skip := e.State == constant.UpdateStateIgnored.String()
 
 		if skip {
-			zap.L().Sugar().Infof("Skipping ignored update '%v'", e.ID)
+			log.Info().Msgf("Skipping ignored update '%v'", e.ID)
 			return nil, nil
 		}
 
@@ -66,10 +66,10 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 		}
 
 		s.eventService.CreateUpdateUpdated(old, e)
-		zap.L().Sugar().Infof("Updated update '%v'", e)
+		log.Info().Msgf("Updated update '%v'", e)
 
 		if constant.UpdateStateApproved.String() == e.State {
-			zap.L().Sugar().Infof("Setting update '%v' state to '%v'", e.ID, constant.UpdateStatePending)
+			log.Info().Msgf("Setting update '%v' state to '%v'", e.ID, constant.UpdateStatePending)
 			if e, err = s.repo.UpdateState(e.ID.String(), constant.UpdateStatePending.String()); err != nil {
 				return nil, err
 			}
@@ -98,7 +98,7 @@ func (s *UpdateService) UpdateState(id string, state constant.UpdateState) (*mod
 
 	s.eventService.CreateUpdateUpdated(oldUpdate, e)
 
-	zap.L().Sugar().Infof("Modified update '%v'", id)
+	log.Info().Msgf("Modified update '%v'", id)
 	return e, nil
 }
 
@@ -119,7 +119,7 @@ func (s *UpdateService) Delete(id string) error {
 
 	s.eventService.CreateUpdateDeleted(e)
 
-	zap.L().Sugar().Infof("Deleted update '%v'", id)
+	log.Info().Msgf("Deleted update '%v'", id)
 	return nil
 }
 

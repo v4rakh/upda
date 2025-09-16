@@ -1,6 +1,8 @@
 module git.myservermanager.com/varakh/upda
 
-go 1.24.0
+go 1.24.3
+
+toolchain go1.24.6
 
 require (
 	github.com/Depado/ginprom v1.8.1
@@ -8,7 +10,6 @@ require (
 	github.com/docker/go-connections v0.6.0
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-contrib/static v1.1.5
-	github.com/gin-contrib/zap v1.1.5
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-co-op/gocron-redis-lock/v2 v2.1.0
 	github.com/go-co-op/gocron/v2 v2.16.5
@@ -18,17 +19,17 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.19.0
 	github.com/google/uuid v1.6.0
 	github.com/redis/go-redis/v9 v9.14.0
+	github.com/rs/zerolog v1.34.0
 	github.com/sethvargo/go-envconfig v1.3.0
+	github.com/skynet2/zerolog-gorm v1.1.0
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.38.0
 	github.com/urfave/cli/v3 v3.4.1
 	go.eigsys.de/gin-cachecontrol/v2 v2.3.0
 	go.uber.org/automaxprocs v1.6.0
-	go.uber.org/zap v1.27.0
 	gorm.io/datatypes v1.2.6
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.0
-	moul.io/zapgorm2 v1.3.0
 )
 
 require (
@@ -81,7 +82,7 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.10 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
@@ -117,7 +118,6 @@ require (
 	go.opentelemetry.io/otel v1.37.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.18.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/net v0.41.0 // indirect

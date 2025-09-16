@@ -5,7 +5,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 type SecretService struct {
@@ -61,7 +61,7 @@ func (s *SecretService) Insert(key string, value string) (*model.Secret, error) 
 		if e, err = s.repo.Create(key, value); err != nil {
 			return nil, err
 		}
-		zap.L().Sugar().Infof("Created secret '%s'", e.Key)
+		log.Info().Msgf("Created secret '%s'", e.Key)
 	} else {
 		return nil, service_error.ErrResourceConflict
 	}
@@ -85,7 +85,7 @@ func (s *SecretService) UpdateValue(id string, value string) (*model.Secret, err
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified secret '%v'", id)
+	log.Info().Msgf("Modified secret '%v'", id)
 	return e, nil
 }
 
@@ -103,6 +103,6 @@ func (s *SecretService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted secret '%v'", id)
+	log.Info().Msgf("Deleted secret '%v'", id)
 	return nil
 }

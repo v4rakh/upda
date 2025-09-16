@@ -4,7 +4,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 type CommentService struct {
@@ -60,7 +60,7 @@ func (s *CommentService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted comment '%v'", id)
+	log.Info().Msgf("Deleted comment '%v'", id)
 
 	return nil
 }
@@ -78,7 +78,7 @@ func (s *CommentService) Create(author string, content string, update *model.Upd
 	if e, err = s.repo.Create(author, content, update.ID.String()); err != nil {
 		return nil, err
 	} else {
-		zap.L().Sugar().Info("Created comment")
+		log.Info().Msg("Created comment")
 		return e, nil
 	}
 }
@@ -99,6 +99,6 @@ func (s *CommentService) UpdateContent(id string, content string) (*model.Commen
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified comment '%v'", id)
+	log.Info().Msgf("Modified comment '%v'", id)
 	return e, nil
 }

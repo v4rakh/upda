@@ -8,7 +8,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"git.myservermanager.com/varakh/upda/internal/str"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 type WebhookService struct {
@@ -53,7 +53,7 @@ func (s *WebhookService) Create(label string, t constant.WebhookType, ignoreHost
 	if e, err = s.repo.Create(label, t.String(), token, ignoreHost); err != nil {
 		return nil, err
 	} else {
-		zap.L().Sugar().Info("Created webhook")
+		log.Info().Msg("Created webhook")
 		return e, nil
 	}
 }
@@ -74,7 +74,7 @@ func (s *WebhookService) UpdateLabel(id string, label string) (*model.Webhook, e
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified webhook '%v'", id)
+	log.Info().Msgf("Modified webhook '%v'", id)
 	return e, nil
 }
 
@@ -94,7 +94,7 @@ func (s *WebhookService) UpdateIgnoreHost(id string, ignoreHost bool) (*model.We
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified webhook '%v'", id)
+	log.Info().Msgf("Modified webhook '%v'", id)
 	return e, nil
 }
 
@@ -112,7 +112,7 @@ func (s *WebhookService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted webhook '%v'", id)
+	log.Info().Msgf("Deleted webhook '%v'", id)
 
 	return nil
 }

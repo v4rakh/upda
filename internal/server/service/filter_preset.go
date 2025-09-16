@@ -5,7 +5,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 type FilterPresetService struct {
@@ -37,7 +37,7 @@ func (s *FilterPresetService) Create(t constant.FilterPresetType, label string, 
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Created filter preset '%s' ('%s')", e.Type, e.Label)
+	log.Info().Msgf("Created filter preset '%s' ('%s')", e.Type, e.Label)
 
 	return e, err
 }
@@ -56,6 +56,6 @@ func (s *FilterPresetService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted filter preset '%v'", id)
+	log.Info().Msgf("Deleted filter preset '%v'", id)
 	return nil
 }

@@ -12,11 +12,14 @@ import (
 	"github.com/gin-contrib/cors"
 	ginstatic "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"go.eigsys.de/gin-cachecontrol/v2"
 	"io"
 	"mime"
 	"net/http"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 )
 
@@ -29,6 +32,50 @@ func middlewareCors(c *config.Cors) gin.HandlerFunc {
 		AllowCredentials: c.AllowCredentials,
 		ExposeHeaders:    c.ExposeHeaders,
 	})
+}
+
+// middlewareLogging logs access
+func middlewareLogging(lc *config.Logging) gin.HandlerFunc {
+	var err error
+	var logLevel zerolog.Level
+	if logLevel, err = zerolog.ParseLevel(lc.LevelRequests); err != nil {
+		logLevel = zerolog.Disabled
+	}
+	return func(c *gin.Context) {
+		c.Next()
+		log.WithLevel(logLevel).Msgf("Handled request %s %s: %d", c.Request.Method, c.Request.URL.Path, c.Writer.Status())
+	}
+}
+
+// middlewarePanicRecoveryHandler recovers app from panics, logs them and returns proper response
+// logs the error and stack trace using zerolog.Logger, and returns a 500 response.
+func middlewarePanicRecoveryHandler(lc *config.Logging) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Error().Str(lc.EncodingStacktraceKey, string(debug.Stack())).Msgf("panic recovered: %v", err)
+				c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeGeneral), fmt.Sprintf("%s", err)))
+			}
+		}()
+
+		c.Next()
+	}
+}
+
+// middlewareErrorTransformer transforms errors into proper responses (does not overwrite any given status)
+func middlewareErrorTransformer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// call next first, so this is the last in chain
+		c.Next()
+
+		if len(c.Errors) > 0 {
+			// status -1 doesn't overwrite existing status code
+			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+			c.JSON(-1, api.NewErrorResponseWithStatusAndMessage(handler.CodeToStr(c.Errors.Last()), c.Errors.Last().Error()))
+			return
+		}
+	}
 }
 
 // middlewareCacheControl applies cache control settings
@@ -94,33 +141,6 @@ func middlewareEnforceJsonContentType() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusBadRequest, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeIllegalArgument), "content-type must be application/json"))
 			return
 		}
-		c.Next()
-	}
-}
-
-// middlewareErrorHandler handles global error handling, does not overwrite any given status (see -1)
-func middlewareErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		// call next first, so this is the last in chain
-		c.Next()
-
-		if len(c.Errors) > 0 {
-			// status -1 doesn't overwrite existing status code
-			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
-			c.JSON(-1, api.NewErrorResponseWithStatusAndMessage(handler.CodeToStr(c.Errors.Last()), c.Errors.Last().Error()))
-			return
-		}
-	}
-}
-
-// middlewareErrorRecoveryHandler recovers from panics, returning a 500 error
-func middlewareErrorRecoveryHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			if err := recover(); err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeGeneral), fmt.Sprintf("%s", err)))
-			}
-		}()
 		c.Next()
 	}
 }

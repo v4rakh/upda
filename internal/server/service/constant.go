@@ -5,7 +5,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 type ConstantService struct {
@@ -61,7 +61,7 @@ func (s *ConstantService) Insert(key string, value string) (*model.Constant, err
 		if e, err = s.repo.Create(key, value); err != nil {
 			return nil, err
 		}
-		zap.L().Sugar().Infof("Created constant '%s'", e.Key)
+		log.Info().Msgf("Created constant '%s'", e.Key)
 	} else {
 		return nil, service_error.ErrResourceConflict
 	}
@@ -85,7 +85,7 @@ func (s *ConstantService) UpdateValue(id string, value string) (*model.Constant,
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified constant '%v'", id)
+	log.Info().Msgf("Modified constant '%v'", id)
 	return e, nil
 }
 
@@ -103,6 +103,6 @@ func (s *ConstantService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted constant '%v'", id)
+	log.Info().Msgf("Deleted constant '%v'", id)
 	return nil
 }

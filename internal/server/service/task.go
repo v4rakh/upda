@@ -9,7 +9,7 @@ import (
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -51,13 +51,13 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 	// global job options
 	singletonModeOption := gocron.WithSingletonMode(gocron.LimitModeReschedule)
 	errorEventListener := gocron.AfterJobRunsWithError(func(jobID uuid.UUID, jobName string, err error) {
-		zap.L().Sugar().Errorf("Job '%s' (%v) had a panic %v", jobName, jobID, err)
+		log.Error().Msgf("Job '%s' (%v) had a panic %v", jobName, jobID, err)
 	})
 	successEventListener := gocron.AfterJobRuns(func(jobID uuid.UUID, jobName string) {
-		zap.L().Sugar().Debugf("Job '%s' (%v) finished", jobName, jobID)
+		log.Debug().Msgf("Job '%s' (%v) finished", jobName, jobID)
 	})
 	beforeEventListener := gocron.BeforeJobRuns(func(jobID uuid.UUID, jobName string) {
-		zap.L().Sugar().Debugf("Job '%s' (%v) starts", jobName, jobID)
+		log.Debug().Msgf("Job '%s' (%v) starts", jobName, jobID)
 	})
 	eventListenerOption := gocron.WithEventListeners(beforeEventListener, successEventListener, errorEventListener)
 	startAtOption := gocron.WithStartAt(gocron.WithStartDateTime(initialTasksStartDelay))
@@ -66,7 +66,7 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 	schedulerOptions := []gocron.SchedulerOption{gocron.WithLocation(location), gocron.WithGlobalJobOptions(singletonModeOption, eventListenerOption, startAtOption)}
 
 	if lc.RedisEnabled {
-		zap.L().Info("Initializing REDIS task service")
+		log.Info().Msg("Initializing REDIS task service")
 
 		var c *redis.Client
 		if c, err = config.NewRedisClient(fmt.Sprintf("%s-task", app.Name), lc.RedisUrl); err != nil {
@@ -123,19 +123,19 @@ func (s *TaskService) Init() error {
 }
 
 func (s *TaskService) Stop() {
-	zap.L().Sugar().Infof("Stopping %d periodic tasks...", len(s.scheduler.Jobs()))
+	log.Info().Msgf("Stopping %d periodic tasks...", len(s.scheduler.Jobs()))
 	if err := s.scheduler.StopJobs(); err != nil {
-		zap.L().Sugar().Warnf("Cannot stop periodic tasks. Reason: %v", err)
+		log.Warn().Msgf("Cannot stop periodic tasks. Reason: %v", err)
 	}
 	if err := s.scheduler.Shutdown(); err != nil {
-		zap.L().Sugar().Warnf("Cannot shut down scheduler. Reason: %v", err)
+		log.Warn().Msgf("Cannot shut down scheduler. Reason: %v", err)
 	}
-	zap.L().Info("Stopped all periodic tasks")
+	log.Info().Msg("Stopped all periodic tasks")
 }
 
 func (s *TaskService) Start() {
 	s.scheduler.Start()
-	zap.L().Sugar().Infof("Started %d periodic tasks", len(s.scheduler.Jobs()))
+	log.Info().Msgf("Started %d periodic tasks", len(s.scheduler.Jobs()))
 }
 
 func (s *TaskService) configureCleanupStaleUpdatesTask() error {
@@ -151,14 +151,14 @@ func (s *TaskService) configureCleanupStaleUpdatesTask() error {
 		var c int64
 
 		if c, err = s.updateService.CleanStale(t, constant.UpdateStateApproved, constant.UpdateStateIgnored); err != nil {
-			zap.L().Sugar().Errorf("Could not clean up ignored or approved updates older than %s (%s). Reason: %s", s.taskConfig.UpdateCleanStaleMaxAge, t, err.Error())
+			log.Error().Msgf("Could not clean up ignored or approved updates older than %s (%s). Reason: %s", s.taskConfig.UpdateCleanStaleMaxAge, t, err.Error())
 			return
 		}
 
 		if c > 0 {
-			zap.L().Sugar().Infof("Cleaned up '%d' stale updates", c)
+			log.Info().Msgf("Cleaned up '%d' stale updates", c)
 		} else {
-			zap.L().Debug("No stale updates found to clean up")
+			log.Debug().Msg("No stale updates found to clean up")
 		}
 	}
 
@@ -183,14 +183,14 @@ func (s *TaskService) configureCleanupStaleEventsTask() error {
 		var c int64
 
 		if c, err = s.eventService.CleanStale(t, constant.EventStateCreated, constant.EventStateEnqueued); err != nil {
-			zap.L().Sugar().Errorf("Could not clean up stale events older than %s (%s). Reason: %s", s.taskConfig.EventCleanStaleMaxAge, t, err.Error())
+			log.Error().Msgf("Could not clean up stale events older than %s (%s). Reason: %s", s.taskConfig.EventCleanStaleMaxAge, t, err.Error())
 			return
 		}
 
 		if c > 0 {
-			zap.L().Sugar().Infof("Cleaned up '%d' stale events", c)
+			log.Info().Msgf("Cleaned up '%d' stale events", c)
 		} else {
-			zap.L().Debug("No stale events found to clean up")
+			log.Debug().Msg("No stale events found to clean up")
 		}
 	}
 
@@ -209,7 +209,7 @@ func (s *TaskService) configureActionsEnqueueTask() error {
 
 	runnable := func() {
 		if err := s.actionInvocationService.Enqueue(s.taskConfig.ActionsEnqueueBatchSize); err != nil {
-			zap.L().Sugar().Errorf("Could enqueue actions. Reason: %s", err.Error())
+			log.Error().Msgf("Could enqueue actions. Reason: %s", err.Error())
 		}
 	}
 
@@ -228,7 +228,7 @@ func (s *TaskService) configureActionsInvokeTask() error {
 
 	runnable := func() {
 		if err := s.actionInvocationService.Invoke(s.taskConfig.ActionsInvokeBatchSize, s.taskConfig.ActionsInvokeMaxRetries); err != nil {
-			zap.L().Sugar().Errorf("Could invoke actions. Reason: %s", err.Error())
+			log.Error().Msgf("Could invoke actions. Reason: %s", err.Error())
 		}
 	}
 
@@ -253,21 +253,21 @@ func (s *TaskService) configureCleanupStaleActionsTask() error {
 		var err error
 
 		if cError, err = s.actionInvocationService.CleanStale(t, s.taskConfig.ActionsInvokeMaxRetries, constant.ActionInvocationStateError); err != nil {
-			zap.L().Sugar().Errorf("Could not clean up error stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
+			log.Error().Msgf("Could not clean up error stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
 			return
 		}
 
 		var cSuccess int64
 		if cSuccess, err = s.actionInvocationService.CleanStale(t, 0, constant.ActionInvocationStateSuccess); err != nil {
-			zap.L().Sugar().Errorf("Could not clean up success stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
+			log.Error().Msgf("Could not clean up success stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
 			return
 		}
 
 		c := cError + cSuccess
 		if c > 0 {
-			zap.L().Sugar().Infof("Cleaned up '%d' stale actions", c)
+			log.Info().Msgf("Cleaned up '%d' stale actions", c)
 		} else {
-			zap.L().Debug("No stale actions found to clean up")
+			log.Debug().Msg("No stale actions found to clean up")
 		}
 	}
 
@@ -288,7 +288,7 @@ func (s *TaskService) configurePrometheusRefreshTask() error {
 		updates, updatesError := s.updateService.GetAll()
 
 		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesTotal, float64(len(updates))); updatesError != nil {
-			zap.L().Sugar().Errorf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
+			log.Error().Msgf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
 		}
 
 		var pendingTotal int64
@@ -306,34 +306,34 @@ func (s *TaskService) configurePrometheusRefreshTask() error {
 		}
 
 		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesPending, float64(pendingTotal)); updatesError != nil {
-			zap.L().Sugar().Errorf("Could not refresh updates pending prometheus metric. Reason: %s", updatesError.Error())
+			log.Error().Msgf("Could not refresh updates pending prometheus metric. Reason: %s", updatesError.Error())
 		}
 		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesIgnored, float64(ignoredTotal)); updatesError != nil {
-			zap.L().Sugar().Errorf("Could not refresh updates ignored prometheus metric. Reason: %s", updatesError.Error())
+			log.Error().Msgf("Could not refresh updates ignored prometheus metric. Reason: %s", updatesError.Error())
 		}
 		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesApproved, float64(ackTotal)); updatesError != nil {
-			zap.L().Sugar().Errorf("Could not refresh updates approved prometheus metric. Reason: %s", updatesError.Error())
+			log.Error().Msgf("Could not refresh updates approved prometheus metric. Reason: %s", updatesError.Error())
 		}
 
 		var webhooksTotal int64
 		var webhooksError error
 		webhooksTotal, webhooksError = s.webhookService.Count()
 		if webhooksError = s.prometheusService.SetGaugeNoLabels(constant.MetricWebhooks, float64(webhooksTotal)); webhooksError != nil {
-			zap.L().Sugar().Errorf("Could not refresh webhooks prometheus metric. Reason: %s", webhooksError.Error())
+			log.Error().Msgf("Could not refresh webhooks prometheus metric. Reason: %s", webhooksError.Error())
 		}
 
 		var eventsTotal int64
 		var eventsError error
 		eventsTotal, eventsError = s.eventService.Count()
 		if eventsError = s.prometheusService.SetGaugeNoLabels(constant.MetricEvents, float64(eventsTotal)); eventsError != nil {
-			zap.L().Sugar().Errorf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
+			log.Error().Msgf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
 		}
 
 		var actionsTotal int64
 		var actionsError error
 		actionsTotal, actionsError = s.actionService.Count()
 		if actionsError = s.prometheusService.SetGaugeNoLabels(constant.MetricActions, float64(actionsTotal)); actionsError != nil {
-			zap.L().Sugar().Errorf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
+			log.Error().Msgf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
 		}
 	}
 

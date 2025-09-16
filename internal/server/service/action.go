@@ -8,7 +8,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/go-playground/validator/v10"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 type ActionService struct {
@@ -51,7 +51,7 @@ func (s *ActionService) Create(label string, t constant.ActionType, matchEvent *
 	if e, err = s.repo.Create(label, t.String(), matchEvent, matchHost, matchApplication, matchProvider, payload, enabled); err != nil {
 		return nil, err
 	} else {
-		zap.L().Sugar().Info("Created action")
+		log.Info().Msg("Created action")
 		return e, nil
 	}
 }
@@ -101,7 +101,7 @@ func (s *ActionService) UpdateLabel(id string, label string) (*model.Action, err
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -121,7 +121,7 @@ func (s *ActionService) UpdateMatchEvent(id string, matchEvent *string) (*model.
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -141,7 +141,7 @@ func (s *ActionService) UpdateMatchApplication(id string, matchApplication *stri
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -161,7 +161,7 @@ func (s *ActionService) UpdateMatchProvider(id string, matchProvider *string) (*
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -181,7 +181,7 @@ func (s *ActionService) UpdateMatchHost(id string, matchHost *string) (*model.Ac
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -208,7 +208,7 @@ func (s *ActionService) UpdateTypeAndPayload(id string, t constant.ActionType, p
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -228,7 +228,7 @@ func (s *ActionService) UpdateEnabled(id string, enabled bool) (*model.Action, e
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action '%v'", id)
+	log.Info().Msgf("Modified action '%v'", id)
 	return e, nil
 }
 
@@ -246,7 +246,7 @@ func (s *ActionService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted action '%v'", id)
+	log.Info().Msgf("Deleted action '%v'", id)
 
 	return nil
 }

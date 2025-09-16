@@ -24,7 +24,7 @@ Head over to the [getting started](#getting-started) for setting up the developm
 * Each entity is only used in repository and service (otherwise, mapping happens, latest at controller level)
 * Presenter layer is constructed from the entity, e.g., in REST responses and mapped
 * No entity is directly returned in any REST response
-* All log calls should be handled by `zap.L()`
+* All log calls should be handled by `log`
 * Configuration is bootstrapped via separated `struct` types which are given to the service which need them
 * Error handling
     * Always throw an error with `NewServiceError` for repositories, services and handlers
@@ -35,7 +35,7 @@ Head over to the [getting started](#getting-started) for setting up the developm
     * Utils can throw any error
     * Repositories, handlers and services should always properly return `error` including any `init`-like function (
       best to avoid them and call in `newXXX`). **Do not abort with `Fatalf` or similar**
-    * `log.Fatalf` or `zap.L().Fatal` is allowed in `config.go` or `server.go`
+    * `log.Fatalf` or `log.Fatal()` is allowed in `config.go` or `server.go`
 * Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml).
 * Consider reading [Effective Go](https://go.dev/doc/effective_go)
 * Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
@@ -84,9 +84,9 @@ Ensure to set the following environment variables for proper debug logs during d
 ```shell
 WEB_INTERFACE_ENABLED=false
 DEVELOPMENT=true
-LOGGING_ENCODING=console
-LOGGING_ENCODING_LEVEL_ENCODER=capitalcolor
 LOGGING_LEVEL=debug
+LOGGING_LEVEL_REQUESTS=debug
+LOGGING_ENCODING_COLORIZE=true
 ```
 
 1. Run `make clean dependencies` to fetch dependencies

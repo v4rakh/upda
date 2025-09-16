@@ -9,7 +9,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 	"time"
 )
 
@@ -90,7 +90,7 @@ func (s *EventService) CreateWithWarnOnly(name constant.EventName, payload inter
 	var err error
 
 	if e, err = s.Create(name, payload); err != nil {
-		zap.L().Sugar().Warnf("Could not create event '%s': %v", name, err)
+		log.Warn().Msgf("Could not create event '%s': %v", name, err)
 		return nil
 	}
 
@@ -109,7 +109,7 @@ func (s *EventService) Create(name constant.EventName, payload interface{}) (*mo
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Created event '%v'", e.Name)
+	log.Info().Msgf("Created event '%v'", e.Name)
 
 	return e, err
 }
@@ -135,7 +135,7 @@ func (s *EventService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted event '%v'", id)
+	log.Info().Msgf("Deleted event '%v'", id)
 	return nil
 }
 
@@ -186,7 +186,7 @@ func (s *EventService) UpdateState(id string, state constant.EventState) (*model
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified event '%v'", id)
+	log.Info().Msgf("Modified event '%v'", id)
 	return e, nil
 }
 

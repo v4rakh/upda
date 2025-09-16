@@ -10,7 +10,7 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	strutil "git.myservermanager.com/varakh/upda/internal/str"
 	"github.com/containrrr/shoutrrr"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 	"strings"
 	"time"
 )
@@ -52,7 +52,7 @@ func (s *ActionInvocationService) Enqueue(batchSize int) error {
 
 	for _, event := range events {
 		if err = s.EnqueueFromEvent(event, actions); err != nil {
-			zap.L().Sugar().Errorf("Could not enqueue action for event '%s' (%s). Reason: %s", event.Name, event.ID, err.Error())
+			log.Error().Msgf("Could not enqueue action for event '%s' (%s). Reason: %s", event.Name, event.ID, err.Error())
 		}
 	}
 
@@ -86,12 +86,12 @@ func (s *ActionInvocationService) EnqueueFromEvent(event *model.Event, actions [
 	}
 
 	if len(filteredActions) == 0 {
-		zap.L().Sugar().Debugf("No actions found which match event '%s', nothing to enqueue", event.Name)
+		log.Debug().Msgf("No actions found which match event '%s', nothing to enqueue", event.Name)
 	}
 
 	for _, action := range filteredActions {
 		if _, err = s.Create(event, action, constant.ActionInvocationStateCreated); err != nil {
-			zap.L().Sugar().Errorf("Could not enqueue action '%s' (%v). Reason: %s", action.Label, action.ID, err.Error())
+			log.Error().Msgf("Could not enqueue action '%s' (%v). Reason: %s", action.Label, action.ID, err.Error())
 			continue
 		}
 	}
@@ -120,35 +120,35 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 	}
 
 	if len(actionInvocations) == 0 {
-		zap.L().Sugar().Debugf("No action invocations found to process")
+		log.Debug().Msgf("No action invocations found to process")
 		return nil
 	}
 
 	for _, actionInvocation := range actionInvocations {
 		if _, err = s.UpdateState(actionInvocation.ID.String(), constant.ActionInvocationStateRunning); err != nil {
-			zap.L().Sugar().Errorf("Could not mark action invocation '%v' as running. Reason: %s", actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not mark action invocation '%v' as running. Reason: %s", actionInvocation.ID, err.Error())
 			continue
 		}
 
-		zap.L().Sugar().Debugf("Invoking action '%v' for event '%v'", actionInvocation.ActionID, actionInvocation.EventID)
+		log.Debug().Msgf("Invoking action '%v' for event '%v'", actionInvocation.ActionID, actionInvocation.EventID)
 
 		var event *model.Event
 		if event, err = s.eventService.Get(actionInvocation.EventID); err != nil {
-			zap.L().Sugar().Errorf("Could not find event '%v' for action '%v' and action invocation '%v'. Reason: %s", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not find event '%v' for action '%v' and action invocation '%v'. Reason: %s", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID, err.Error())
 			// with cascade, cannot happen
 			continue
 		}
 
 		var eventPayload *dto.EventPayloadInformationDto
 		if eventPayload, err = s.eventService.ExtractPayloadInfo(event); err != nil {
-			zap.L().Sugar().Errorf("Could not extract event's '%v' information for action '%v' and action invocation '%v'. Reason: %s", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not extract event's '%v' information for action '%v' and action invocation '%v'. Reason: %s", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID, err.Error())
 			// with layout of attached payload, cannot happen
 			continue
 		}
 
 		var action *model.Action
 		if action, err = s.actionService.Get(actionInvocation.ActionID); err != nil {
-			zap.L().Sugar().Errorf("Could not find action '%v' for action invocation '%v'. Reason: %s", actionInvocation.ActionID, actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not find action '%v' for action invocation '%v'. Reason: %s", actionInvocation.ActionID, actionInvocation.ID, err.Error())
 			// with cascade, cannot happen
 			continue
 		}
@@ -157,39 +157,39 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 			var cause error
 			cause = err
 
-			zap.L().Sugar().Errorf("Could not invoke action '%s' (%v) for action invocation '%v'. Reason: %s", action.Label, action.ID, actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not invoke action '%s' (%v) for action invocation '%v'. Reason: %s", action.Label, action.ID, actionInvocation.ID, err.Error())
 
 			var newState constant.ActionInvocationState
 			newRetryCount := actionInvocation.RetryCount + 1
 			newState = constant.ActionInvocationStateRetrying
 
 			if newRetryCount >= maxRetries {
-				zap.L().Sugar().Infof("Action invocation '%v' exceeded max retry count of '%d'. Not trying again.", actionInvocation.ID, newRetryCount)
+				log.Info().Msgf("Action invocation '%v' exceeded max retry count of '%d'. Not trying again.", actionInvocation.ID, newRetryCount)
 				newState = constant.ActionInvocationStateError
 			}
 
 			if _, err = s.UpdateState(actionInvocation.ID.String(), newState); err != nil {
-				zap.L().Sugar().Errorf("Could not mark action invocation '%v' as '%v'. Reason: %s", actionInvocation.ID, newState, err.Error())
+				log.Error().Msgf("Could not mark action invocation '%v' as '%v'. Reason: %s", actionInvocation.ID, newState, err.Error())
 			}
 
 			if _, err = s.UpdateRetryCount(actionInvocation.ID.String(), newRetryCount); err != nil {
-				zap.L().Sugar().Errorf("Could not update action invocation '%v' retry count to '%d'. Reason: %s", actionInvocation.ID, newRetryCount, err.Error())
+				log.Error().Msgf("Could not update action invocation '%v' retry count to '%d'. Reason: %s", actionInvocation.ID, newRetryCount, err.Error())
 			}
 
 			msg := cause.Error()
 			if _, err = s.UpdateMessage(actionInvocation.ID.String(), &msg); err != nil {
-				zap.L().Sugar().Errorf("Could not update action invocation '%v' message. Reason: %s", actionInvocation.ID, err.Error())
+				log.Error().Msgf("Could not update action invocation '%v' message. Reason: %s", actionInvocation.ID, err.Error())
 			}
 
 			continue
 		}
 
-		zap.L().Sugar().Debugf("Processed action invocation '%v' for event '%s' (%v) and action '%s' (%v)", actionInvocation.ID, event.Name, event.ID, action.Label, action.ID)
+		log.Debug().Msgf("Processed action invocation '%v' for event '%s' (%v) and action '%s' (%v)", actionInvocation.ID, event.Name, event.ID, action.Label, action.ID)
 		if _, err = s.UpdateState(actionInvocation.ID.String(), constant.ActionInvocationStateSuccess); err != nil {
-			zap.L().Sugar().Errorf("Could not mark action invocation '%v' as success. Reason: %s", actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not mark action invocation '%v' as success. Reason: %s", actionInvocation.ID, err.Error())
 		}
 		if _, err = s.UpdateMessage(actionInvocation.ID.String(), nil); err != nil {
-			zap.L().Sugar().Errorf("Could not update action invocation '%v' message. Reason: %s", actionInvocation.ID, err.Error())
+			log.Error().Msgf("Could not update action invocation '%v' message. Reason: %s", actionInvocation.ID, err.Error())
 		}
 	}
 
@@ -248,7 +248,7 @@ func (s *ActionInvocationService) replaceSecrets(str string) string {
 	for _, match := range matches {
 		var val string
 		if val, err = s.secretService.GetValueByKey(match[1]); err != nil {
-			zap.L().Sugar().Warnf("Could not inject secret '%s'. Reason: %s", match[1], err.Error())
+			log.Warn().Msgf("Could not inject secret '%s'. Reason: %s", match[1], err.Error())
 			continue
 		}
 		str = strings.ReplaceAll(str, match[0], val)
@@ -270,7 +270,7 @@ func (s *ActionInvocationService) replaceConstants(str string) string {
 	for _, match := range matches {
 		var val string
 		if val, err = s.constantService.GetValueByKey(match[1]); err != nil {
-			zap.L().Sugar().Warnf("Could not inject constant '%s'. Reason: %s", match[1], err.Error())
+			log.Warn().Msgf("Could not inject constant '%s'. Reason: %s", match[1], err.Error())
 			continue
 		}
 		str = strings.ReplaceAll(str, match[0], val)
@@ -343,7 +343,7 @@ func (s *ActionInvocationService) Delete(id string) error {
 		return err
 	}
 
-	zap.L().Sugar().Infof("Deleted action '%v'", id)
+	log.Info().Msgf("Deleted action '%v'", id)
 
 	return nil
 }
@@ -364,7 +364,7 @@ func (s *ActionInvocationService) UpdateState(id string, state constant.ActionIn
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action invocation '%v'", id)
+	log.Info().Msgf("Modified action invocation '%v'", id)
 	return e, nil
 }
 
@@ -384,7 +384,7 @@ func (s *ActionInvocationService) UpdateMessage(id string, message *string) (*mo
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action invocation '%v'", id)
+	log.Info().Msgf("Modified action invocation '%v'", id)
 	return e, nil
 }
 
@@ -404,7 +404,7 @@ func (s *ActionInvocationService) UpdateRetryCount(id string, retryCount int) (*
 		return nil, err
 	}
 
-	zap.L().Sugar().Infof("Modified action invocation '%v'", id)
+	log.Info().Msgf("Modified action invocation '%v'", id)
 	return e, nil
 }
 
@@ -421,7 +421,7 @@ func (s *ActionInvocationService) Create(event *model.Event, action *model.Actio
 	if e, err = s.repo.Create(event.ID.String(), action.ID.String(), state.String()); err != nil {
 		return nil, err
 	} else {
-		zap.L().Sugar().Info("Created action invocation")
+		log.Info().Msg("Created action invocation")
 		return e, nil
 	}
 }
