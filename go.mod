@@ -2,7 +2,7 @@ module git.myservermanager.com/varakh/upda
 
 go 1.24.3
 
-toolchain go1.24.7
+toolchain go1.25.1
 
 require (
 	github.com/Depado/ginprom v1.8.1
