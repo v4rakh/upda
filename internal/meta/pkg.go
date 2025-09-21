@@ -1,4 +1,4 @@
-package app
+package meta
 
 const Name = "upda"
 

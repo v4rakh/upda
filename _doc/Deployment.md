@@ -167,7 +167,7 @@ server {
 
     # forward matching requests to the main upda application
     # make sure that SERVER_BASE_PATH is the same as the path inside the location (except for trailing slash)
-    location /upda-app {
+    location /upda-meta {
         proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

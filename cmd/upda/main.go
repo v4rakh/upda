@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"git.myservermanager.com/varakh/upda/internal/app"
+	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server"
 	"git.myservermanager.com/varakh/upda/internal/terminal"
 	"github.com/urfave/cli/v3"
@@ -16,9 +16,9 @@ func main() {
 	}
 
 	application := &cli.Command{
-		Name:    app.Name,
+		Name:    meta.Name,
 		Usage:   "command-line interface for upda",
-		Version: app.Version,
+		Version: meta.Version,
 		Commands: []*cli.Command{
 			{
 				Name: "server",

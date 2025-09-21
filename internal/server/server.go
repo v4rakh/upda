@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"git.myservermanager.com/varakh/upda/internal/app"
+	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/handler"
@@ -37,7 +37,7 @@ func start(c context.Context) {
 	// configuration init
 	cfg, db := config.LoadFromEnvironment(c)
 
-	log.Info().Msgf("Starting %s %s", app.Name, app.Version)
+	log.Info().Msgf("Starting %s %s", meta.Name, meta.Version)
 
 	// adhere to GOMAXPROCS, but silence default output
 	_, _ = maxprocs.Set(maxprocs.Logger(nil))
@@ -73,7 +73,7 @@ func start(c context.Context) {
 		if err = prometheusService.Init(); err != nil {
 			log.Fatal().Msgf("Prometheus service init failed: %s", err.Error())
 		}
-		// always instrument tracking for the app router
+		// always instrument tracking for the meta router
 		appRouter.Use(prometheusService.GetProm().Instrument())
 	}
 

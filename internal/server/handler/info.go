@@ -2,7 +2,7 @@ package handler
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/internal/app"
+	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -17,5 +17,5 @@ func NewInfoHandler(a *config.App) *InfoHandler {
 }
 
 func (h *InfoHandler) Show(c *gin.Context) {
-	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewInfoResponse(app.Name, app.Version, h.appConfig.TimeZone)))
+	c.JSON(http.StatusOK, api.NewDataResponseWithPayload(api.NewInfoResponse(meta.Name, meta.Version, h.appConfig.TimeZone)))
 }

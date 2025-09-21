@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/internal/app"
+	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v3"
@@ -387,7 +387,7 @@ func failIfFlagsNotPresent(cmd *cli.Command, flagKeys []string) error {
 
 func newClient(cmd *cli.Command) *resty.Client {
 	client := resty.New()
-	client.SetHeader("User-Agent", fmt.Sprintf("%s/%s", app.Name, app.Version))
+	client.SetHeader("User-Agent", fmt.Sprintf("%s/%s", meta.Name, meta.Version))
 	client.SetDisableWarn(true)
 	client.SetTimeout(cmd.Duration(flagTimeout))
 	client.SetBaseURL(cmd.String(flagUrl))

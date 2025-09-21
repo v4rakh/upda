@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/internal/app"
+	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/str"
 	"github.com/docker/go-connections/nat"
 	"github.com/stretchr/testify/assert"
@@ -186,7 +186,7 @@ func TestRequestInfoEndpoint(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.Equal(t, app.Name, i.Name)
+	assert.Equal(t, meta.Name, i.Name)
 	assert.NotEmpty(t, i.TimeZone)
 	assert.NotEmpty(t, i.Version)
 }
