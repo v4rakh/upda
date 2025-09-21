@@ -23,7 +23,7 @@ func main() {
 			{
 				Name: "server",
 				Commands: []*cli.Command{
-					server.ServeCmd,
+					serverServeCmd,
 				},
 			},
 			{
@@ -45,4 +45,14 @@ func main() {
 	if err := application.Run(context.Background(), os.Args); err != nil {
 		golog.Fatal(err)
 	}
+}
+
+var serverServeCmd = &cli.Command{
+	Name:  "serve",
+	Usage: "Starts the server and keeps it running",
+	Action: func(ctx context.Context, _ *cli.Command) error {
+		server := server.New(&ctx)
+		server.Start()
+		return nil
+	},
 }

@@ -13,7 +13,6 @@ import (
 	ginstatic "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
-	"github.com/urfave/cli/v3"
 	"go.uber.org/automaxprocs/maxprocs"
 	"net/http"
 	"os"
@@ -22,20 +21,26 @@ import (
 	"syscall"
 )
 
-var ServeCmd = &cli.Command{
-	Name:  "serve",
-	Usage: "Starts the server and keeps it running",
-	Action: func(ctx context.Context, _ *cli.Command) error {
-		start(ctx)
-		return nil
-	},
+type Server struct {
+	ctx context.Context
 }
 
-func start(c context.Context) {
+func New(ctx *context.Context) *Server {
+	s := &Server{}
+	if ctx == nil {
+		s.ctx = context.Background()
+	} else {
+		s.ctx = *ctx
+	}
+
+	return s
+}
+
+func (s *Server) Start() {
 	var err error
 
 	// configuration init
-	cfg, db := config.LoadFromEnvironment(c)
+	cfg, db := config.LoadFromEnvironment(s.ctx)
 
 	log.Info().Msgf("Starting %s %s", meta.Name, meta.Version)
 
@@ -56,8 +61,8 @@ func start(c context.Context) {
 	errorMiddleware := middlewareErrorTransformer()
 
 	// routers init
-	appRouter := newEngine(loggingMiddleware, recoveryMiddleware, corsMiddleware, middlewareAppName(), middlewareAppVersion(), errorMiddleware)
-	promRouter := newEngine(loggingMiddleware, recoveryMiddleware, errorMiddleware)
+	appRouter := s.newEngine(loggingMiddleware, recoveryMiddleware, corsMiddleware, middlewareAppName(), middlewareAppVersion(), errorMiddleware)
+	promRouter := s.newEngine(loggingMiddleware, recoveryMiddleware, errorMiddleware)
 
 	separatePromServer := cfg.Prometheus.Enabled && cfg.Prometheus.Port != cfg.Server.Port
 
@@ -235,13 +240,13 @@ func start(c context.Context) {
 	apiAuthGroup.DELETE("/comments/:id", commentHandler.Delete)
 
 	// start servers (run in separate goroutines)
-	appSrv := newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port))
-	prometheusSrv := newServer(promRouter, fmt.Sprintf("%s:%d", cfg.Prometheus.Listen, cfg.Prometheus.Port))
+	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port))
+	prometheusSrv := s.newServer(promRouter, fmt.Sprintf("%s:%d", cfg.Prometheus.Listen, cfg.Prometheus.Port))
 
-	startServer(appSrv, cfg.Server)
+	s.startServer(appSrv, cfg.Server)
 
 	if separatePromServer {
-		startServer(prometheusSrv, cfg.Server)
+		s.startServer(prometheusSrv, cfg.Server)
 	}
 
 	// gracefully handle shut down
@@ -256,14 +261,14 @@ func start(c context.Context) {
 
 	log.Info().Msg("Shutting down...")
 
-	timeoutCtx, timeoutCancel := context.WithTimeout(c, cfg.Server.Timeout)
+	timeoutCtx, timeoutCancel := context.WithTimeout(s.ctx, cfg.Server.Timeout)
 	defer timeoutCancel()
 
 	shutdownDone := make(chan struct{})
 	go func() {
 		taskService.Stop()
-		stopServer(c, appSrv)
-		stopServer(c, prometheusSrv)
+		s.stopServer(s.ctx, appSrv)
+		s.stopServer(s.ctx, prometheusSrv)
 		close(shutdownDone)
 	}()
 
@@ -276,7 +281,7 @@ func start(c context.Context) {
 	}
 }
 
-func newServer(r *gin.Engine, address string) *http.Server {
+func (s *Server) newServer(r *gin.Engine, address string) *http.Server {
 	if r == nil || address == "" {
 		log.Fatal().Msg("Failed to create server, engine or address is nil")
 		return nil
@@ -288,15 +293,15 @@ func newServer(r *gin.Engine, address string) *http.Server {
 	}
 }
 
-func startServer(s *http.Server, cfg *config.Server) {
+func (s *Server) startServer(h *http.Server, cfg *config.Server) {
 	go func() {
 		var e error
-		log.Info().Msgf("Server listening on '%s'", s.Addr)
+		log.Info().Msgf("Server listening on '%s'", h.Addr)
 
 		if cfg.TlsEnabled {
-			e = s.ListenAndServeTLS(cfg.TlsCertPath, cfg.TlsKeyPath)
+			e = h.ListenAndServeTLS(cfg.TlsCertPath, cfg.TlsKeyPath)
 		} else {
-			e = s.ListenAndServe()
+			e = h.ListenAndServe()
 		}
 
 		if e != nil && !errors.Is(e, http.ErrServerClosed) {
@@ -305,19 +310,19 @@ func startServer(s *http.Server, cfg *config.Server) {
 	}()
 }
 
-func stopServer(ctx context.Context, s *http.Server) {
-	if s == nil {
+func (s *Server) stopServer(ctx context.Context, h *http.Server) {
+	if h == nil {
 		return
 	}
 
-	if err := s.Shutdown(ctx); err != nil {
+	if err := h.Shutdown(ctx); err != nil {
 		log.Fatal().Msgf("Shutdown failed, exited directly: %v", err)
 	}
 
-	log.Info().Msgf("Shutdown for '%s' complete", s.Addr)
+	log.Info().Msgf("Shutdown for '%s' complete", h.Addr)
 }
 
-func newEngine(middleware ...gin.HandlerFunc) *gin.Engine {
+func (s *Server) newEngine(middleware ...gin.HandlerFunc) *gin.Engine {
 	r := gin.New()
 
 	for _, m := range middleware {
