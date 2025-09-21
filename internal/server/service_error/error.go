@@ -3,6 +3,7 @@ package service_error
 import (
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 var (
@@ -37,6 +38,11 @@ func NewServiceError(status ErrorCode, err error) error {
 	return &ServiceError{status, fmt.Errorf("service error (%v): %w", status, err)}
 }
 
+// NewServiceErrorHttp returns an error from HTTP status codes
+func NewServiceErrorHttp(status int, err error) error {
+	return NewServiceError(toErrorCode(status), err)
+}
+
 // NewServiceDatabaseError returns an error that formats as the given text and aligns with builtin error
 func NewServiceDatabaseError(error error) error {
 	return NewServiceError(ErrCodeGeneral, fmt.Errorf("database error: %w", error))
@@ -49,4 +55,23 @@ type ServiceError struct {
 
 func (e *ServiceError) Error() string {
 	return fmt.Sprintf("%v", e.Cause)
+}
+
+func toErrorCode(status int) ErrorCode {
+	switch status {
+	case http.StatusBadRequest:
+		return ErrCodeIllegalArgument
+	case http.StatusUnauthorized:
+		return ErrCodeUnauthorized
+	case http.StatusForbidden:
+		return ErrCodeForbidden
+	case http.StatusNotFound:
+		return ErrCodeNotFound
+	case http.StatusMethodNotAllowed:
+		return ErrCodeMethodNotAllowed
+	case http.StatusConflict:
+		return ErrCodeConflict
+	default:
+		return ErrCodeGeneral
+	}
 }

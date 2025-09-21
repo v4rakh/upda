@@ -49,7 +49,6 @@ const CreateComment = ({ updateId, onCreateSuccess }: CreateCommentProps): React
 		if (isError) {
 			apiError({
 				i18n: {
-					conflict: t('error_conflict'),
 					notFound: t('error_unable'),
 					unAuthorized: t('error_unauthorized'),
 					forbidden: t('error_forbidden'),

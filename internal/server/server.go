@@ -4,20 +4,27 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
+	"git.myservermanager.com/varakh/upda/internal/server/auth"
+	"git.myservermanager.com/varakh/upda/internal/server/auth/sessiongormstore"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/handler"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
+	"git.myservermanager.com/varakh/upda/internal/server/service_error"
+	"github.com/gin-contrib/sessions"
 	ginstatic "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"github.com/wader/gormstore/v2"
 	"go.uber.org/automaxprocs/maxprocs"
 	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
+	"slices"
 	"syscall"
 )
 
@@ -157,12 +164,11 @@ func (s *Server) Start() {
 
 	infoHandler := handler.NewInfoHandler(cfg.App)
 	healthHandler := handler.NewHealthHandler()
-	authHandler := handler.NewAuthHandler()
 
 	// in production, the web interface is served on SERVER_BASE_PATH, build with go flag -tags prod is required
 	if cfg.Webinterface.Enabled && !cfg.App.Development {
 		cacheControl := middlewareCacheControl(cfg.WebinterfaceCacheControl)
-		webinterfaceHandler := handler.NewWebinterfaceHandler(cfg.Webinterface)
+		webinterfaceHandler := handler.NewWebinterfaceHandler(cfg.Webinterface, cfg.Auth)
 		appRouter.GET(fmt.Sprintf("%sui/conf/runtime-config.js", cfg.Server.BasePath), cacheControl, webinterfaceHandler.GetConfig)
 
 		targetFSPath := "web/build"
@@ -184,76 +190,106 @@ func (s *Server) Start() {
 
 	apiPublicGroup.POST("/webhooks/:id", middlewareEnforceJsonContentType(), webhookInvocationHandler.Execute)
 
-	var authMethodHandler gin.HandlerFunc
+	apiProtectedGroup := appRouter.Group(fmt.Sprintf("%sapi/v1", cfg.Server.BasePath))
 
-	if constant.ConfigAuthModeBasicSingle == cfg.Auth.AuthMethod {
-		authMethodHandler = gin.BasicAuth(gin.Accounts{
-			cfg.Auth.BasicAuthUser: cfg.Auth.BasicAuthPassword,
-		})
-	} else if constant.ConfigAuthModeBasicCredentials == cfg.Auth.AuthMethod {
-		authMethodHandler = gin.BasicAuth(cfg.Auth.BasicAuthCredentials)
-	} else {
-		log.Fatal().Msg("No valid auth mode found")
+	// authentication provider
+	if !slices.Contains(constant.ConfigAuthTypeValues(), cfg.Auth.Type) {
+		log.Fatal().Msg("No valid auth type found")
 	}
 
-	apiAuthGroup := appRouter.Group(fmt.Sprintf("%sapi/v1", cfg.Server.BasePath), authMethodHandler)
-	apiAuthGroup.Use(middlewareSessionProvider())
+	var authProvider auth.Provider
 
-	apiAuthGroup.GET("/login", authHandler.Login)
+	if constant.ConfigAuthTypeSession == cfg.Auth.Type {
+		var validCredentials map[string]string
+		if constant.ConfigAuthSessionProviderSingle == cfg.Auth.SessionProvider {
+			validCredentials = map[string]string{cfg.Auth.SessionUser: cfg.Auth.SessionPassword}
+		} else if constant.ConfigAuthSessionProviderCredentials == cfg.Auth.SessionProvider {
+			validCredentials = cfg.Auth.SessionCredentials
+		}
 
-	apiAuthGroup.GET("/updates", updateHandler.Paginate)
-	apiAuthGroup.GET("/updates/:id", updateHandler.Get)
-	apiAuthGroup.PATCH("/updates/:id/state", middlewareEnforceJsonContentType(), updateHandler.UpdateState)
-	apiAuthGroup.DELETE("/updates/:id", updateHandler.Delete)
+		authSessionCleanTask := service.NewAuthSessionCleanTask(cfg.Auth, taskService)
 
-	apiAuthGroup.GET("/webhooks", webhookHandler.Paginate)
-	apiAuthGroup.POST("/webhooks", middlewareEnforceJsonContentType(), webhookHandler.Create)
-	apiAuthGroup.GET("/webhooks/:id", webhookHandler.Get)
-	apiAuthGroup.PATCH("/webhooks/:id/label", middlewareEnforceJsonContentType(), webhookHandler.UpdateLabel)
-	apiAuthGroup.PATCH("/webhooks/:id/ignore-host", middlewareEnforceJsonContentType(), webhookHandler.UpdateIgnoreHost)
-	apiAuthGroup.DELETE("/webhooks/:id", webhookHandler.Delete)
+		sessionOptions := sessions.Options{
+			MaxAge:   int(cfg.Auth.SessionCookieMaxAge.Seconds()),
+			SameSite: cfg.Auth.SessionCookieSameSiteMode,
+			Path:     cfg.Auth.SessionCookiePath,
+			HttpOnly: cfg.Auth.SessionCookieHttpOnly,
+			Secure:   cfg.Auth.SessionCookieSecure,
+		}
+		if cfg.Auth.SessionCookieDomain != nil {
+			sessionOptions.Domain = *cfg.Auth.SessionCookieDomain
+		}
 
-	apiAuthGroup.GET("/events", eventHandler.Window)
-	apiAuthGroup.GET("/events/:id", eventHandler.Get)
-	apiAuthGroup.DELETE("/events/:id", eventHandler.Delete)
+		gormStoreOptions := gormstore.Options{
+			TableName:       "sessions",
+			SkipCreateTable: true,
+		}
 
-	apiAuthGroup.GET("/secrets", secretHandler.GetAll)
-	apiAuthGroup.GET("/secrets/:id", secretHandler.Get)
-	apiAuthGroup.POST("/secrets", middlewareEnforceJsonContentType(), secretHandler.Create)
-	apiAuthGroup.PATCH("/secrets/:id/value", middlewareEnforceJsonContentType(), secretHandler.UpdateValue)
-	apiAuthGroup.DELETE("/secrets/:id", secretHandler.Delete)
+		sessionStore := sessiongormstore.New(db,
+			sessiongormstore.WithKeyPairs([]byte(cfg.Auth.SessionSecret)),
+			sessiongormstore.WithSessionOpts(sessionOptions),
+			sessiongormstore.WithGormStoreOpts(gormStoreOptions),
+			sessiongormstore.WithCleanupFunc(authSessionCleanTask.GetCleanupFn()),
+		)
 
-	apiAuthGroup.GET("/constants", constantHandler.GetAll)
-	apiAuthGroup.GET("/constants/:id", constantHandler.Get)
-	apiAuthGroup.POST("/constants", middlewareEnforceJsonContentType(), constantHandler.Create)
-	apiAuthGroup.PATCH("/constants/:id/value", middlewareEnforceJsonContentType(), constantHandler.UpdateValue)
-	apiAuthGroup.DELETE("/constants/:id", constantHandler.Delete)
+		authProvider = auth.NewSessionProvider(cfg.Auth.SessionCookieName, cfg.Auth.SessionCookiePath, auth.NewStaticUserPasswordValidator(validCredentials), sessionStore)
+	}
 
-	apiAuthGroup.GET("/actions", actionHandler.Paginate)
-	apiAuthGroup.POST("/actions", middlewareEnforceJsonContentType(), actionHandler.Create)
-	apiAuthGroup.GET("/actions/:id", actionHandler.Get)
-	apiAuthGroup.PATCH("/actions/:id/label", middlewareEnforceJsonContentType(), actionHandler.UpdateLabel)
-	apiAuthGroup.PATCH("/actions/:id/match-event", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchEvent)
-	apiAuthGroup.PATCH("/actions/:id/match-host", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchHost)
-	apiAuthGroup.PATCH("/actions/:id/match-application", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchApplication)
-	apiAuthGroup.PATCH("/actions/:id/match-provider", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchProvider)
-	apiAuthGroup.PATCH("/actions/:id/payload", middlewareEnforceJsonContentType(), actionHandler.UpdatePayload)
-	apiAuthGroup.PATCH("/actions/:id/enabled", middlewareEnforceJsonContentType(), actionHandler.UpdateEnabled)
-	apiAuthGroup.DELETE("/actions/:id", actionHandler.Delete)
-	apiAuthGroup.POST("/actions/:id/test", middlewareEnforceJsonContentType(), actionInvocationHandler.Test)
+	s.applyAuthProvider(authProvider, apiPublicGroup, apiProtectedGroup)
 
-	apiAuthGroup.GET("/action-invocations", actionInvocationHandler.Paginate)
-	apiAuthGroup.GET("/action-invocations/:id", actionInvocationHandler.Get)
-	apiAuthGroup.DELETE("/action-invocations/:id", actionInvocationHandler.Delete)
+	apiProtectedGroup.GET("/updates", updateHandler.Paginate)
+	apiProtectedGroup.GET("/updates/:id", updateHandler.Get)
+	apiProtectedGroup.PATCH("/updates/:id/state", middlewareEnforceJsonContentType(), updateHandler.UpdateState)
+	apiProtectedGroup.DELETE("/updates/:id", updateHandler.Delete)
 
-	apiAuthGroup.GET("/filter-presets/:type", filterPresetHandler.GetByType)
-	apiAuthGroup.POST("/filter-presets", middlewareEnforceJsonContentType(), filterPresetHandler.Create)
-	apiAuthGroup.DELETE("/filter-presets/:id", filterPresetHandler.Delete)
+	apiProtectedGroup.GET("/webhooks", webhookHandler.Paginate)
+	apiProtectedGroup.POST("/webhooks", middlewareEnforceJsonContentType(), webhookHandler.Create)
+	apiProtectedGroup.GET("/webhooks/:id", webhookHandler.Get)
+	apiProtectedGroup.PATCH("/webhooks/:id/label", middlewareEnforceJsonContentType(), webhookHandler.UpdateLabel)
+	apiProtectedGroup.PATCH("/webhooks/:id/ignore-host", middlewareEnforceJsonContentType(), webhookHandler.UpdateIgnoreHost)
+	apiProtectedGroup.DELETE("/webhooks/:id", webhookHandler.Delete)
 
-	apiAuthGroup.GET("/comments/:updateId", commentHandler.GetAllByUpdateId)
-	apiAuthGroup.POST("/comments/:updateId", middlewareEnforceJsonContentType(), commentHandler.Create)
-	apiAuthGroup.PATCH("/comments/:id/content", middlewareEnforceJsonContentType(), commentHandler.UpdateContent)
-	apiAuthGroup.DELETE("/comments/:id", commentHandler.Delete)
+	apiProtectedGroup.GET("/events", eventHandler.Window)
+	apiProtectedGroup.GET("/events/:id", eventHandler.Get)
+	apiProtectedGroup.DELETE("/events/:id", eventHandler.Delete)
+
+	apiProtectedGroup.GET("/secrets", secretHandler.GetAll)
+	apiProtectedGroup.GET("/secrets/:id", secretHandler.Get)
+	apiProtectedGroup.POST("/secrets", middlewareEnforceJsonContentType(), secretHandler.Create)
+	apiProtectedGroup.PATCH("/secrets/:id/value", middlewareEnforceJsonContentType(), secretHandler.UpdateValue)
+	apiProtectedGroup.DELETE("/secrets/:id", secretHandler.Delete)
+
+	apiProtectedGroup.GET("/constants", constantHandler.GetAll)
+	apiProtectedGroup.GET("/constants/:id", constantHandler.Get)
+	apiProtectedGroup.POST("/constants", middlewareEnforceJsonContentType(), constantHandler.Create)
+	apiProtectedGroup.PATCH("/constants/:id/value", middlewareEnforceJsonContentType(), constantHandler.UpdateValue)
+	apiProtectedGroup.DELETE("/constants/:id", constantHandler.Delete)
+
+	apiProtectedGroup.GET("/actions", actionHandler.Paginate)
+	apiProtectedGroup.POST("/actions", middlewareEnforceJsonContentType(), actionHandler.Create)
+	apiProtectedGroup.GET("/actions/:id", actionHandler.Get)
+	apiProtectedGroup.PATCH("/actions/:id/label", middlewareEnforceJsonContentType(), actionHandler.UpdateLabel)
+	apiProtectedGroup.PATCH("/actions/:id/match-event", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchEvent)
+	apiProtectedGroup.PATCH("/actions/:id/match-host", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchHost)
+	apiProtectedGroup.PATCH("/actions/:id/match-application", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchApplication)
+	apiProtectedGroup.PATCH("/actions/:id/match-provider", middlewareEnforceJsonContentType(), actionHandler.UpdateMatchProvider)
+	apiProtectedGroup.PATCH("/actions/:id/payload", middlewareEnforceJsonContentType(), actionHandler.UpdatePayload)
+	apiProtectedGroup.PATCH("/actions/:id/enabled", middlewareEnforceJsonContentType(), actionHandler.UpdateEnabled)
+	apiProtectedGroup.DELETE("/actions/:id", actionHandler.Delete)
+	apiProtectedGroup.POST("/actions/:id/test", middlewareEnforceJsonContentType(), actionInvocationHandler.Test)
+
+	apiProtectedGroup.GET("/action-invocations", actionInvocationHandler.Paginate)
+	apiProtectedGroup.GET("/action-invocations/:id", actionInvocationHandler.Get)
+	apiProtectedGroup.DELETE("/action-invocations/:id", actionInvocationHandler.Delete)
+
+	apiProtectedGroup.GET("/filter-presets/:type", filterPresetHandler.GetByType)
+	apiProtectedGroup.POST("/filter-presets", middlewareEnforceJsonContentType(), filterPresetHandler.Create)
+	apiProtectedGroup.DELETE("/filter-presets/:id", filterPresetHandler.Delete)
+
+	apiProtectedGroup.GET("/comments/:updateId", commentHandler.GetAllByUpdateId)
+	apiProtectedGroup.POST("/comments/:updateId", middlewareEnforceJsonContentType(), commentHandler.Create)
+	apiProtectedGroup.PATCH("/comments/:id/content", middlewareEnforceJsonContentType(), commentHandler.UpdateContent)
+	apiProtectedGroup.DELETE("/comments/:id", commentHandler.Delete)
 
 	// start servers (run in separate goroutines)
 	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port))
@@ -349,4 +385,88 @@ func (s *Server) newEngine(middleware ...gin.HandlerFunc) *gin.Engine {
 	r.NoRoute(middlewareGlobalNotFound())
 
 	return r
+}
+
+func (s *Server) applyAuthProvider(p auth.Provider, public *gin.RouterGroup, protected *gin.RouterGroup) {
+	s.applyGroupMiddleware(public, p.PublicMiddleware()...)
+	s.applyGroupMiddleware(protected, p.ProtectedMiddleware()...)
+
+	protected.Use(func(c *gin.Context) {
+		pass := p.IsAuthenticated(c)
+
+		if !pass {
+			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+			_ = c.AbortWithError(handler.ToHttpStatus(service_error.ErrUnauthorized), service_error.ErrUnauthorized)
+			return
+		}
+
+		c.Next()
+	})
+
+	if p.Config().HasLoginRoute {
+		public.Handle(p.Config().LoginMethod, p.Config().LoginPath, func(c *gin.Context) {
+			var loginErr error
+			var loginHttpStatus int
+
+			if loginErr, loginHttpStatus = p.Login(c); loginErr != nil {
+				httpErr := service_error.NewServiceErrorHttp(loginHttpStatus, loginErr)
+				c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+				_ = c.AbortWithError(handler.ToHttpStatus(httpErr), httpErr)
+				return
+			}
+
+			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+			c.Status(loginHttpStatus)
+		})
+	}
+	if p.Config().HasLogoutRoute {
+		protected.Handle(p.Config().LogoutMethod, p.Config().LogoutPath, func(c *gin.Context) {
+			var logoutErr error
+			var logoutHttpStatus int
+
+			if logoutErr, logoutHttpStatus = p.Logout(c); logoutErr != nil {
+				httpErr := service_error.NewServiceErrorHttp(logoutHttpStatus, logoutErr)
+				c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+				_ = c.AbortWithError(handler.ToHttpStatus(httpErr), httpErr)
+				return
+			}
+
+			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+			c.Status(logoutHttpStatus)
+		})
+	}
+	if p.Config().HasProfileRoute {
+		protected.Handle(p.Config().ProfileMethod, p.Config().ProfilePath, func(c *gin.Context) {
+			var profile *auth.Profile
+			var profileError error
+			var profileHttpStatus int
+			if profile, profileError, profileHttpStatus = p.Profile(c); profileError != nil {
+				httpErr := service_error.NewServiceErrorHttp(profileHttpStatus, profileError)
+				_ = c.AbortWithError(handler.ToHttpStatus(httpErr), httpErr)
+				return
+			}
+
+			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
+			c.JSON(profileHttpStatus, api.NewDataResponseWithPayload(profile))
+		})
+	}
+
+	protected.Use(func(c *gin.Context) {
+		var err error
+		var profile *auth.Profile
+
+		if profile, err = p.RouteContext(c); err != nil {
+			log.Warn().Msg("Cannot pass route context")
+		} else {
+			c.Set(auth.RouteContext, profile)
+		}
+
+		c.Next()
+	})
+}
+
+func (s *Server) applyGroupMiddleware(g *gin.RouterGroup, middleware ...gin.HandlerFunc) {
+	for _, m := range middleware {
+		g.Use(m)
+	}
 }

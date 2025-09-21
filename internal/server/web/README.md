@@ -1,7 +1,5 @@
 # README
 
-Frontend for _upda_.
-
 ## Configuration
 
 * During development: `.env.development`

@@ -1,5 +1,6 @@
 import Languages from '../constants/languages';
 import Locales from '../constants/locales';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Col, ConfigProvider, Layout, Row, Spin } from 'antd';
 import { Locale } from 'antd/lib/locale';
 import en_US from 'antd/lib/locale/en_US';
@@ -93,7 +94,7 @@ const LocaleContextProvider: FC<LocaleProviderProviderProps> = ({ children }): R
 			<Layout.Content>
 				<Row align="middle">
 					<Col span={24}>
-						<Spin tip={t('loading')} spinning />
+						<Spin tip={t('loading')} indicator={<LoadingOutlined />} spinning />
 					</Col>
 				</Row>
 			</Layout.Content>

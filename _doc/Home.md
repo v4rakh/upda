@@ -7,7 +7,7 @@ _upda_ provides a **single** dashboard to manage, display, and organize update i
 and sources. Instead of checking each system or container image individually, administrators can see all available
 updates in one convenient place.
 
-Already familiar with _upda_? **[Deploy it now](./Deployment.md)**.
+Already familiar with _upda_? **[Deploy it now](./Deployment.md)** or see **[Configuration](./Configuration.md)**.
 
 ## What It Solves
 

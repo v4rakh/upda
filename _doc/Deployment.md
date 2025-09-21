@@ -2,8 +2,7 @@
 
 _upda_ is a server application which embeds a web interface directly in its binary form (can be disabled). This makes it
 easy to deploy natively. Besides native binaries, _upda_ is published as docker image. The `upda` binary can manage the
-server and is at the same time a command-line utility to quickly invoke webhooks or list tracked updates in your
-instance.
+server and is at the same time a command-line utility to quickly invoke webhooks.
 
 Depending on **how you like to reach _upda_** (reverse proxy setup with a (sub)domain or reverse proxy setup on sub
 path of your existing domain), pick one of the below **deployment** options.
@@ -20,7 +19,7 @@ make sure to create necessary network (for podman use the _pod_ concept) and vol
 resources if you're not familiar how to translate the docker-compose examples to plain container engine commands.
 
 > You need to ensure to properly replace `$GENERATED_SECURE_SECRET_OF_SIZE_32_CHARS`, `$SECURE_RANDOM_DATABASE_PASSWORD`
-> and `$SECURE_ADMIN_PASSWORD` with secure randomly generated passwords.
+> `$SECURE_AUTH_SESSION_SECRET`, and `$SECURE_ADMIN_PASSWORD` with secure randomly generated passwords.
 
 By default, the following examples only make _upda_ listen on `localhost`/`127.0.0.1` which can be used with
 a [reverse proxy](#reverse-proxy) (**recommended**). For testing, you can also remove the local part in the port mapping
@@ -49,10 +48,12 @@ services:
             - DB_POSTGRES_NAME=upda
             - DB_POSTGRES_USER=upda
             - DB_POSTGRES_PASSWORD=$SECURE_RANDOM_DATABASE_PASSWORD
-            - BASIC_AUTH_USER=admin
-            - BASIC_AUTH_PASSWORD=$SECURE_ADMIN_PASSWORD
+            - AUTH_SESSION_USER=admin
+            - AUTH_SESSION_PASSWORD=$SECURE_ADMIN_PASSWORD
             # generate 32 character long secret, e.g., with "openssl rand -hex 16"
             - SECRET=$GENERATED_SECURE_SECRET_OF_SIZE_32_CHARS
+            # generate a random secret for session storage, e.g., with "openssl rand -hex 16"
+            - AUTH_SESSION_SECRET=$SECURE_AUTH_SESSION_SECRET
         restart: unless-stopped
         networks:
             - internal

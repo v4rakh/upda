@@ -59,7 +59,7 @@ manager [nix](https://nixos.org/), you can achieve a full and easy setup when yo
 
 This project can optionally use [direnv](https://github.com/direnv/direnv) (
 or [nix-direnv](https://github.com/nix-community/nix-direnv) with `nix`) to automatically load environment variables
-from an `.env` file. Copy `.env.example` to `.env` and adjust the values accordingly.
+from an `.env` file. Copy `.env.development` to `.env` and adjust the values accordingly.
 
 When you change directory into the project, the environment variables are automatically loaded after you've allowed
 `direnv` with `direnv allow`.
@@ -79,18 +79,8 @@ directory (or open an IDE terminal) within this project (similar to `direnv` its
 
 ### Pre-requisites
 
-Ensure to set the following environment variables for proper debug logs during development
-
-```shell
-WEB_INTERFACE_ENABLED=false
-DEVELOPMENT=true
-LOGGING_LEVEL=debug
-LOGGING_LEVEL_REQUESTS=debug
-LOGGING_ENCODING_COLORIZE=true
-```
-
-1. Run `make clean dependencies` to fetch dependencies
-2. Start `git.myservermanager.com/varakh/upda/cmd/main.go`
+1. Copy `.env.development` to `.env`.
+2. Start with `make run-server`
 
 If you like to test with Postgres and/or REDIS for task locking, here are some useful docker commands to have containers
 up and running quickly. Set necessary environment variables properly.
@@ -113,24 +103,15 @@ docker run --name some-redis \
 
 ### Web interface
 
-_upda_ includes a frontend in a monorepo fashion inside `server/web/`. For production (binary and OCI), it's
+_upda_ includes a frontend in a monorepo fashion inside `internal/server/web/`. For production (binary and OCI), it's
 embedded into the GoLang binary itself.
 
 For _development_, no other steps are required. Simply follow
-the [frontend instructions](./internal/server/web/README.md) and
-start the frontend separately.
+the [frontend instructions](./internal/server/web/README.md) and start the frontend separately.
 
 If you like to have a look on the _production_ experience, the frontend needs to be build first, and you need to build
 the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
 the `Makefile` (additional `rm -rf` cmd!).
-
-### Windows hints
-
-On Windows, you need a valid `gcc`, e.g., https://jmeubank.github.io/tdm-gcc/download/ and add the `\bin` folder to your
-path.
-
-For any `go` command you run, ensure that your `PATH` has the `gcc` binary and that you add `CGO_ENABLED=1` as
-environment if `go` commands fail.
 
 ### enums
 

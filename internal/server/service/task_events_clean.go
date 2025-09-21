@@ -36,8 +36,6 @@ func (s *EventsCleanTask) configureEventsCleanTask() error {
 		return nil
 	}
 
-	// TODO keep taskConfig?!
-
 	runnable := func() {
 		t := time.Now()
 		t = t.Add(-s.taskConfig.EventCleanStaleMaxAge)

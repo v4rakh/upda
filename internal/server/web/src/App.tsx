@@ -1,15 +1,20 @@
+import { AuthProvider } from './auth/AuthProvider';
+import { AuthProviderRehydrate } from './auth/AuthProviderRehydrate';
 import getConfiguration from './getConfiguration';
 import AppRouter from './router/AppRouter';
-import { isDevelopment } from './utils/envHelper';
 import { useEffect } from 'react';
 
 const App = () => {
 	useEffect(() => {
-		if (isDevelopment()) {
-			document.title = getConfiguration().VITE_TITLE;
-		}
+		document.title = getConfiguration().VITE_TITLE;
 	}, []);
 
-	return <AppRouter />;
+	return (
+		<AuthProvider authType={getConfiguration().VITE_AUTH_TYPE}>
+			<AuthProviderRehydrate>
+				<AppRouter />
+			</AuthProviderRehydrate>
+		</AuthProvider>
+	);
 };
 export default App;

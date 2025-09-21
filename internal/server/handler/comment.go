@@ -2,8 +2,7 @@ package handler
 
 import (
 	"git.myservermanager.com/varakh/upda/api"
-	"git.myservermanager.com/varakh/upda/internal/server/constant"
-	"git.myservermanager.com/varakh/upda/internal/server/dto"
+	"git.myservermanager.com/varakh/upda/internal/server/auth"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"github.com/gin-gonic/gin"
@@ -92,10 +91,10 @@ func (h *CommentHandler) Create(c *gin.Context) {
 		return
 	}
 
-	session := c.MustGet(constant.GinContextSession).(dto.ContextSession)
+	routeContext := c.MustGet(auth.RouteContext).(*auth.Profile)
 
 	var e *model.Comment
-	if e, err = h.commentService.Create(session.User, req.Content, update); err != nil {
+	if e, err = h.commentService.Create(routeContext.PreferredUsername, req.Content, update); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}

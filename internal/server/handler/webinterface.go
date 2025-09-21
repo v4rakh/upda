@@ -8,11 +8,12 @@ import (
 )
 
 type WebinterfaceHandler struct {
-	config *config.Webinterface
+	webInterfaceConfig *config.Webinterface
+	authConfig         *config.Auth
 }
 
-func NewWebinterfaceHandler(c *config.Webinterface) *WebinterfaceHandler {
-	return &WebinterfaceHandler{config: c}
+func NewWebinterfaceHandler(wc *config.Webinterface, ac *config.Auth) *WebinterfaceHandler {
+	return &WebinterfaceHandler{webInterfaceConfig: wc, authConfig: ac}
 }
 
 func (h *WebinterfaceHandler) GetConfig(c *gin.Context) {
@@ -22,7 +23,8 @@ const runtime_config = Object.freeze({
   VITE_API_URL: '%s',
   VITE_TITLE: '%s',
   VITE_ENABLE_DARK_THEME: %d,
-  VITE_ENABLE_FOOTER: %d
+  VITE_ENABLE_FOOTER: %d,
+  VITE_AUTH_TYPE: %s
 });
 
 Object.defineProperty(window, 'runtime_config', {
@@ -31,13 +33,14 @@ Object.defineProperty(window, 'runtime_config', {
 });
 	`
 	darkThemeEnabled := 0
-	if h.config.DarkThemeEnabled {
+	if h.webInterfaceConfig.DarkThemeEnabled {
 		darkThemeEnabled = 1
 	}
 	enableFooter := 0
-	if h.config.FooterEnabled {
+	if h.webInterfaceConfig.FooterEnabled {
 		enableFooter = 1
 	}
 
-	c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(fmt.Sprintf(runtimeConfig, h.config.ApiUrl, h.config.Title, darkThemeEnabled, enableFooter)))
+	webinterfaceConfig := fmt.Sprintf(runtimeConfig, h.webInterfaceConfig.ApiUrl, h.webInterfaceConfig.Title, darkThemeEnabled, enableFooter, h.authConfig.Type)
+	c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(webinterfaceConfig))
 }

@@ -29,14 +29,7 @@ func main() {
 			{
 				Name: "webhook",
 				Commands: []*cli.Command{
-					terminal.WebhookCreateCmd,
 					terminal.WebhookSendCmd,
-				},
-			},
-			{
-				Name: "update",
-				Commands: []*cli.Command{
-					terminal.UpdateShowCmd,
 				},
 			},
 		},

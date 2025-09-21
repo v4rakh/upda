@@ -18,7 +18,7 @@ State management of tracked updates:
 ##### The `application` attribute
 
 The _application_ attribute is an arbitrary identifier, name or label of a subject you like to track,
-e.g., `docker.io/varakh/upda` for an OCI image.
+e.g., `git.myservermanager.com/varakh/upda` for an OCI image.
 
 ##### The `provider` attribute
 

@@ -1,20 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AuthProfile } from '../types';
 
 export type Auth = {
-	username: string | null;
-	password: string | null;
+	isAuthenticated: boolean;
+	profile?: AuthProfile;
 };
 const initialState: Auth = {
-	username: null,
-	password: null
+	isAuthenticated: false
 };
 
 const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
-		updateAuth: (state, { payload }: PayloadAction<Auth>): Auth => {
-			return { username: payload.username, password: payload.password };
+		updateAuth: (_, { payload: { isAuthenticated, profile } }: PayloadAction<Auth>): Auth => {
+			return { isAuthenticated, profile };
 		}
 	}
 });

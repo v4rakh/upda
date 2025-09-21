@@ -1,56 +1,44 @@
-import { useGetProbeLoginMutation } from '../../api/loginApi';
+import { useAuth } from '../../auth/AuthContext';
 import AppPaths from '../../constants/appPaths';
-import { updateAuth } from '../../slices/authSlice';
-import { useAppDispatch } from '../../store';
-import { LoginRequest } from '../../types';
-import { useNotification } from '../../use/useNotification';
+import { AuthTypeSessionLoginRequest } from '../../types';
 import { getPageFullPath } from '../../utils/urlHelper';
 import AppBreadcrumb from '../common/AppBreadcrumb';
 import { Button, Card, Flex, Form, Input, Space } from 'antd';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-const Login = () => {
-	const [t] = useTranslation('login');
-	const { apiError } = useNotification();
-
-	const dispatch = useAppDispatch();
+const SessionLogin = () => {
+	const [t] = useTranslation('session_login');
+	const { login, isAuthenticated } = useAuth();
+	const [form] = Form.useForm();
+	const [isLoggingIn, setIsLoggingIn] = useState(false);
 	const navigate = useNavigate();
 
-	const [form] = Form.useForm();
-	const [getProbeLogin, { isLoading, isSuccess, isError, error }] = useGetProbeLoginMutation();
-
 	useEffect(() => {
-		if (isError) {
-			apiError({
-				i18n: {
-					unAuthorized: t('unauthorized'),
-					default: t('default_message')
-				},
-				error: error
-			});
-		}
-	}, [apiError, error, isError, t]);
-
-	useEffect(() => {
-		if (isSuccess) {
-			const auth = { username: form.getFieldValue('username'), password: form.getFieldValue('password') };
-			dispatch(updateAuth(auth));
+		if (isAuthenticated) {
 			navigate(getPageFullPath(AppPaths.HOME));
 		}
-	}, [isSuccess, t, form, dispatch, navigate]);
+	}, [isAuthenticated, navigate]);
+
+	const preLogin = useCallback(() => {
+		setIsLoggingIn(true);
+	}, []);
+
+	const postLogin = useCallback(() => {
+		setIsLoggingIn(false);
+	}, []);
 
 	const sendLogin = useCallback(
-		(values: LoginRequest) => {
-			getProbeLogin(values);
+		(values: AuthTypeSessionLoginRequest) => {
+			login({ credentials: values, preLogin: preLogin, postLogin: postLogin });
 		},
-		[getProbeLogin]
+		[login, postLogin, preLogin]
 	);
 
 	const onFinish = useCallback(
-		(values: any) => {
-			sendLogin(values);
+		(values: { username: string; password: string }) => {
+			sendLogin({ username: values.username, password: values.password } as AuthTypeSessionLoginRequest);
 		},
 		[sendLogin]
 	);
@@ -79,7 +67,7 @@ const Login = () => {
 						</Form.Item>
 						<Form.Item>
 							<Space>
-								<Button type="primary" htmlType="submit" loading={isLoading}>
+								<Button type="primary" htmlType="submit" loading={isLoggingIn}>
 									{t('submit')}
 								</Button>
 								<Button htmlType="button" onClick={onReset}>
@@ -94,4 +82,4 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export default SessionLogin;

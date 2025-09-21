@@ -1,10 +1,5 @@
 package dto
 
-// ContextSession represents context which gets loaded in each route the middleware is attached
-type ContextSession struct {
-	User string
-}
-
 // ActionPayloadShoutrrrDto payload for shoutrrr
 type ActionPayloadShoutrrrDto struct {
 	Body string   `json:"body" binding:"required" validate:"required"`

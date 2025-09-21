@@ -1,8 +1,7 @@
 import classes from './style/PrimaryMenu.module.less';
 
+import { useAuth } from '../auth/AuthContext';
 import AppPaths from '../constants/appPaths';
-import { useAuthenticatedSelector } from '../selectors/authSelectors';
-import { useAuthorization } from '../use/useAuthorization';
 import { getPageFullPath } from '../utils/urlHelper';
 import {
 	BarsOutlined,
@@ -10,6 +9,7 @@ import {
 	ClockCircleOutlined,
 	FolderOutlined,
 	LinkOutlined,
+	LoadingOutlined,
 	LockOutlined,
 	LogoutOutlined,
 	UnorderedListOutlined,
@@ -17,8 +17,8 @@ import {
 } from '@ant-design/icons';
 import { Menu, Typography } from 'antd';
 import { TFunction } from 'i18next';
-import { forEach } from 'lodash';
-import { FC, ReactNode, useMemo } from 'react';
+import { forEach, noop } from 'lodash';
+import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 export type PrimaryMenuProps = {
@@ -29,9 +29,20 @@ const { Text } = Typography;
 
 const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 	const navigate = useNavigate();
-	const isAuthenticated = useAuthenticatedSelector();
-	const { logout, getUserName } = useAuthorization();
-	const username = getUserName();
+	const { logout, profile, isAuthenticated } = useAuth();
+	const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+	const preLogout = useCallback(() => {
+		setIsLoggingOut(true);
+	}, []);
+
+	const postLogout = useCallback(() => {
+		setIsLoggingOut(false);
+	}, []);
+
+	const onLogoutClicked = useCallback(() => {
+		logout({ preLogout: preLogout, postLogout: postLogout });
+	}, [logout, postLogout, preLogout]);
 
 	const primaryNavs = useMemo(() => {
 		const staticItems = [
@@ -94,20 +105,18 @@ const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 		} else {
 			items.push({
 				key: 'menu_logout',
-				icon: <LogoutOutlined />,
+				icon: isLoggingOut ? <LoadingOutlined /> : <LogoutOutlined />,
 				label: (
 					<Text strong ellipsis className={classes.username}>
-						{username}
+						{profile?.preferredUsername}
 					</Text>
 				),
-				onClick: () => {
-					logout();
-				}
+				onClick: isLoggingOut ? noop : onLogoutClicked
 			});
 		}
 
 		return items;
-	}, [isAuthenticated, t, navigate, username, logout]);
+	}, [isAuthenticated, t, navigate, isLoggingOut, profile?.preferredUsername, onLogoutClicked]);
 	return (
 		<Menu theme="dark" selectable={false} mode="horizontal" items={primaryNavs} style={{ flex: 1, minWidth: 0 }} />
 	);

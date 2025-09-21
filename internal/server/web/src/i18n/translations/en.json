@@ -202,6 +202,14 @@
   "auth": {
     "loading": "Loading..."
   },
+  "auth_provider_session": {
+    "login_error_default_message": "Error while logging in. Please make sure your device has network connection.",
+    "login_error_unauthorized": "Username or password are incorrect.",
+    "logout_error_description": "There was an error logging you out. Please make sure your device has network connection.",
+    "logout_error_title": "Logout unavailable",
+    "profile_error_description": "There was an error retrieving your profile. Please make sure your device has network connection.",
+    "profile_error_title": "Profile unavailable"
+  },
   "comment_create": {
     "content": "Content",
     "content_required": "Content is required",
@@ -246,8 +254,6 @@
     "reload_tooltip": "Reload comments"
   },
   "common": {
-    "404": "The page you've requested doesn't exist.",
-    "404_title": "Not found.",
     "action_invocations": "Action History",
     "actions": "Actions",
     "back_home": "Go back",
@@ -308,6 +314,10 @@
     "no_constants": "No constants yet. Create one?",
     "reload_tooltip": "Reload all constants",
     "title": "Constants"
+  },
+  "error": {
+    "404_description": "The page you've requested doesn't exist.",
+    "404_title": "Not found."
   },
   "event": {
     "cancel": "Cancel",
@@ -370,17 +380,6 @@
     "generic_error_title": "Services unhealthy",
     "reload": "Reload"
   },
-  "login": {
-    "default_message": "Error while logging in.",
-    "password": "Password",
-    "password_required": "Password is required",
-    "reset": "Reset",
-    "submit": "Submit",
-    "title": "Login",
-    "unauthorized": "Username or password are incorrect.",
-    "username": "Username",
-    "username_required": "Username is required"
-  },
   "secret_create": {
     "create": "Create new secret",
     "created_message": "Secret is ready to use. Remember its value, you'll not see it again:<br/><br/>{{value}}",
@@ -429,6 +428,15 @@
     "no_secrets": "No secrets yet. Create one?",
     "reload_tooltip": "Reload all secrets",
     "title": "Secrets"
+  },
+  "session_login": {
+    "password": "Password",
+    "password_required": "Password is required",
+    "reset": "Reset",
+    "submit": "Submit",
+    "title": "Login",
+    "username": "Username",
+    "username_required": "Username is required"
   },
   "update": {
     "cancel": "Cancel",

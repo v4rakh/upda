@@ -20,6 +20,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	golog "log"
+	"net/http"
 	"os"
 	"time"
 )
@@ -109,10 +110,27 @@ type WebinterfaceCacheControl struct {
 }
 
 type Auth struct {
-	AuthMethod           constant.ConfigAuthMode `env:"AUTH_MODE,default=basic_single" validate:"required,oneof=basic_single basic_credentials"`
-	BasicAuthUser        string                  `env:"BASIC_AUTH_USER" validate:"required_if=AuthMethod basic_single"`
-	BasicAuthPassword    string                  `env:"BASIC_AUTH_PASSWORD" validate:"required_if=AuthMethod basic_single"`
-	BasicAuthCredentials map[string]string       `env:"BASIC_AUTH_CREDENTIALS,separator=|,delimiter=;" validate:"required_if=AuthMethod basic_credentials"`
+	Type                   constant.ConfigAuthType            `env:"AUTH_TYPE,default=session" validate:"required,oneof=session"`
+	SessionSecret          string                             `env:"AUTH_SESSION_SECRET,required" validate:"required_if=Type session"`
+	SessionProvider        constant.ConfigAuthSessionProvider `env:"AUTH_SESSION_PROVIDER,default=single" validate:"required_if=Type session,oneof=single credentials"`
+	SessionUser            string                             `env:"AUTH_SESSION_USER" validate:"required_if=SessionProvider single"`
+	SessionPassword        string                             `env:"AUTH_SESSION_PASSWORD" validate:"required_if=SessionProvider single"`
+	SessionCredentials     map[string]string                  `env:"AUTH_SESSION_CREDENTIALS,separator=|,delimiter=;" validate:"required_if=SessionProvider credentials"`
+	SessionCleanupEnabled  bool                               `env:"AUTH_SESSION_CLEANUP_ENABLED,default=true"`
+	SessionCleanupInterval time.Duration                      `env:"AUTH_SESSION_CLEANUP_INTERVAL,default=1h" validate:"required_if=Type session,gte=0"`
+	SessionCookieMaxAge    time.Duration                      `env:"AUTH_SESSION_COOKIE_MAX_AGE,default=8h" validate:"required_if=Type session"`
+	SessionCookieName      string                             `env:"AUTH_SESSION_COOKIE_NAME,default=UPDA_SESSION" validate:"required_if=Type session"`
+	// if set to non-blank, subdomains send it
+	SessionCookieDomain *string `env:"AUTH_SESSION_COOKIE_DOMAIN"`
+	// cookie's scope (/ meaning when browser adds it automatically)
+	SessionCookiePath string `env:"AUTH_SESSION_COOKIE_PATH,default=/" validate:"required_if=Type session"`
+	// true means JavaScript cannot access it (recommended)
+	SessionCookieHttpOnly bool `env:"AUTH_SESSION_COOKIE_HTTP_ONLY,default=true"`
+	// true means SSL is required, otherwise cookie is not sent
+	SessionCookieSecure bool `env:"AUTH_SESSION_COOKIE_SECURE,default=true"`
+	// force mode when browser stores (recommended is strict)
+	SessionCookieSameSite     constant.ConfigAuthSessionSameSite `env:"AUTH_SESSION_COOKIE_SAME_SITE,default=strict" validate:"required_if=Type session,oneof=lax strict"`
+	SessionCookieSameSiteMode http.SameSite
 }
 
 type Task struct {
@@ -297,6 +315,8 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 		}
 	}
 
+	c.Auth.SessionCookieSameSiteMode = convertSessionCookieSameSite(c.Auth.SessionCookieSameSite)
+
 	log.Info().Msgf("Configuration: App %+v", c.App)
 	log.Info().Msg("Configuration: Auth ***REDACTED***")
 	log.Info().Msgf("Configuration: Cors %+v", c.Cors)
@@ -346,5 +366,16 @@ func configureLogger(cfg *Logging) {
 
 	} else {
 		log.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: zerolog.TimeFieldFormat, NoColor: !cfg.EncodingColorize}).With().Timestamp().Caller().Logger()
+	}
+}
+
+func convertSessionCookieSameSite(site constant.ConfigAuthSessionSameSite) http.SameSite {
+	switch site {
+	case constant.ConfigAuthSessionSameSiteLax:
+		return http.SameSiteLaxMode
+	case constant.ConfigAuthSessionSameSiteStrict:
+		return http.SameSiteStrictMode
+	default:
+		return http.SameSiteDefaultMode
 	}
 }

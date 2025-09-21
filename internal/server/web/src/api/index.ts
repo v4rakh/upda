@@ -1,29 +1,19 @@
 import ApiTags from '../constants/apiTags';
 import getConfiguration from '../getConfiguration';
 import { updateAuth } from '../slices/authSlice';
-import { RootState } from '../store';
 import { BaseQueryApi, createApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import AuthType from '../auth/AuthType';
 
 const baseQuery = fetchBaseQuery({
 	baseUrl: getConfiguration().VITE_API_URL,
-	prepareHeaders: (headers, { getState }) => {
-		const state = getState() as RootState;
-		const username = state.auth.username;
-		const password = state.auth.password;
-		const authHeader = window.btoa(`${username}:${password}`);
-
-		if (username && password && authHeader) {
-			headers.set('Authorization', `Basic ${authHeader}`);
-		}
-		return headers;
-	}
+	credentials: getConfiguration().VITE_AUTH_TYPE === AuthType.SESSION ? 'include' : undefined
 });
 
 const baseQueryWithReAuth = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: any) => {
 	let result = await baseQuery(args, api, extraOptions);
 
-	if (result?.meta?.response?.status === 401) {
-		api.dispatch(updateAuth({ username: null, password: null }));
+	if ((getConfiguration().VITE_AUTH_TYPE === AuthType.SESSION && result?.meta?.response?.status) === 401) {
+		api.dispatch(updateAuth({ isAuthenticated: false }));
 		result = await baseQuery(args, api, extraOptions);
 	}
 

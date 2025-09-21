@@ -1,6 +1,8 @@
 import { RequireAuth } from './RequireAuth';
+import AuthType from '../auth/AuthType';
 import AppPathParamNames from '../constants/appPathParamNames';
 import AppPaths from '../constants/appPaths';
+import getConfiguration from '../getConfiguration';
 import AppLayout from '../layout/AppLayout';
 import ActionInvocationsPage from '../pages/action-invocations/ActionInvocationsPage';
 import ActionsPage from '../pages/actions/ActionsPage';
@@ -8,7 +10,7 @@ import ConstantsPage from '../pages/constants/ConstantsPage';
 import ErrorPage404 from '../pages/error-pages/ErrorPage404';
 import EventsPage from '../pages/events/EventsPage';
 import Home from '../pages/home/Home';
-import Login from '../pages/login/Login';
+import SessionLogin from '../pages/login/SessionLogin';
 import SecretsPage from '../pages/secrets/SecretsPage';
 import UpdateSinglePage from '../pages/updates/UpdateSinglePage';
 import UpdatesPage from '../pages/updates/UpdatesPage';
@@ -22,7 +24,9 @@ const AppRouter = () => {
 		<Routes>
 			<Route path={getAppBasePath()} element={<AppLayout />}>
 				<Route index element={<Home />} />
-				<Route path={AppPaths.LOGIN} element={<Login />} />
+				{getConfiguration().VITE_AUTH_TYPE === AuthType.SESSION && (
+					<Route path={AppPaths.LOGIN} element={<SessionLogin />} />
+				)}
 				<Route
 					path={AppPaths.UPDATES}
 					element={

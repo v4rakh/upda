@@ -118,6 +118,7 @@ func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainer
 	adminUser, _ := str.GenerateSecureRandomString(8)
 	adminPass, _ := str.GenerateSecureRandomString(8)
 	secret, _ := str.GenerateSecureRandomString(32)
+	sessionSecret, _ := str.GenerateSecureRandomString(16)
 
 	appContainerReq := testcontainers.ContainerRequest{
 		Image:          image,
@@ -125,6 +126,9 @@ func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainer
 		Networks:       []string{n.Name},
 		LogConsumerCfg: NewVerboseLogConsumerConfig(meta.Name),
 		Env: map[string]string{
+			"AUTH_SESSION_USER":     adminUser,
+			"AUTH_SESSION_PASSWORD": adminPass,
+			"AUTH_SESSION_SECRET":   sessionSecret,
 			"DB_POSTGRES_HOST":      postgresNetworkAlias,
 			"DB_POSTGRES_PORT":      postgresPort,
 			"DB_POSTGRES_USER":      postgresUser,
@@ -132,8 +136,6 @@ func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainer
 			"DB_POSTGRES_NAME":      postgresDb,
 			"SECRET":                secret,
 			"WEB_INTERFACE_ENABLED": "false",
-			"BASIC_AUTH_USER":       adminUser,
-			"BASIC_AUTH_PASSWORD":   adminPass,
 		},
 		WaitingFor: wait.ForAll(
 			wait.ForHTTP("/api/v1/health").WithPort(appNatPort),

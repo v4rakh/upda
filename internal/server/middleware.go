@@ -5,8 +5,6 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
-	"git.myservermanager.com/varakh/upda/internal/server/constant"
-	"git.myservermanager.com/varakh/upda/internal/server/dto"
 	"git.myservermanager.com/varakh/upda/internal/server/handler"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/gin-contrib/cors"
@@ -202,26 +200,5 @@ func middlewareRedirect(targetPath string) gin.HandlerFunc {
 		c.Redirect(http.StatusMovedPermanently, t)
 		c.Abort()
 		return
-	}
-}
-
-// middlewareSessionProvider apply middleware to necessary routes only to provide session information.
-func middlewareSessionProvider() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var session *dto.ContextSession
-
-		user, exists := c.Get(gin.AuthUserKey)
-		if !exists || user == nil {
-			e := service_error.ErrUnauthorized
-			_ = c.AbortWithError(handler.ToHttpStatus(e), e)
-			return
-		}
-
-		session = &dto.ContextSession{
-			User: user.(string),
-		}
-
-		c.Set(constant.GinContextSession, *session)
-		c.Next()
 	}
 }

@@ -1,4 +1,4 @@
-export * from './login';
+export * from './auth';
 export * from './health';
 export * from './info';
 export * from './update';

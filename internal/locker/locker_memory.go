@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	MemoryLockerDefaultExpiration time.Duration = 0
-	MemoryLockerNoExpiration                    = -1
+	DefaultExpiration time.Duration = 0
+	NoExpiration                    = -1
 )
 
 // ErrorNoSuchLock is returned when the requested lock does not exist
@@ -63,7 +63,7 @@ func (l *lockCtr) Unlock() {
 // NewInMemoryLockRegistry creates a new InMemoryLockRegistry
 func NewInMemoryLockRegistry() *InMemoryLockRegistry {
 	return &InMemoryLockRegistry{
-		defaultExpiry: MemoryLockerNoExpiration,
+		defaultExpiry: NoExpiration,
 		locks:         make(map[string]*lockCtr),
 	}
 }
@@ -84,7 +84,7 @@ func (r *InMemoryLockRegistry) Exists(name string) bool {
 
 // Lock locks a mutex with the given name and no expiration. If it doesn't exist, one is created.
 func (r *InMemoryLockRegistry) Lock(name string) {
-	r.LockWithTTL(name, MemoryLockerDefaultExpiration)
+	r.LockWithTTL(name, DefaultExpiration)
 }
 
 // LockWithTTL locks a mutex with the given name and duration. If it doesn't exist, one is created. If duration is greater than 0, expiration is added.

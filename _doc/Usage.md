@@ -89,6 +89,10 @@ As an example, create a new secret, go to the _Secrets_ tab and click on _Create
 
 ![img](./img/secrets.png)
 
+The same works for _Constants_.
+
+![img](./img/constants.png)
+
 Available **variables** which can be used with the `<VAR>VARIABLE_NAME</VAR>` syntax are:
 
 | Variable name            | Description                                       |
@@ -195,6 +199,6 @@ application with the ease of one click.
 
 ## See what has changed
 
-For a full activity view, head over to the Events tab.
+For a full activity view, head over to the Events page or the tab for a specific update.
 
 ![img](./img/events.png)
