@@ -7,28 +7,6 @@ import (
 	"testing"
 )
 
-func TestFindInSlice(t *testing.T) {
-	a := assert.New(t)
-	a.True(FindInSlice([]string{""}, ""))
-	a.True(FindInSlice([]string{"test", "abc"}, "test"))
-	a.False(FindInSlice([]string{"abc"}, "test"))
-	a.False(FindInSlice([]string{""}, "test"))
-}
-
-func TestToSnakeCase(t *testing.T) {
-	a := assert.New(t)
-	a.Equal("test_this", ToSnakeCase("TestThis"))
-	a.Equal("this", ToSnakeCase("This"))
-	a.Equal("", ToSnakeCase(""))
-	a.NotEqual("test_this", ToSnakeCase("Test This"))
-}
-
-func TestRandomString(t *testing.T) {
-	a := assert.New(t)
-	a.Equal("", RandomString(-1))
-	a.Equal(4, len(RandomString(4)))
-}
-
 func TestExtractValuesFromString(t *testing.T) {
 	a := assert.New(t)
 	a.Equal("", ValuesString(nil))

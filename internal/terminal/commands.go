@@ -8,10 +8,10 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/app"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
-	"git.myservermanager.com/varakh/upda/internal/str"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v3"
 	"os"
+	"slices"
 	"strconv"
 	"text/tabwriter"
 	"time"
@@ -218,7 +218,7 @@ func webhookCreate(_ context.Context, cmd *cli.Command) error {
 		t = constant.WebhookTypeGeneric.String()
 	}
 
-	if !str.FindInSlice(validTypes, t) {
+	if !slices.Contains(validTypes, t) {
 		return cli.Exit(errors.New(fmt.Sprintf("type must be one of %v", validTypes)), 1)
 	}
 
