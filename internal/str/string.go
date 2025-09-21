@@ -23,3 +23,17 @@ func ExtractBetween(str string, leftDelimiter string, rightDelimiter string) [][
 	rx := regexp.MustCompile(`(?s)` + regexp.QuoteMeta(leftDelimiter) + `(.*?)` + regexp.QuoteMeta(rightDelimiter))
 	return rx.FindAllStringSubmatch(str, -1)
 }
+
+// AllContained determines if all a slice values are in the b slice
+func AllContained(a, b []string) bool {
+	lookup := make(map[string]struct{}, len(b))
+	for _, v := range b {
+		lookup[v] = struct{}{}
+	}
+	for _, item := range a {
+		if _, ok := lookup[item]; !ok {
+			return false
+		}
+	}
+	return true
+}

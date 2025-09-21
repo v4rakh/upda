@@ -136,8 +136,6 @@ type Task struct {
 	ActionsCleanStaleEnabled  bool          `env:"TASK_ACTIONS_CLEAN_STALE_ENABLED,default=true"`
 	ActionsCleanStaleInterval time.Duration `env:"TASK_ACTIONS_CLEAN_STALE_INTERVAL,default=12h" validate:"required_if=ActionsCleanStaleEnabled true,gt=0"`
 	ActionsCleanStaleMaxAge   time.Duration `env:"TASK_ACTIONS_CLEAN_STALE_MAX_AGE,default=720h" validate:"required_if=ActionsCleanStaleEnabled true,gt=0"`
-
-	PrometheusRefreshInterval time.Duration `env:"TASK_PROMETHEUS_REFRESH_INTERVAL,default=60s" validate:"required,gte=0"`
 }
 
 type Lock struct {
@@ -158,13 +156,14 @@ type Webhook struct {
 }
 
 type Prometheus struct {
-	Enabled            bool   `env:"PROMETHEUS_ENABLED,default=false"`
-	Port               int    `env:"PROMETHEUS_PORT,default=8080" validate:"required_if=Enabled true,gte=1"`
-	Listen             string `env:"PROMETHEUS_LISTEN"`
-	BasePath           string `env:"PROMETHEUS_BASE_PATH,default=/" validate:"required_if=Enabled true"`
-	Path               string `env:"PROMETHEUS_METRICS_PATH,default=/metrics" validate:"required_if=Enabled true"`
-	SecureTokenEnabled bool   `env:"PROMETHEUS_SECURE_TOKEN_ENABLED,default=true"`
-	SecureToken        string `env:"PROMETHEUS_SECURE_TOKEN" validate:"required_if=Enabled true SecureTokenEnabled true"`
+	Enabled            bool          `env:"PROMETHEUS_ENABLED,default=false"`
+	Port               int           `env:"PROMETHEUS_PORT,default=8080" validate:"required_if=Enabled true,gte=1"`
+	Listen             string        `env:"PROMETHEUS_LISTEN"`
+	BasePath           string        `env:"PROMETHEUS_BASE_PATH,default=/" validate:"required_if=Enabled true"`
+	Path               string        `env:"PROMETHEUS_METRICS_PATH,default=/metrics" validate:"required_if=Enabled true"`
+	SecureTokenEnabled bool          `env:"PROMETHEUS_SECURE_TOKEN_ENABLED,default=true"`
+	SecureToken        string        `env:"PROMETHEUS_SECURE_TOKEN" validate:"required_if=Enabled true SecureTokenEnabled true"`
+	RefreshInterval    time.Duration `env:"PROMETHEUS_REFRESH_INTERVAL,default=60s" validate:"required_if=Enabled true,gte=0"`
 }
 
 type Configuration struct {

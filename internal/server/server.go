@@ -75,13 +75,11 @@ func (s *Server) Start() {
 		log.Info().Msg("Starting embedded Prometheus server")
 	}
 	if cfg.Prometheus.Enabled {
-		if err = prometheusService.Init(); err != nil {
-			log.Fatal().Msgf("Prometheus service init failed: %s", err.Error())
-		}
 		// always instrument tracking for the meta router
 		appRouter.Use(prometheusService.GetProm().Instrument())
 	}
 
+	// repositories init
 	updateRepo := repository.NewUpdateDbRepo(db)
 	webhookRepo := repository.NewWebhookDbRepo(db)
 	eventRepo := repository.NewEventDbRepo(db)
@@ -92,17 +90,18 @@ func (s *Server) Start() {
 	filterPresetRepo := repository.NewFilterPresetDbRepo(db)
 	commentRepo := repository.NewCommentDbRepo(db)
 
-	var lockService service.LockService
-
+	// services init
+	lockService := service.NewLockMemService()
 	if cfg.Lock.RedisEnabled {
 		var e error
-		lockService, e = service.NewLockRedisService(cfg.Lock)
-
-		if err != nil {
-			log.Fatal().Msgf("Failed to create lock service %+v", e)
+		if lockService, e = service.NewLockRedisService(cfg.Lock); e != nil {
+			log.Fatal().Msgf("Failed to create lock service: %+v", e)
 		}
-	} else {
-		lockService = service.NewLockMemService()
+	}
+
+	var taskService *service.TaskService
+	if taskService, err = service.NewTaskService(lockService, cfg.App, cfg.Lock); err != nil {
+		log.Fatal().Msgf("Task service creation failed: %v", err)
 	}
 
 	eventService := service.NewEventService(eventRepo)
@@ -116,18 +115,35 @@ func (s *Server) Start() {
 	filterPresetService := service.NewFilterPresetService(filterPresetRepo)
 	commentService := service.NewCommentService(commentRepo)
 
-	var taskService *service.TaskService
-
-	if taskService, err = service.NewTaskService(updateService, eventService, webhookService, actionService, actionInvocationService, lockService, prometheusService, cfg.App, cfg.Task, cfg.Lock, cfg.Prometheus); err != nil {
-		log.Fatal().Msgf("Task service creation failed: %v", err)
+	// tasks init
+	updatesCleanTask := service.NewUpdatesCleanTask(updateService, taskService, cfg.Task)
+	if err = updatesCleanTask.Init(); err != nil {
+		log.Fatal().Msgf("Task updates clean initialization failed: %v", err)
 	}
-
-	if err = taskService.Init(); err != nil {
-		log.Fatal().Msgf("Task service initialization failed: %v", err)
+	eventsCleanTask := service.NewEventsCleanTask(eventService, taskService, cfg.Task)
+	if err = eventsCleanTask.Init(); err != nil {
+		log.Fatal().Msgf("Task events clean initialization failed: %v", err)
+	}
+	actionsCleanTask := service.NewActionsCleanTask(actionInvocationService, taskService, cfg.Task)
+	if err = actionsCleanTask.Init(); err != nil {
+		log.Fatal().Msgf("Task actions clean initialization failed: %v", err)
+	}
+	actionsEnqueueTask := service.NewActionsEnqueueTask(actionInvocationService, taskService, cfg.Task)
+	if err = actionsEnqueueTask.Init(); err != nil {
+		log.Fatal().Msgf("Task actions enqueue initialization failed: %v", err)
+	}
+	actionsInvokeTask := service.NewActionsInvokeTask(actionInvocationService, taskService, cfg.Task)
+	if err = actionsInvokeTask.Init(); err != nil {
+		log.Fatal().Msgf("Task actions invoke initialization failed: %v", err)
+	}
+	prometheusTask := service.NewPrometheusTask(updateService, eventService, webhookService, actionService, prometheusService, taskService, cfg.Prometheus)
+	if err = prometheusTask.Init(); err != nil {
+		log.Fatal().Msgf("Task prometheus task initialization failed: %v", err)
 	}
 
 	taskService.Start()
 
+	// handlers init
 	updateHandler := handler.NewUpdateHandler(updateService, cfg.App)
 	webhookHandler := handler.NewWebhookHandler(webhookService)
 	webhookInvocationHandler := handler.NewWebhookInvocationHandler(webhookInvocationService, webhookService)

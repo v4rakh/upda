@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
-	"git.myservermanager.com/varakh/upda/internal/server/constant"
+	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/go-co-op/gocron-redis-lock/v2"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
@@ -14,34 +14,14 @@ import (
 )
 
 type TaskService struct {
-	updateService           *UpdateService
-	eventService            *EventService
-	actionService           *ActionService
-	actionInvocationService *ActionInvocationService
-	webhookService          *WebhookService
-	lockService             LockService
-	prometheusService       *PrometheusService
-	appConfig               *config.App
-	taskConfig              *config.Task
-	lockConfig              *config.Lock
-	prometheusConfig        *config.Prometheus
-	scheduler               gocron.Scheduler
+	lockService LockService
+	appConfig   *config.App
+	lockConfig  *config.Lock
+	scheduler   gocron.Scheduler
 }
 
-const (
-	jobUpdatesCleanStale = "UPDATES_CLEAN_STALE"
-	jobEventsCleanStale  = "EVENTS_CLEAN_STALE"
-	jobActionsEnqueue    = "ACTIONS_ENQUEUE"
-	jobActionsInvoke     = "ACTIONS_INVOKE"
-	jobActionsCleanStale = "ACTIONS_CLEAN_STALE"
-	jobPrometheusRefresh = "PROMETHEUS_REFRESH"
-)
-
-var (
-	initialTasksStartDelay = time.Now().Add(10 * time.Second)
-)
-
-func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *ActionService, ai *ActionInvocationService, l LockService, p *PrometheusService, ac *config.App, tc *config.Task, lc *config.Lock, pc *config.Prometheus) (*TaskService, error) {
+// NewTaskService constructs the service, ensuring bootstrapped connection to potential redis works
+func NewTaskService(l LockService, ac *config.App, lc *config.Lock) (*TaskService, error) {
 	var err error
 	var location *time.Location
 	if location, err = time.LoadLocation(ac.TimeZone); err != nil {
@@ -60,10 +40,9 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 		log.Debug().Msgf("Job '%s' (%v) starts", jobName, jobID)
 	})
 	eventListenerOption := gocron.WithEventListeners(beforeEventListener, successEventListener, errorEventListener)
-	startAtOption := gocron.WithStartAt(gocron.WithStartDateTime(initialTasksStartDelay))
 
 	// global scheduler options
-	schedulerOptions := []gocron.SchedulerOption{gocron.WithLocation(location), gocron.WithGlobalJobOptions(singletonModeOption, eventListenerOption, startAtOption)}
+	schedulerOptions := []gocron.SchedulerOption{gocron.WithLocation(location), gocron.WithGlobalJobOptions(singletonModeOption, eventListenerOption)}
 
 	if lc.RedisEnabled {
 		log.Info().Msg("Initializing REDIS task service")
@@ -84,44 +63,20 @@ func NewTaskService(u *UpdateService, e *EventService, w *WebhookService, a *Act
 	scheduler, _ := gocron.NewScheduler(schedulerOptions...)
 
 	return &TaskService{
-		updateService:           u,
-		eventService:            e,
-		actionService:           a,
-		actionInvocationService: ai,
-		webhookService:          w,
-		lockService:             l,
-		prometheusService:       p,
-		appConfig:               ac,
-		taskConfig:              tc,
-		lockConfig:              lc,
-		prometheusConfig:        pc,
-		scheduler:               scheduler,
+		lockService: l,
+		appConfig:   ac,
+		lockConfig:  lc,
+		scheduler:   scheduler,
 	}, nil
 }
 
-func (s *TaskService) Init() error {
-	if err := s.configureCleanupStaleUpdatesTask(); err != nil {
-		return err
-	}
-	if err := s.configureCleanupStaleEventsTask(); err != nil {
-		return err
-	}
-	if err := s.configureActionsEnqueueTask(); err != nil {
-		return err
-	}
-	if err := s.configureActionsInvokeTask(); err != nil {
-		return err
-	}
-	if err := s.configureCleanupStaleActionsTask(); err != nil {
-		return err
-	}
-	if err := s.configurePrometheusRefreshTask(); err != nil {
-		return err
-	}
-
-	return nil
+// Start starts the scheduler, should be called after Init
+func (s *TaskService) Start() {
+	s.scheduler.Start()
+	log.Info().Msgf("Started %d periodic tasks", len(s.scheduler.Jobs()))
 }
 
+// Stop stops the service and shuts down the scheduler
 func (s *TaskService) Stop() {
 	log.Info().Msgf("Stopping %d periodic tasks...", len(s.scheduler.Jobs()))
 	if err := s.scheduler.StopJobs(); err != nil {
@@ -133,214 +88,31 @@ func (s *TaskService) Stop() {
 	log.Info().Msg("Stopped all periodic tasks")
 }
 
-func (s *TaskService) Start() {
-	s.scheduler.Start()
-	log.Info().Msgf("Started %d periodic tasks", len(s.scheduler.Jobs()))
+// EnqueueOnce enqueues a new job once for execution, convenience method for gocron.WithLimitedRuns, see https://github.com/go-co-op/gocron/issues/709
+func (s *TaskService) EnqueueOnce(job gocron.JobDefinition, task gocron.Task, name string, options ...gocron.JobOption) (gocron.Job, error) {
+	jobOptions := []gocron.JobOption{gocron.WithLimitedRuns(1)}
+	jobOptions = append(jobOptions, options...)
+	return s.Enqueue(job, task, name, jobOptions...)
 }
 
-func (s *TaskService) configureCleanupStaleUpdatesTask() error {
-	if !s.taskConfig.UpdateCleanStaleEnabled {
-		return nil
+// Enqueue enqueues a new job
+func (s *TaskService) Enqueue(job gocron.JobDefinition, task gocron.Task, name string, options ...gocron.JobOption) (gocron.Job, error) {
+	if name == "" {
+		return nil, service_error.ErrValidationNotBlank
 	}
-
-	runnable := func() {
-		t := time.Now()
-		t = t.Add(-s.taskConfig.UpdateCleanStaleMaxAge)
-
-		var err error
-		var c int64
-
-		if c, err = s.updateService.CleanStale(t, constant.UpdateStateApproved, constant.UpdateStateIgnored); err != nil {
-			log.Error().Msgf("Could not clean up ignored or approved updates older than %s (%s). Reason: %s", s.taskConfig.UpdateCleanStaleMaxAge, t, err.Error())
-			return
-		}
-
-		if c > 0 {
-			log.Info().Msgf("Cleaned up '%d' stale updates", c)
-		} else {
-			log.Debug().Msg("No stale updates found to clean up")
-		}
-	}
-
-	scheduledJob := gocron.DurationJob(s.taskConfig.UpdateCleanStaleInterval)
-	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobUpdatesCleanStale)); err != nil {
-		return fmt.Errorf("could not create task for cleaning stale updates: %w", err)
-	}
-
-	return nil
+	jobOptions := []gocron.JobOption{gocron.WithName(name)}
+	jobOptions = append(jobOptions, options...)
+	return s.scheduler.NewJob(job, task, jobOptions...)
 }
 
-func (s *TaskService) configureCleanupStaleEventsTask() error {
-	if !s.taskConfig.EventCleanStaleEnabled {
-		return nil
-	}
-
-	runnable := func() {
-		t := time.Now()
-		t = t.Add(-s.taskConfig.EventCleanStaleMaxAge)
-
-		var err error
-		var c int64
-
-		if c, err = s.eventService.CleanStale(t, constant.EventStateCreated, constant.EventStateEnqueued); err != nil {
-			log.Error().Msgf("Could not clean up stale events older than %s (%s). Reason: %s", s.taskConfig.EventCleanStaleMaxAge, t, err.Error())
-			return
-		}
-
-		if c > 0 {
-			log.Info().Msgf("Cleaned up '%d' stale events", c)
-		} else {
-			log.Debug().Msg("No stale events found to clean up")
-		}
-	}
-
-	scheduledJob := gocron.DurationJob(s.taskConfig.EventCleanStaleInterval)
-	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobEventsCleanStale)); err != nil {
-		return fmt.Errorf("could not create task for cleaning stale events: %w", err)
-	}
-
-	return nil
+// Cancel cancels a job by ID
+func (s *TaskService) Cancel(id uuid.UUID) error {
+	log.Debug().Msgf("Removing by ID '%v'", id)
+	return s.scheduler.RemoveJob(id)
 }
 
-func (s *TaskService) configureActionsEnqueueTask() error {
-	if !s.taskConfig.ActionsEnqueueEnabled {
-		return nil
-	}
-
-	runnable := func() {
-		if err := s.actionInvocationService.Enqueue(s.taskConfig.ActionsEnqueueBatchSize); err != nil {
-			log.Error().Msgf("Could enqueue actions. Reason: %s", err.Error())
-		}
-	}
-
-	scheduledJob := gocron.DurationJob(s.taskConfig.ActionsEnqueueInterval)
-	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobActionsEnqueue)); err != nil {
-		return fmt.Errorf("could not create task for enqueueing actions: %w", err)
-	}
-
-	return nil
-}
-
-func (s *TaskService) configureActionsInvokeTask() error {
-	if !s.taskConfig.ActionsInvokeEnabled {
-		return nil
-	}
-
-	runnable := func() {
-		if err := s.actionInvocationService.Invoke(s.taskConfig.ActionsInvokeBatchSize, s.taskConfig.ActionsInvokeMaxRetries); err != nil {
-			log.Error().Msgf("Could invoke actions. Reason: %s", err.Error())
-		}
-	}
-
-	scheduledJob := gocron.DurationJob(s.taskConfig.ActionsInvokeInterval)
-	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobActionsInvoke)); err != nil {
-		return fmt.Errorf("could not create task for invoking actions: %w", err)
-	}
-
-	return nil
-}
-
-func (s *TaskService) configureCleanupStaleActionsTask() error {
-	if !s.taskConfig.ActionsCleanStaleEnabled {
-		return nil
-	}
-
-	runnable := func() {
-		t := time.Now()
-		t = t.Add(-s.taskConfig.ActionsCleanStaleMaxAge)
-
-		var cError int64
-		var err error
-
-		if cError, err = s.actionInvocationService.CleanStale(t, s.taskConfig.ActionsInvokeMaxRetries, constant.ActionInvocationStateError); err != nil {
-			log.Error().Msgf("Could not clean up error stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
-			return
-		}
-
-		var cSuccess int64
-		if cSuccess, err = s.actionInvocationService.CleanStale(t, 0, constant.ActionInvocationStateSuccess); err != nil {
-			log.Error().Msgf("Could not clean up success stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
-			return
-		}
-
-		c := cError + cSuccess
-		if c > 0 {
-			log.Info().Msgf("Cleaned up '%d' stale actions", c)
-		} else {
-			log.Debug().Msg("No stale actions found to clean up")
-		}
-	}
-
-	scheduledJob := gocron.DurationJob(s.taskConfig.ActionsCleanStaleInterval)
-	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobActionsCleanStale)); err != nil {
-		return fmt.Errorf("could not create task for cleaning stale actions: %w", err)
-	}
-
-	return nil
-}
-
-func (s *TaskService) configurePrometheusRefreshTask() error {
-	if !s.prometheusConfig.Enabled {
-		return nil
-	}
-
-	runnable := func() {
-		updates, updatesError := s.updateService.GetAll()
-
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesTotal, float64(len(updates))); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
-		}
-
-		var pendingTotal int64
-		var ignoredTotal int64
-		var ackTotal int64
-
-		for _, update := range updates {
-			if constant.UpdateStatePending.String() == update.State {
-				pendingTotal += 1
-			} else if constant.UpdateStateIgnored.String() == update.State {
-				ignoredTotal += 1
-			} else if constant.UpdateStateApproved.String() == update.State {
-				ackTotal += 1
-			}
-		}
-
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesPending, float64(pendingTotal)); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates pending prometheus metric. Reason: %s", updatesError.Error())
-		}
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesIgnored, float64(ignoredTotal)); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates ignored prometheus metric. Reason: %s", updatesError.Error())
-		}
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesApproved, float64(ackTotal)); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates approved prometheus metric. Reason: %s", updatesError.Error())
-		}
-
-		var webhooksTotal int64
-		var webhooksError error
-		webhooksTotal, webhooksError = s.webhookService.Count()
-		if webhooksError = s.prometheusService.SetGaugeNoLabels(constant.MetricWebhooks, float64(webhooksTotal)); webhooksError != nil {
-			log.Error().Msgf("Could not refresh webhooks prometheus metric. Reason: %s", webhooksError.Error())
-		}
-
-		var eventsTotal int64
-		var eventsError error
-		eventsTotal, eventsError = s.eventService.Count()
-		if eventsError = s.prometheusService.SetGaugeNoLabels(constant.MetricEvents, float64(eventsTotal)); eventsError != nil {
-			log.Error().Msgf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
-		}
-
-		var actionsTotal int64
-		var actionsError error
-		actionsTotal, actionsError = s.actionService.Count()
-		if actionsError = s.prometheusService.SetGaugeNoLabels(constant.MetricActions, float64(actionsTotal)); actionsError != nil {
-			log.Error().Msgf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
-		}
-	}
-
-	scheduledJob := gocron.DurationJob(s.taskConfig.PrometheusRefreshInterval)
-	if _, err := s.scheduler.NewJob(scheduledJob, gocron.NewTask(runnable), gocron.WithName(jobPrometheusRefresh)); err != nil {
-		return fmt.Errorf("could not create task for refreshing prometheus: %w", err)
-	}
-
-	return nil
+// CancelByTag cancels a job by tags
+func (s *TaskService) CancelByTag(tags ...string) {
+	log.Debug().Msgf("Removing by tags '%v'", tags)
+	s.scheduler.RemoveByTags(tags...)
 }

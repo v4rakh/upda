@@ -38,3 +38,14 @@ func TestExtractBetweenVars(t *testing.T) {
 	a.Equal("APPLICATION", matches[1][1])
 	a.Equal("MY_SECOND_VAR", matches[2][1])
 }
+
+func TestAllContained(t *testing.T) {
+	a := assert.New(t)
+	a.True(AllContained([]string{"a", "b"}, []string{"a", "b", "c"}))
+	a.True(AllContained([]string{"b", "a"}, []string{"a", "b", "c"}))
+	a.True(AllContained([]string{"b", "c", "a"}, []string{"a", "b", "c"}))
+	a.False(AllContained([]string{"c", "a"}, []string{"a"}))
+	a.True(AllContained([]string{}, []string{"a"}))
+	a.True(AllContained([]string{}, []string{}))
+	a.False(AllContained([]string{"a"}, []string{}))
+}
