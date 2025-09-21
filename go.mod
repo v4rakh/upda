@@ -2,8 +2,6 @@ module git.myservermanager.com/varakh/upda
 
 go 1.24.3
 
-toolchain go1.25.1
-
 require (
 	github.com/Depado/ginprom v1.8.1
 	github.com/containrrr/shoutrrr v0.8.0
