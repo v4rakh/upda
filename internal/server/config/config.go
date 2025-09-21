@@ -32,7 +32,6 @@ const (
 var migrationPostgresFS embed.FS
 
 type Logging struct {
-	Development           bool                          `env:"DEVELOPMENT,default=false"`
 	Encoding              constant.ConfigLogEncoding    `env:"LOGGING_ENCODING,default=console" validate:"required,oneof=json console"`
 	EncodingColorize      bool                          `env:"LOGGING_ENCODING_COLORIZE,default=false"`
 	EncodingErrorKey      string                        `env:"LOGGING_ENCODING_ERROR_KEY,default=error" validate:"required"`
@@ -300,13 +299,13 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	}
 
 	log.Info().Msgf("Configuration: App %+v", c.App)
-	log.Info().Msgf("Configuration: Auth ***REDACTED***")
+	log.Info().Msg("Configuration: Auth ***REDACTED***")
 	log.Info().Msgf("Configuration: Cors %+v", c.Cors)
-	log.Info().Msgf("Configuration: Database ***REDACTED***")
-	log.Info().Msgf("Configuration: Lock ***REDACTED***")
+	log.Info().Msg("Configuration: Database ***REDACTED***")
+	log.Info().Msg("Configuration: Lock ***REDACTED***")
 	log.Info().Msgf("Configuration: Logging %+v", lc)
-	log.Info().Msgf("Configuration: Prometheus ***REDACTED***")
-	log.Info().Msgf("Configuration: Secret ***REDACTED***")
+	log.Info().Msg("Configuration: Prometheus ***REDACTED***")
+	log.Info().Msg("Configuration: Secret ***REDACTED***")
 	log.Info().Msgf("Configuration: Server %+v", c.Server)
 	log.Info().Msgf("Configuration: Task %+v", c.Task)
 	log.Info().Msgf("Configuration: Webhook %+v", c.Webhook)
