@@ -9,6 +9,7 @@ import {
 } from '../types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import CommentFilterQueryParamNames from '../constants/api/commentFilterQueryParamNames';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -34,7 +35,7 @@ export const commentsApi = injectEndpoints({
 						params.append(CommentFilterQueryParamNames.PAGE_SIZE, `${pageSize}`);
 					}
 
-					return { url: `comments/${updateId}?${params.toString()}` };
+					return { url: `${ApiVersion.V1}/comments/${updateId}?${params.toString()}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -47,14 +48,14 @@ export const commentsApi = injectEndpoints({
 				}
 			}),
 			createComment: build.mutation<CommentSingleResponse, { updateId: string; body: CreateCommentRequest }>({
-				query: ({ updateId, body }) => ({ url: `comments/${updateId}`, method: 'POST', body }),
+				query: ({ updateId, body }) => ({ url: `${ApiVersion.V1}/comments/${updateId}`, method: 'POST', body }),
 				invalidatesTags
 			}),
 			modifyCommentContent: build.mutation<
 				CommentSingleResponse,
 				{ id: string; body: ModifyCommentContentRequest }
 			>({
-				query: ({ id, body }) => ({ url: `comments/${id}/content`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/comments/${id}/content`, method: 'PATCH', body }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];
@@ -63,7 +64,7 @@ export const commentsApi = injectEndpoints({
 				}
 			}),
 			deleteComment: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `comments/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/comments/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			})
 		};

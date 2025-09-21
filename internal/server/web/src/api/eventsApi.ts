@@ -2,6 +2,7 @@ import { injectEndpoints } from './index';
 import EventFilterQueryParamNames from '../constants/api/eventFilterQueryParamNames';
 import ApiTags from '../constants/apiTags';
 import { EventSingleResponse, EventsRequestParams, EventsResponse } from '../types/event';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -26,7 +27,7 @@ export const eventsApi = injectEndpoints({
 					if (updateId) {
 						params.append(EventFilterQueryParamNames.UPDATE_ID, `${updateId}`);
 					}
-					return { url: `events?${params.toString()}` };
+					return { url: `${ApiVersion.V1}/events?${params.toString()}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -39,7 +40,7 @@ export const eventsApi = injectEndpoints({
 				}
 			}),
 			getEventById: build.query<EventSingleResponse, { id: string }>({
-				query: ({ id }) => ({ url: `events/${id}` }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/events/${id}` }),
 				providesTags: (result, error) => {
 					if (!error && result?.data) {
 						return [{ type: ApiTags.Events, id: result.data.id }];
@@ -48,7 +49,7 @@ export const eventsApi = injectEndpoints({
 				}
 			}),
 			deleteEvent: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `events/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/events/${id}`, method: 'DELETE' }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];

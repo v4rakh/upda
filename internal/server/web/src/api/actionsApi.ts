@@ -17,6 +17,7 @@ import {
 	TestActionRequest
 } from '../types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -45,7 +46,7 @@ export const actionsApi = injectEndpoints({
 					if (orderBy) {
 						params.append(ActionFilterQueryParamNames.ORDER_BY, `${orderBy}`);
 					}
-					return { url: `actions?${params.toString()}` };
+					return { url: `${ApiVersion.V1}/actions?${params.toString()}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -58,7 +59,7 @@ export const actionsApi = injectEndpoints({
 				}
 			}),
 			getActionById: build.query<ActionSingleResponse, { id: string }>({
-				query: ({ id }) => ({ url: `actions/${id}` }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/actions/${id}` }),
 				providesTags: (result, error) => {
 					if (!error && result?.data) {
 						return [{ type: ApiTags.Actions, id: result.data.id }];
@@ -67,14 +68,14 @@ export const actionsApi = injectEndpoints({
 				}
 			}),
 			createAction: build.mutation<ActionSingleResponse, CreateActionRequest>({
-				query: (body) => ({ url: 'actions', method: 'POST', body }),
+				query: (body) => ({ url: '${ApiVersion.V1}/actions', method: 'POST', body }),
 				invalidatesTags
 			}),
 			testAction: build.mutation<ActionTestSingleResponse, { id: string; body: TestActionRequest }>({
-				query: ({ id, body }) => ({ url: `actions/${id}/test`, method: 'POST', body })
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/actions/${id}/test`, method: 'POST', body })
 			}),
 			modifyLabelAction: build.mutation<ActionSingleResponse, { id: string; body: ModifyActionLabelRequest }>({
-				query: ({ id, body }) => ({ url: `actions/${id}/label`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/actions/${id}/label`, method: 'PATCH', body }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];
@@ -87,7 +88,7 @@ export const actionsApi = injectEndpoints({
 				{ id: string; body: ModifyActionMatchApplicationRequest }
 			>({
 				query: ({ id, body }) => ({
-					url: `actions/${id}/match-application`,
+					url: `${ApiVersion.V1}/actions/${id}/match-application`,
 					method: 'PATCH',
 					body
 				}),
@@ -103,7 +104,7 @@ export const actionsApi = injectEndpoints({
 				{ id: string; body: ModifyActionMatchHostRequest }
 			>({
 				query: ({ id, body }) => ({
-					url: `actions/${id}/match-host`,
+					url: `${ApiVersion.V1}/actions/${id}/match-host`,
 					method: 'PATCH',
 					body
 				}),
@@ -119,7 +120,7 @@ export const actionsApi = injectEndpoints({
 				{ id: string; body: ModifyActionMatchEventRequest }
 			>({
 				query: ({ id, body }) => ({
-					url: `actions/${id}/match-event`,
+					url: `${ApiVersion.V1}/actions/${id}/match-event`,
 					method: 'PATCH',
 					body
 				}),
@@ -135,7 +136,7 @@ export const actionsApi = injectEndpoints({
 				{ id: string; body: ModifyActionMatchProviderRequest }
 			>({
 				query: ({ id, body }) => ({
-					url: `actions/${id}/match-provider`,
+					url: `${ApiVersion.V1}/actions/${id}/match-provider`,
 					method: 'PATCH',
 					body
 				}),
@@ -151,7 +152,7 @@ export const actionsApi = injectEndpoints({
 				{ id: string; body: ModifyActionPayloadRequest }
 			>({
 				query: ({ id, body }) => ({
-					url: `actions/${id}/payload`,
+					url: `${ApiVersion.V1}/actions/${id}/payload`,
 					method: 'PATCH',
 					body
 				}),
@@ -164,7 +165,7 @@ export const actionsApi = injectEndpoints({
 			}),
 			modifyEnabledAction: build.mutation<ActionSingleResponse, { id: string; body: ModifyActionEnabledRequest }>(
 				{
-					query: ({ id, body }) => ({ url: `actions/${id}/enabled`, method: 'PATCH', body }),
+					query: ({ id, body }) => ({ url: `${ApiVersion.V1}/actions/${id}/enabled`, method: 'PATCH', body }),
 					invalidatesTags: (result, error, arg) => {
 						if (error) {
 							return [];
@@ -174,7 +175,7 @@ export const actionsApi = injectEndpoints({
 				}
 			),
 			deleteAction: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `actions/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/actions/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			})
 		};

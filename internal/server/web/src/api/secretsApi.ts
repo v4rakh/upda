@@ -2,6 +2,7 @@ import { injectEndpoints } from './index';
 import ApiTags from '../constants/apiTags';
 import { CreateSecretRequest, ModifySecretValueRequest, SecretSingleResponse, SecretsResponse } from '../types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -17,7 +18,7 @@ export const secretsApi = injectEndpoints({
 		return {
 			getSecrets: build.query<SecretsResponse, void>({
 				query: () => {
-					return { url: 'secrets' };
+					return { url: `${ApiVersion.V1}/secrets` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -30,11 +31,11 @@ export const secretsApi = injectEndpoints({
 				}
 			}),
 			createSecret: build.mutation<SecretSingleResponse, CreateSecretRequest>({
-				query: (body) => ({ url: 'secrets', method: 'POST', body }),
+				query: (body) => ({ url: `${ApiVersion.V1}/secrets`, method: 'POST', body }),
 				invalidatesTags
 			}),
 			modifyValueSecret: build.mutation<SecretSingleResponse, { id: string; body: ModifySecretValueRequest }>({
-				query: ({ id, body }) => ({ url: `secrets/${id}/value`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/secrets/${id}/value`, method: 'PATCH', body }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];
@@ -43,7 +44,7 @@ export const secretsApi = injectEndpoints({
 				}
 			}),
 			deleteSecret: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `secrets/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/secrets/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			})
 		};

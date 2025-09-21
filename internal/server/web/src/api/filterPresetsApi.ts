@@ -7,6 +7,7 @@ import {
 	FilterPresetsResponse,
 	FilterPresetType
 } from '../types/filterPreset';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -25,7 +26,7 @@ export const filterPresetsApi = injectEndpoints({
 		return {
 			getFilterPresetsByType: build.query<FilterPresetsResponse, FilterPresetType>({
 				query: (type) => {
-					return { url: `filter-presets/${type}` };
+					return { url: `${ApiVersion.V1}/filter-presets/${type}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -38,11 +39,11 @@ export const filterPresetsApi = injectEndpoints({
 				}
 			}),
 			createFilterPreset: build.mutation<FilterPresetSingleResponse, CreateFilterPresetRequest>({
-				query: (body) => ({ url: 'filter-presets', method: 'POST', body }),
+				query: (body) => ({ url: '${ApiVersion.V1}/filter-presets', method: 'POST', body }),
 				invalidatesTags
 			}),
 			deleteFilterPreset: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `filter-presets/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/filter-presets/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			})
 		};

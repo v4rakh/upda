@@ -3,6 +3,7 @@ import ActionInvocationFilterQueryParamNames from '../constants/api/actionInvoca
 import ApiTags from '../constants/apiTags';
 import { ActionInvocationsRequestParams, ActionInvocationSingleResponse, ActionInvocationsResponse } from '../types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -34,7 +35,7 @@ export const actionInvocationsApi = injectEndpoints({
 					if (orderBy) {
 						params.append(ActionInvocationFilterQueryParamNames.ORDER_BY, `${orderBy}`);
 					}
-					return { url: `action-invocations?${params.toString()}` };
+					return { url: `${ApiVersion.V1}/action-invocations?${params.toString()}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -47,7 +48,7 @@ export const actionInvocationsApi = injectEndpoints({
 				}
 			}),
 			getActionInvocationById: build.query<ActionInvocationSingleResponse, { id: string }>({
-				query: ({ id }) => ({ url: `action-invocations/${id}` }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/action-invocations/${id}` }),
 				providesTags: (result, error) => {
 					if (!error && result?.data) {
 						return [{ type: ApiTags.ActionInvocations, id: result.data.id }];
@@ -56,7 +57,7 @@ export const actionInvocationsApi = injectEndpoints({
 				}
 			}),
 			deleteActionInvocation: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `action-invocations/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/action-invocations/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			})
 		};

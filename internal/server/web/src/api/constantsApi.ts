@@ -2,6 +2,7 @@ import { injectEndpoints } from './index';
 import ApiTags from '../constants/apiTags';
 import { CreateConstantRequest, ModifyConstantValueRequest, ConstantSingleResponse, ConstantsResponse } from '../types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -17,7 +18,7 @@ export const constantsApi = injectEndpoints({
 		return {
 			getConstants: build.query<ConstantsResponse, void>({
 				query: () => {
-					return { url: 'constants' };
+					return { url: `${ApiVersion.V1}/constants` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -30,14 +31,14 @@ export const constantsApi = injectEndpoints({
 				}
 			}),
 			createConstant: build.mutation<ConstantSingleResponse, CreateConstantRequest>({
-				query: (body) => ({ url: 'constants', method: 'POST', body }),
+				query: (body) => ({ url: `${ApiVersion.V1}/constants`, method: 'POST', body }),
 				invalidatesTags
 			}),
 			modifyValueConstant: build.mutation<
 				ConstantSingleResponse,
 				{ id: string; body: ModifyConstantValueRequest }
 			>({
-				query: ({ id, body }) => ({ url: `constants/${id}/value`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/constants/${id}/value`, method: 'PATCH', body }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];
@@ -46,7 +47,7 @@ export const constantsApi = injectEndpoints({
 				}
 			}),
 			deleteConstant: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `constants/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/constants/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			})
 		};

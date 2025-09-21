@@ -10,6 +10,7 @@ import {
 	WebhooksResponse
 } from '../types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -38,7 +39,7 @@ export const webhooksApi = injectEndpoints({
 					if (orderBy) {
 						params.append(WebhookFilterQueryParamNames.ORDER_BY, `${orderBy}`);
 					}
-					return { url: `webhooks?${params.toString()}` };
+					return { url: `${ApiVersion.V1}/webhooks?${params.toString()}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -51,15 +52,15 @@ export const webhooksApi = injectEndpoints({
 				}
 			}),
 			createWebhook: build.mutation<WebhookSingleResponse, CreateWebhookRequest>({
-				query: (body) => ({ url: 'webhooks', method: 'POST', body }),
+				query: (body) => ({ url: `${ApiVersion.V1}/webhooks`, method: 'POST', body }),
 				invalidatesTags
 			}),
 			deleteWebhook: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `webhooks/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/webhooks/${id}`, method: 'DELETE' }),
 				invalidatesTags
 			}),
 			modifyLabelWebhook: build.mutation<WebhookSingleResponse, { id: string; body: ModifyWebhookLabelRequest }>({
-				query: ({ id, body }) => ({ url: `webhooks/${id}/label`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/webhooks/${id}/label`, method: 'PATCH', body }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];
@@ -71,7 +72,11 @@ export const webhooksApi = injectEndpoints({
 				WebhookSingleResponse,
 				{ id: string; body: ModifyWebhookIgnoreHostRequest }
 			>({
-				query: ({ id, body }) => ({ url: `webhooks/${id}/ignore-host`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({
+					url: `${ApiVersion.V1}/webhooks/${id}/ignore-host`,
+					method: 'PATCH',
+					body
+				}),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];

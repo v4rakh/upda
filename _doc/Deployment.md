@@ -41,7 +41,7 @@ services:
         container_name: upda_app
         image: git.myservermanager.com/varakh/upda:latest
         environment:
-            - WEB_INTERFACE_API_URL=https://upda.domain.tld/api/v1/
+            - WEB_INTERFACE_API_URL=https://upda.domain.tld/api/
             - TZ=Europe/Berlin
             - DB_POSTGRES_TZ=Europe/Berlin
             - DB_POSTGRES_HOST=db
@@ -83,7 +83,7 @@ volumes:
 
 Use the [deployment on a (sub)domain](#docker-compose-deployment-on-a-subdomain) as starting point and adapt your
 `docker-compose.yaml` file accordingly. Let's assume you like to deploy under the `/upda-app` base path, then add
-`SERVER_BASE_PATH=/upda-app/`. Make sure to adapt `WEB_INTERFACE_API_URL=https://domain.tld/upda-app/api/v1/`
+`SERVER_BASE_PATH=/upda-app/`. Make sure to adapt `WEB_INTERFACE_API_URL=https://domain.tld/upda-app/api/`
 as well.
 
 Next, look into the fitting [reverse proxy setup](#reverse-proxy) or decide if you

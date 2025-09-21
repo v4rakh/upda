@@ -7,7 +7,7 @@ externalDocs:
   description: Find out more about the project
   url: https://git.myservermanager.com/varakh/upda
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: http://localhost:8080/api
 tags:
   - name: updates
     description: Updates endpoints
@@ -32,7 +32,7 @@ tags:
   - name: auth
     description: Application authorization related endpoints
 paths:
-  '/info':
+  '/v1/info':
     get:
       tags:
         - application
@@ -46,7 +46,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InfoResponse'
-  '/health':
+  '/v1/health':
     get:
       tags:
         - application
@@ -60,7 +60,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
-  /updates:
+  /v1/updates:
     get:
       tags:
         - updates
@@ -174,7 +174,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/updates/{id}':
+  '/v1/updates/{id}':
     get:
       tags:
         - updates
@@ -275,7 +275,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/updates/{id}/state':
+  '/v1/updates/{id}/state':
     patch:
       tags:
         - updates
@@ -334,7 +334,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /comments/{updateId}:
+  /v1/comments/{updateId}:
     get:
       tags:
         - comments
@@ -459,7 +459,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/comments/{id}/content':
+  '/v1/comments/{id}/content':
     patch:
       tags:
         - comments
@@ -518,7 +518,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/comments/{id}':
+  '/v1/comments/{id}':
     delete:
       tags:
         - comments
@@ -567,7 +567,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/webhooks':
+  '/v1/webhooks':
     post:
       tags:
         - webhooks
@@ -701,7 +701,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/webhooks/{id}':
+  '/v1/webhooks/{id}':
     post:
       tags:
         - webhooks
@@ -861,7 +861,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/webhooks/{id}/label':
+  '/v1/webhooks/{id}/label':
     patch:
       tags:
         - webhooks
@@ -920,7 +920,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/webhooks/{id}/ignore-host':
+  '/v1/webhooks/{id}/ignore-host':
     patch:
       tags:
         - webhooks
@@ -979,7 +979,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /events:
+  /v1/events:
     get:
       tags:
         - events
@@ -1069,7 +1069,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/events/{id}':
+  '/v1/events/{id}':
     get:
       tags:
         - events
@@ -1170,7 +1170,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /actions:
+  /v1/actions:
     post:
       tags:
         - actions
@@ -1305,7 +1305,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/label':
+  '/v1/actions/{id}/label':
     patch:
       tags:
         - actions
@@ -1364,7 +1364,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/match-event':
+  '/v1/actions/{id}/match-event':
     patch:
       tags:
         - actions
@@ -1423,7 +1423,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/match-host':
+  '/v1/actions/{id}/match-host':
     patch:
       tags:
         - actions
@@ -1482,7 +1482,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/match-application':
+  '/v1/actions/{id}/match-application':
     patch:
       tags:
         - actions
@@ -1541,7 +1541,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/match-provider':
+  '/v1/actions/{id}/match-provider':
     patch:
       tags:
         - actions
@@ -1600,7 +1600,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/payload':
+  '/v1/actions/{id}/payload':
     patch:
       tags:
         - actions
@@ -1659,7 +1659,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/enabled':
+  '/v1/actions/{id}/enabled':
     patch:
       tags:
         - actions
@@ -1718,7 +1718,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}/test':
+  '/v1/actions/{id}/test':
     post:
       tags:
         - actions
@@ -1777,7 +1777,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/actions/{id}':
+  '/v1/actions/{id}':
     get:
       tags:
         - actions
@@ -1878,7 +1878,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /action-invocations:
+  /v1/action-invocations:
     get:
       tags:
         - action-invocations
@@ -1962,7 +1962,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/action-invocations/{id}':
+  '/v1/action-invocations/{id}':
     get:
       tags:
         - action-invocations
@@ -2063,7 +2063,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /secrets:
+  /v1/secrets:
     post:
       tags:
         - secrets
@@ -2166,7 +2166,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/secrets/{id}':
+  '/v1/secrets/{id}':
     get:
       tags:
         - secrets
@@ -2267,7 +2267,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/secrets/{id}/value':
+  '/v1/secrets/{id}/value':
     patch:
       tags:
         - secrets
@@ -2326,7 +2326,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /constants:
+  /v1/constants:
     post:
       tags:
         - constants
@@ -2429,7 +2429,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/constants/{id}':
+  '/v1/constants/{id}':
     get:
       tags:
         - constants
@@ -2530,7 +2530,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/constants/{id}/value':
+  '/v1/constants/{id}/value':
     patch:
       tags:
         - constants
@@ -2589,7 +2589,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /filter-presets:
+  /v1/filter-presets:
     post:
       tags:
         - filter-presets
@@ -2647,7 +2647,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/filter-presets/{type}':
+  '/v1/filter-presets/{type}':
     get:
       tags:
         - filter-presets
@@ -2702,7 +2702,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/filter-presets/{id}':
+  '/v1/filter-presets/{id}':
     delete:
       tags:
         - filter-presets
@@ -2751,7 +2751,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /login:
+  /v1/login:
     get:
       tags:
         - auth

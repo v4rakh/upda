@@ -3,6 +3,7 @@ import UpdateFilterQueryParamNames from '../constants/api/updateFilterQueryParam
 import ApiTags from '../constants/apiTags';
 import { ModifyUpdateStateRequest, UpdateSingleResponse, UpdatesRequestParams, UpdatesResponse } from '../types';
 import { forEach } from 'lodash';
+import ApiVersion from '../constants/apiVersion';
 
 const TAG_LIST_ID = 'LIST';
 
@@ -37,7 +38,7 @@ export const updatesApi = injectEndpoints({
 					if (orderBy) {
 						params.append(UpdateFilterQueryParamNames.ORDER_BY, `${orderBy}`);
 					}
-					return { url: `updates?${params.toString()}` };
+					return { url: `${ApiVersion.V1}/updates?${params.toString()}` };
 				},
 				providesTags: (result, error) => {
 					if (!error && result?.data.content) {
@@ -50,7 +51,7 @@ export const updatesApi = injectEndpoints({
 				}
 			}),
 			getUpdateById: build.query<UpdateSingleResponse, { id: string }>({
-				query: ({ id }) => ({ url: `updates/${id}` }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/updates/${id}` }),
 				providesTags: (result, error) => {
 					if (!error && result?.data) {
 						return [{ type: ApiTags.Updates, id: result.data.id }];
@@ -59,7 +60,7 @@ export const updatesApi = injectEndpoints({
 				}
 			}),
 			modifyUpdateState: build.mutation<UpdateSingleResponse, { id: string; body: ModifyUpdateStateRequest }>({
-				query: ({ id, body }) => ({ url: `updates/${id}/state`, method: 'PATCH', body }),
+				query: ({ id, body }) => ({ url: `${ApiVersion.V1}/updates/${id}/state`, method: 'PATCH', body }),
 				invalidatesTags: (result, error, arg) => {
 					if (error) {
 						return [];
@@ -68,7 +69,7 @@ export const updatesApi = injectEndpoints({
 				}
 			}),
 			deleteUpdate: build.mutation<void, { id: string }>({
-				query: ({ id }) => ({ url: `updates/${id}`, method: 'DELETE' }),
+				query: ({ id }) => ({ url: `${ApiVersion.V1}/updates/${id}`, method: 'DELETE' }),
 				invalidatesTags: (error) => {
 					if (error) {
 						return [];
