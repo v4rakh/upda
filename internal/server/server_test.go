@@ -22,23 +22,74 @@ import (
 )
 
 const (
-	postgresNetworkAlias     = "db"
-	postgresPort             = "5432"
-	postgresImage            = "postgres:17-alpine"
-	postgresUser             = "upda"
-	postgresPass             = "upda"
-	postgresDb               = "upda"
-	appPort                  = "8080"
-	imageEnvKey              = "IMAGE"
+	natPortFormat            = "%s/tcp"
 	containerStartupTimeout  = 20 * time.Second
 	containerDeadlineTimeout = 120 * time.Second
 	containerLogTimeout      = 10 * time.Second
+	imageEnvKey              = "IMAGE"
+
+	postgresNetworkAlias = "db"
+	postgresPort         = "5432"
+	postgresImage        = "postgres:17-alpine"
+	postgresUser         = "upda"
+	postgresPass         = "upda"
+	postgresDb           = "upda"
+	appPort              = "8080"
 )
 
-type VerboseLogConsumer struct{}
+type VerboseLogConsumer struct {
+	name string
+}
+
+func NewVerboseLogConsumer(name string) *VerboseLogConsumer {
+	return &VerboseLogConsumer{name: name}
+}
 
 func (g *VerboseLogConsumer) Accept(l testcontainers.Log) {
-	fmt.Printf("Container Log: %s", string(l.Content))
+	fmt.Printf("Container[%s]:\t%s", g.name, string(l.Content))
+}
+
+func NewVerboseLogConsumerConfig(name string) *testcontainers.LogConsumerConfig {
+	return &testcontainers.LogConsumerConfig{
+		Consumers: []testcontainers.LogConsumer{NewVerboseLogConsumer(name)},
+		Opts: []testcontainers.LogProductionOption{
+			testcontainers.WithLogProductionTimeout(containerLogTimeout),
+		},
+	}
+}
+
+func createDatabaseContainer(ctx context.Context, t *testing.T, networkName string) testcontainers.Container {
+	var err error
+	req := testcontainers.ContainerRequest{
+		Image:        postgresImage,
+		ExposedPorts: []string{fmt.Sprintf(natPortFormat, postgresPort)},
+		Networks:     []string{networkName},
+		NetworkAliases: map[string][]string{
+			networkName: {postgresNetworkAlias},
+		},
+		LogConsumerCfg: NewVerboseLogConsumerConfig(postgresNetworkAlias),
+		Env: map[string]string{
+			"POSTGRES_USER":     postgresUser,
+			"POSTGRES_PASSWORD": postgresPass,
+			"POSTGRES_DB":       postgresDb,
+		},
+		WaitingFor: wait.ForAll(
+			wait.ForExposedPort(),
+			wait.ForLog("database system is ready to accept connections"),
+		).WithStartupTimeoutDefault(containerStartupTimeout).
+			WithDeadline(containerDeadlineTimeout),
+	}
+
+	var c testcontainers.Container
+	if c, err = testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	}); err != nil {
+		t.Fatalf("failed to start database container: %v", err)
+	}
+	testcontainers.CleanupContainer(t, c)
+
+	return c
 }
 
 func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainers.Container, string) {
@@ -57,45 +108,8 @@ func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainer
 	}
 	testcontainers.CleanupNetwork(t, n)
 
-	// Create loggers for the containers
-	logConsumer := &VerboseLogConsumer{}
-	logConsumerConfig := &testcontainers.LogConsumerConfig{
-		Consumers: []testcontainers.LogConsumer{logConsumer},
-		Opts: []testcontainers.LogProductionOption{
-			testcontainers.WithLogProductionTimeout(containerLogTimeout),
-		},
-	}
-
 	// Create database container
-	const natPortFormat = "%s/tcp"
-	dbContainerReq := testcontainers.ContainerRequest{
-		Image:        postgresImage,
-		ExposedPorts: []string{fmt.Sprintf(natPortFormat, postgresPort)},
-		Networks:     []string{n.Name},
-		NetworkAliases: map[string][]string{
-			n.Name: {postgresNetworkAlias},
-		},
-		LogConsumerCfg: logConsumerConfig,
-		Env: map[string]string{
-			"POSTGRES_USER":     postgresUser,
-			"POSTGRES_PASSWORD": postgresPass,
-			"POSTGRES_DB":       postgresDb,
-		},
-		WaitingFor: wait.ForAll(
-			wait.ForExposedPort(),
-			wait.ForLog("database system is ready to accept connections"),
-		).WithStartupTimeoutDefault(containerStartupTimeout).
-			WithDeadline(containerDeadlineTimeout),
-	}
-
-	var dbContainer testcontainers.Container
-	if dbContainer, err = testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: dbContainerReq,
-		Started:          true,
-	}); err != nil {
-		t.Fatalf("failed to start database container: %v", err)
-	}
-	testcontainers.CleanupContainer(t, dbContainer)
+	dbContainer := createDatabaseContainer(ctx, t, n.Name)
 
 	// Create application container
 	appPortMapped := fmt.Sprintf(natPortFormat, appPort)
@@ -109,7 +123,7 @@ func setupTestEnvironment(t *testing.T) (testcontainers.Container, testcontainer
 		Image:          image,
 		ExposedPorts:   []string{appPortMapped},
 		Networks:       []string{n.Name},
-		LogConsumerCfg: logConsumerConfig,
+		LogConsumerCfg: NewVerboseLogConsumerConfig(meta.Name),
 		Env: map[string]string{
 			"DB_POSTGRES_HOST":      postgresNetworkAlias,
 			"DB_POSTGRES_PORT":      postgresPort,
