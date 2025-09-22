@@ -24,7 +24,7 @@ const runtime_config = Object.freeze({
   VITE_TITLE: '%s',
   VITE_ENABLE_DARK_THEME: %d,
   VITE_ENABLE_FOOTER: %d,
-  VITE_AUTH_TYPE: %s
+  VITE_AUTH_TYPE: '%s'
 });
 
 Object.defineProperty(window, 'runtime_config', {
