@@ -31,7 +31,7 @@
     "clean": "npx --quiet rimraf build && npx --quiet rimraf ci/*.xml && npx --quiet rimraf coverage && npx --quiet rimraf node_modules"
   },
   "dependencies": {
-    "@ant-design/icons": "6.0.2",
+    "@ant-design/icons": "6.1.0",
     "@ant-design/pro-layout": "7.22.7",
     "@ant-design/v5-patch-for-react-19": "1.0.3",
     "@reduxjs/toolkit": "2.9.0",
