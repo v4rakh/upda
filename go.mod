@@ -25,7 +25,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.39.0
 	github.com/urfave/cli/v3 v3.4.1
 	github.com/wader/gormstore/v2 v2.0.3
-	go.eigsys.de/gin-cachecontrol/v2 v2.3.0
+	go.eigsys.de/gin-cachecontrol/v2 v2.4.0
 	go.uber.org/automaxprocs v1.6.0
 	gorm.io/datatypes v1.2.7
 	gorm.io/driver/postgres v1.6.0
@@ -110,7 +110,7 @@ require (
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
-	github.com/quic-go/quic-go v0.54.0 // indirect
+	github.com/quic-go/quic-go v0.54.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/shirou/gopsutil/v4 v4.25.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
