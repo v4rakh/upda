@@ -34,7 +34,7 @@
     "@ant-design/icons": "6.1.0",
     "@ant-design/pro-layout": "7.22.7",
     "@ant-design/v5-patch-for-react-19": "1.0.3",
-    "@reduxjs/toolkit": "2.9.0",
+    "@reduxjs/toolkit": "2.9.1",
     "@uiw/react-md-editor": "4.0.8",
     "antd": "5.27.5",
     "html-react-parser": "5.2.7",
