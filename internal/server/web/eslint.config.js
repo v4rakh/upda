@@ -63,6 +63,7 @@ export default [
 			'@typescript-eslint/no-empty-function': 'off',
 			'react/react-in-jsx-scope': 'off',
 			'react/jsx-uses-react': 'off',
+			'react-hooks/set-state-in-effect': 'off',
 			'no-console': 'warn',
 			'no-duplicate-imports': 'warn',
 			'jsx-a11y/no-autofocus': 'off',
