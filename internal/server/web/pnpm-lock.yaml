@@ -112,8 +112,8 @@ importers:
         specifier: 10.1.8
         version: 10.1.8(eslint@9.38.0)
       eslint-formatter-checkstyle:
-        specifier: 8.40.0
-        version: 8.40.0
+        specifier: 9.0.1
+        version: 9.0.1
       eslint-import-resolver-typescript:
         specifier: 4.4.4
         version: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.38.0)
@@ -1844,9 +1844,9 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-formatter-checkstyle@8.40.0:
-    resolution: {integrity: sha512-OpYAiI2yejMPUlB1O2pkfyNfBQrKNWrMK6X2eOn2vg/q94roDiHnOYExK0isdNglKeaYHA5JtgmuBtokFdj0AA==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+  eslint-formatter-checkstyle@9.0.1:
+    resolution: {integrity: sha512-DeD1XkqFr22ZK+KsREcW3YFUsYtS5hTZb52m+fLVeAHMnTtgtLP9xiA55b5qiNvNxDf/hbTN+9X8lZl9jHH/cQ==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   eslint-import-context@0.1.8:
     resolution: {integrity: sha512-bq+F7nyc65sKpZGT09dY0S0QrOnQtuDVIfyTGQ8uuvtMIF7oHp6CEP3mouN0rrnYF3Jqo6Ke0BfU/5wASZue1w==}
@@ -6165,7 +6165,7 @@ snapshots:
     dependencies:
       eslint: 9.38.0
 
-  eslint-formatter-checkstyle@8.40.0: {}
+  eslint-formatter-checkstyle@9.0.1: {}
 
   eslint-import-context@0.1.8(unrs-resolver@1.7.11):
     dependencies:
