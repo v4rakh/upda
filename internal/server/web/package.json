@@ -46,16 +46,16 @@
     "moment-timezone": "0.6.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-i18next": "16.2.1",
+    "react-i18next": "16.2.3",
     "react-markdown": "10.1.0",
     "react-redux": "9.2.0",
-    "react-router": "7.9.4",
+    "react-router": "7.9.5",
     "rehype-sanitize": "6.0.0",
     "remark-gfm": "4.0.1",
     "typescript": "5.9.3"
   },
   "devDependencies": {
-    "@eslint/compat": "1.4.0",
+    "@eslint/compat": "1.4.1",
     "@eslint/js": "9.38.0",
     "@types/lodash": "4.17.20",
     "@types/node": "22.14.1",
@@ -64,7 +64,7 @@
     "@typescript-eslint/eslint-plugin": "8.46.2",
     "@typescript-eslint/parser": "8.46.2",
     "@vitejs/plugin-react": "5.1.0",
-    "@vitest/coverage-v8": "4.0.4",
+    "@vitest/coverage-v8": "4.0.5",
     "eslint": "9.38.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-checkstyle": "9.0.1",
@@ -93,7 +93,7 @@
     "vite-plugin-stylelint": "6.0.2",
     "vite-plugin-svgr": "4.5.0",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.0.4"
+    "vitest": "4.0.5"
   },
   "browserslist": {
     "production": [
