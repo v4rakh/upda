@@ -68,7 +68,7 @@ export const actionsApi = injectEndpoints({
 				}
 			}),
 			createAction: build.mutation<ActionSingleResponse, CreateActionRequest>({
-				query: (body) => ({ url: '${ApiVersion.V1}/actions', method: 'POST', body }),
+				query: (body) => ({ url: `${ApiVersion.V1}/actions`, method: 'POST', body }),
 				invalidatesTags
 			}),
 			testAction: build.mutation<ActionTestSingleResponse, { id: string; body: TestActionRequest }>({
