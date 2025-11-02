@@ -64,7 +64,7 @@
     "@typescript-eslint/eslint-plugin": "8.46.2",
     "@typescript-eslint/parser": "8.46.2",
     "@vitejs/plugin-react": "5.1.0",
-    "@vitest/coverage-v8": "4.0.5",
+    "@vitest/coverage-v8": "4.0.6",
     "eslint": "9.38.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-checkstyle": "9.0.1",
@@ -93,7 +93,7 @@
     "vite-plugin-stylelint": "6.0.2",
     "vite-plugin-svgr": "4.5.0",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.0.5"
+    "vitest": "4.0.6"
   },
   "browserslist": {
     "production": [
