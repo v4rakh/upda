@@ -64,7 +64,7 @@
     "@typescript-eslint/eslint-plugin": "8.46.3",
     "@typescript-eslint/parser": "8.46.3",
     "@vitejs/plugin-react": "5.1.0",
-    "@vitest/coverage-v8": "4.0.7",
+    "@vitest/coverage-v8": "4.0.8",
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-checkstyle": "9.0.1",
@@ -88,12 +88,12 @@
     "stylelint-declaration-block-no-ignored-properties": "2.8.0",
     "stylelint-order": "7.0.0",
     "stylelint-prettier": "5.0.3",
-    "vite": "7.2.1",
+    "vite": "7.2.2",
     "vite-plugin-eslint2": "5.0.4",
     "vite-plugin-stylelint": "6.0.2",
     "vite-plugin-svgr": "4.5.0",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.0.7"
+    "vitest": "4.0.8"
   },
   "browserslist": {
     "production": [
