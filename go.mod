@@ -23,7 +23,7 @@ require (
 	github.com/skynet2/zerolog-gorm v1.1.0
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.40.0
-	github.com/urfave/cli/v3 v3.6.0
+	github.com/urfave/cli/v3 v3.6.1
 	github.com/wader/gormstore/v2 v2.0.3
 	go.eigsys.de/gin-cachecontrol/v2 v2.4.0
 	go.uber.org/automaxprocs v1.6.0
