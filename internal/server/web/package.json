@@ -57,14 +57,14 @@
   "devDependencies": {
     "@eslint/compat": "1.4.1",
     "@eslint/js": "9.39.1",
-    "@types/lodash": "4.17.20",
+    "@types/lodash": "4.17.21",
     "@types/node": "22.14.1",
     "@types/react": "19.2.6",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.47.0",
     "@typescript-eslint/parser": "8.47.0",
     "@vitejs/plugin-react": "5.1.1",
-    "@vitest/coverage-v8": "4.0.12",
+    "@vitest/coverage-v8": "4.0.13",
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-checkstyle": "9.0.1",
@@ -75,7 +75,7 @@
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-sonarjs": "3.0.5",
-    "eslint-plugin-testing-library": "7.13.4",
+    "eslint-plugin-testing-library": "7.13.5",
     "i18next-json-sync": "3.1.2",
     "jsdom": "27.2.0",
     "less": "4.4.2",
@@ -93,7 +93,7 @@
     "vite-plugin-stylelint": "6.0.2",
     "vite-plugin-svgr": "4.5.0",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.0.12"
+    "vitest": "4.0.13"
   },
   "browserslist": {
     "production": [
