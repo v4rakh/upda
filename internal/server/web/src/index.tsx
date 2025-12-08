@@ -9,7 +9,6 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { HashRouter as Router } from 'react-router';
 import './style/app-theme.less';
-import '@ant-design/v5-patch-for-react-19';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 const algorithm = darkThemeEnabled() ? theme.darkAlgorithm : theme.defaultAlgorithm;

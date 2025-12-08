@@ -24,7 +24,7 @@ export interface NotificationSimpleErrorProps {
 export interface NotificationSimpleInfoProps {
 	message: ReactNode;
 	title?: ReactNode;
-	duration?: number | null;
+	duration?: number | false;
 }
 
 export interface NotificationHook {
@@ -40,8 +40,8 @@ export const useNotification = (): NotificationHook => {
 		(props: NotificationErrorProps) => {
 			notification.error({
 				placement: 'top',
-				duration: null,
-				message: '',
+				duration: false,
+				title: '',
 				description: <span style={{ paddingRight: '10px' }}>{getApiErrorMessage(props)}</span>,
 				key
 			});
@@ -53,8 +53,8 @@ export const useNotification = (): NotificationHook => {
 		({ message, title }: NotificationSimpleErrorProps) => {
 			notification.error({
 				placement: 'top',
-				duration: null,
-				message: title || '',
+				duration: false,
+				title: title || '',
 				description: <span style={{ paddingRight: '5px' }}>{message}</span>,
 				key
 			});
@@ -63,11 +63,11 @@ export const useNotification = (): NotificationHook => {
 	);
 
 	const simpleInfo = useCallback(
-		({ message, title, duration }: NotificationSimpleInfoProps) => {
+		({ message, title, duration = 10 }: NotificationSimpleInfoProps) => {
 			notification.info({
 				placement: 'top',
 				duration: duration,
-				message: title || '',
+				title: title || '',
 				description: <span style={{ paddingRight: '5px' }}>{message}</span>,
 				key
 			});
