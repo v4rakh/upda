@@ -20,7 +20,7 @@ const ItemActionInvocation: FC<ItemActionProps> = ({ e }): ReactNode => {
 	const [t] = useTranslation('action_item');
 
 	return (
-		<Space direction="vertical">
+		<Space orientation="vertical">
 			<Descriptions
 				size="small"
 				layout="vertical"

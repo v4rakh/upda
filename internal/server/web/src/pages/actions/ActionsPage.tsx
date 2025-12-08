@@ -199,7 +199,7 @@ const ActionsPage = () => {
 					onChange={onTableChange}
 					pagination={{
 						pageSizeOptions: TABLE_PAGE_DEFAULT_OPTIONS,
-						position: ['bottomCenter'],
+						placement: ['bottomCenter'],
 						showSizeChanger: true,
 						pageSize: data?.data.pageSize || TABLE_PAGE_SIZE_DEFAULT,
 						total: data?.data.totalElements,

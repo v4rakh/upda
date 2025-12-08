@@ -65,7 +65,7 @@ const CreateComment = ({ updateId, onCreateSuccess }: CreateCommentProps): React
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIconPosition="end"
+			expandIconPlacement="end"
 			bordered={false}
 			ghost
 			size="small"

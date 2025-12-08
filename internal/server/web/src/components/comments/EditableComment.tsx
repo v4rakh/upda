@@ -80,7 +80,7 @@ const EditableComment: FC<EditableCommentProps> = ({ comment, onEditSuccess }): 
 						/>
 					</Form.Item>
 					<Form.Item>
-						<Space direction="horizontal">
+						<Space orientation="horizontal">
 							<Button type="primary" onClick={onSubmit} loading={isLoading} disabled={isLoading}>
 								{t('submit')}
 							</Button>

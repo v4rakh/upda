@@ -80,7 +80,7 @@ const FilterPresets = ({ type, showFilterReset, filtersActive }: FilterPresetsPr
 					{map(getData.data.content, (preset) => {
 						return (
 							<Tag
-								bordered={false}
+								variant="filled"
 								key={preset.id}
 								color={preset.color}
 								onClick={() => onClick(preset)}

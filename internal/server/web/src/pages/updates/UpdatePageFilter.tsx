@@ -129,7 +129,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIconPosition="end"
+			expandIconPlacement="end"
 			bordered={false}
 			ghost
 			size="small"
@@ -140,7 +140,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 					showArrow: false,
 					label: filtersActive ? filterButtonActive : filterButtonInactive,
 					children: (
-						<Space direction="vertical">
+						<Space orientation="vertical">
 							<Form layout="inline" form={form} disabled={loading}>
 								<Form.Item label={t('search_term')} name="searchTerm">
 									<Search
@@ -149,7 +149,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 										maxLength={255}
 										placeholder={t('search_term_placeholder')}
 										allowClear
-										enterButton={<Button type="primary" icon={<SearchOutlined />} />}
+										enterButton={<Button type="link" icon={<SearchOutlined />} />}
 										onSearch={onSearchTermChange}
 									/>
 								</Form.Item>

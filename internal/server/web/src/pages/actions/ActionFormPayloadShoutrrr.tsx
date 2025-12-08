@@ -26,7 +26,7 @@ const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading, for
 
 	return (
 		<>
-			<Alert showIcon type="info" style={{ marginBottom: '2vh' }} message={parse(t('global_help_banner'))} />
+			<Alert showIcon type="info" style={{ marginBottom: '2vh' }} title={parse(t('global_help_banner'))} />
 			<Form.List
 				name="urls"
 				rules={[

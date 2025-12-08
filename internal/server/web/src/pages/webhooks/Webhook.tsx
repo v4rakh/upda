@@ -174,7 +174,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 					</>
 				}
 				actions={buttons}>
-				<Space direction="vertical">
+				<Space orientation="vertical">
 					<Row>
 						<Col>
 							<Space>

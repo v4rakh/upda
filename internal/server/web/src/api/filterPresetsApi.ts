@@ -39,7 +39,7 @@ export const filterPresetsApi = injectEndpoints({
 				}
 			}),
 			createFilterPreset: build.mutation<FilterPresetSingleResponse, CreateFilterPresetRequest>({
-				query: (body) => ({ url: '${ApiVersion.V1}/filter-presets', method: 'POST', body }),
+				query: (body) => ({ url: `${ApiVersion.V1}/filter-presets`, method: 'POST', body }),
 				invalidatesTags
 			}),
 			deleteFilterPreset: build.mutation<void, { id: string }>({

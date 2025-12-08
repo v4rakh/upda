@@ -4,7 +4,7 @@ import { EventName, EventResponse, EventsRequestParams } from '../../types/event
 import useEventsFilterQueryParams from '../../use/useEventsFilterQueryParams';
 import { DownOutlined, ReloadOutlined } from '@ant-design/icons';
 import { Button, Col, Flex, Result, Row, Skeleton, Timeline, Tooltip } from 'antd';
-import { filter, unionBy, values } from 'lodash';
+import { concat, filter, unionBy, values } from 'lodash';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -90,34 +90,42 @@ const EventsTree: FC<EventsTreeProps> = ({ updateId }) => {
 				<Row justify="center" align="middle">
 					<Col xs={24} sm={16}>
 						<Timeline
-							pending={hasMore}
-							pendingDot={
-								<Button
-									size="small"
-									type="link"
-									onClick={onLoadMore}
-									icon={<DownOutlined />}
-									loading={result.isLoading || result.isFetching}
-									disabled={result.isLoading || result.isFetching}>
-									{t('load_more')}
-								</Button>
-							}
 							mode="alternate"
 							reverse={false}
-							items={[
-								...events.map((event) => {
-									return {
-										children: (
-											<Event
-												key={event.id}
-												entity={event}
-												onDeleteSuccess={() => removeEvent(event.id)}
-											/>
-										),
-										color: renderTimelineItemColor(event.name)
-									};
-								})
-							]}
+							items={concat(
+								[
+									...events.map((event) => {
+										return {
+											content: (
+												<Event
+													key={event.id}
+													entity={event}
+													onDeleteSuccess={() => removeEvent(event.id)}
+												/>
+											),
+											color: renderTimelineItemColor(event.name)
+										};
+									})
+								],
+								hasMore
+									? [
+											{
+												content: (
+													<Button
+														size="small"
+														type="link"
+														onClick={onLoadMore}
+														icon={<DownOutlined />}
+														loading={result.isLoading || result.isFetching}
+														disabled={result.isLoading || result.isFetching}>
+														{t('load_more')}
+													</Button>
+												),
+												color: 'blue'
+											}
+										]
+									: []
+							)}
 						/>
 					</Col>
 				</Row>

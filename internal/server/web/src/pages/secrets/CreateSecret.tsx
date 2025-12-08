@@ -56,7 +56,7 @@ const CreateSecret: FC = () => {
 			onChange={(keys) => {
 				setCollapseActiveKeys(keys);
 			}}
-			expandIconPosition="end"
+			expandIconPlacement="end"
 			bordered={false}
 			ghost
 			size="small"
