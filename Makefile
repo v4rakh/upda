@@ -63,7 +63,7 @@ run-web:
 audit: audit-web audit-server
 
 audit-web:
-	@cd ${WEB_DIR}; $(PNPM) audit -P;
+	@cd ${WEB_DIR}; $(PNPM) audit -P --audit-level high;
 
 audit-server:
 	@$(GO) install github.com/securego/gosec/v2/cmd/gosec@latest

@@ -20,5 +20,3 @@ jobs:
         name: OCI prepare
       - uses: ./.forgejo/actions/oci-build
         name: OCI build
-        with:
-          loadImage: false

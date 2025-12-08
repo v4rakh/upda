@@ -2,7 +2,7 @@ runs:
   using: "composite"
   steps:
     - name: Tooling - set up node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: 22
     - name: Tooling - set up pnpm
@@ -10,6 +10,6 @@ runs:
       with:
         version: 10
     - name: Tooling - set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v6
       with:
         go-version: '^1.23'

@@ -13,12 +13,5 @@ jobs:
         name: Checkout
       - uses: ./.forgejo/actions/oci-prepare
         name: OCI prepare
-      - uses: ./.forgejo/actions/oci-build
-        name: OCI build
-        with:
-          loadImage: true
       - uses: ./.forgejo/actions/oci-test-integration
         name: OCI test integration
-        with:
-          image: varakh/upda:${{ github.sha }}
-          cleanImage: true

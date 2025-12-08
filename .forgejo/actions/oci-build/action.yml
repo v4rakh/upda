@@ -1,19 +1,7 @@
-inputs:
-  loadImage:
-    description: "load image, so it's available after build and thus not automatically removed"
-    required: true
-    type: boolean
 runs:
   using: "composite"
   steps:
     - name: OCI - build
-      uses: docker/build-push-action@v4
-      with:
-        push: false
-        context: .
-        load: ${{ inputs.loadImage }}
-        no-cache: true
-        build-args: |
-          VERSION=${{ github.sha }}
-        tags: |
-          varakh/upda:${{ github.sha }}
+      shell: bash
+      run: |
+        docker buildx build --no-cache --build-arg VERSION=${{ github.sha }} -t git.myservermanager.com/varakh/upda:${{ github.sha }} -f Dockerfile .
