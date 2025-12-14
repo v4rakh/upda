@@ -33,7 +33,7 @@
   "dependencies": {
     "@ant-design/icons": "6.1.0",
     "@ant-design/pro-layout": "7.22.7",
-    "@reduxjs/toolkit": "2.11.1",
+    "@reduxjs/toolkit": "2.11.2",
     "@uiw/react-md-editor": "4.0.11",
     "antd": "6.1.0",
     "html-react-parser": "5.2.10",
