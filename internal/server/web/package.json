@@ -35,9 +35,9 @@
     "@ant-design/pro-layout": "7.22.7",
     "@reduxjs/toolkit": "2.11.2",
     "@uiw/react-md-editor": "4.0.11",
-    "antd": "6.1.0",
+    "antd": "6.1.1",
     "html-react-parser": "5.2.10",
-    "i18next": "25.7.2",
+    "i18next": "25.7.3",
     "i18next-browser-languagedetector": "8.2.0",
     "linkify-html": "4.3.2",
     "linkifyjs": "4.3.2",
@@ -63,7 +63,7 @@
     "@typescript-eslint/eslint-plugin": "8.49.0",
     "@typescript-eslint/parser": "8.49.0",
     "@vitejs/plugin-react": "5.1.2",
-    "@vitest/coverage-v8": "4.0.15",
+    "@vitest/coverage-v8": "4.0.16",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-checkstyle": "9.0.1",
@@ -92,7 +92,7 @@
     "vite-plugin-stylelint": "6.0.2",
     "vite-plugin-svgr": "4.5.0",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "4.0.15"
+    "vitest": "4.0.16"
   },
   "browserslist": {
     "production": [
