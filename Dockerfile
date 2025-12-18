@@ -1,7 +1,7 @@
 #
 # Build image
 #
-FROM alpine:3.22 AS builder
+FROM alpine:3.23 AS builder
 LABEL maintainer="Varakh <varakh@varakh.de>"
 ARG VERSION="rolling-oci"
 
@@ -19,14 +19,14 @@ RUN npm install --global pnpm@^10 && \
 #
 # Actual image
 #
-FROM alpine:3.22
+FROM alpine:3.23
 LABEL maintainer="Varakh <varakh@varakh.de>" \
     description="upda" \
     org.opencontainers.image.authors="Varakh" \
     org.opencontainers.image.vendor="Varakh" \
     org.opencontainers.image.title="upda" \
     org.opencontainers.image.description="upda" \
-    org.opencontainers.image.base.name="alpine:3.22"
+    org.opencontainers.image.base.name="alpine:3.23"
 
 ENV USER=appuser
 ENV GROUP=appuser
