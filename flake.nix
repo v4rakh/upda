@@ -15,7 +15,7 @@
       let pkgs = nixpkgs.legacyPackages.${system};
       in {
         devShells.default = pkgs.mkShell {
-          packages = with pkgs; [ gnumake go nodejs_22 pnpm_10 git-cliff ];
+          packages = with pkgs; [ gnumake go nodejs_24 pnpm git-cliff ];
         };
       });
 }

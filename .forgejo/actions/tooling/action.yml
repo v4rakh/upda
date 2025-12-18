@@ -4,7 +4,7 @@ runs:
     - name: Tooling - set up node
       uses: actions/setup-node@v6
       with:
-        node-version: 22
+        node-version: 24
     - name: Tooling - set up pnpm
       uses: pnpm/action-setup@v4
       with:
@@ -12,4 +12,4 @@ runs:
     - name: Tooling - set up Go
       uses: actions/setup-go@v6
       with:
-        go-version: '^1.23'
+        go-version: '^1.25'
