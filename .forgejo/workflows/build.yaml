@@ -15,8 +15,8 @@ jobs:
       - uses: ./.forgejo/actions/tooling
         name: Tooling
       - uses: ./.forgejo/actions/native-build
-        name: Native build
+        name: Native - build
       - uses: ./.forgejo/actions/oci-prepare
-        name: OCI prepare
+        name: OCI - prepare
       - uses: ./.forgejo/actions/oci-build
-        name: OCI build
+        name: OCI - build

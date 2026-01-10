@@ -1,11 +1,11 @@
 runs:
   using: "composite"
   steps:
-    - name: Native - build, test
+    - name: Native - build, checkstyle, audit
       shell: bash
       run: |
-        VERSION=${{ github.sha }} make clean dependencies audit checkstyle test-unit build
-    - name: Native - scan
+        VERSION=${{ github.sha }} make clean dependencies audit checkstyle build
+    - name: Native - security scan
       uses: https://github.com/anchore/scan-action@v6
       with:
         path: bin
@@ -13,7 +13,7 @@ runs:
         output-file: bin/grype.txt
         cache-db: true
         fail-build: false
-    - name: Native - archive scan results
+    - name: Native - security scan result archival
       uses: actions/upload-artifact@v3
       with:
         name: grype.txt

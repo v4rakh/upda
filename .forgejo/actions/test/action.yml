@@ -1,12 +1,12 @@
 runs:
   using: "composite"
   steps:
-    - name: OCI - integration test
+    - name: Test
       shell: bash
       run: |
         docker buildx build --load --no-cache --build-arg VERSION=${{ github.sha }} -t git.myservermanager.com/varakh/upda:${{ github.sha }} -f Dockerfile .
-        make image="git.myservermanager.com/varakh/upda:${{ github.sha }}" test-server-integration
-    - name: OCI - cleanup after integration test
+        make image="git.myservermanager.com/varakh/upda:${{ github.sha }}" test
+    - name: Test - cleanup after test
       shell: bash
       run: |
         docker image rm git.myservermanager.com/varakh/upda:${{ github.sha }} || true

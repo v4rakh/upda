@@ -47,12 +47,10 @@ generate: generate-server
 generate-server:
 	$(GO) generate ./...
 
-test-unit: test-web-unit test-server-unit
-test-server-unit:
-	$(GO_TEST) test -race -shuffle on ./...
-test-server-integration:
-	IMAGE=$(image) $(GO_TEST) test -tags=integration ./...
-test-web-unit:
+test: test-web test-server
+test-server:
+	IMAGE=$(image) $(GO_TEST) test -race -shuffle on ./...
+test-web:
 	cd ${WEB_DIR}; $(PNPM) run test:coverage
 
 run-server:
