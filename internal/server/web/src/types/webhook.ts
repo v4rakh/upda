@@ -26,6 +26,7 @@ export interface WebhookResponse {
 	type: WebhookType;
 	token: string;
 	ignoreHost: boolean;
+	ignoreHostReplacement: string;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -38,6 +39,7 @@ export type CreateWebhookRequest = {
 	label: string;
 	type: WebhookType;
 	ignoreHost: boolean;
+	ignoreHostReplacement: string;
 };
 
 export type ModifyWebhookLabelRequest = {
@@ -46,4 +48,8 @@ export type ModifyWebhookLabelRequest = {
 
 export type ModifyWebhookIgnoreHostRequest = {
 	ignoreHost: boolean;
+};
+
+export type ModifyWebhookIgnoreHostReplacementRequest = {
+	ignoreHostReplacement: string;
 };

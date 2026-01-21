@@ -20,10 +20,15 @@ type ModifyWebhookIgnoreHostRequest struct {
 	IgnoreHost bool `json:"ignoreHost"`
 }
 
+type ModifyWebhookIgnoreHostReplacementRequest struct {
+	IgnoreHostReplacement string `json:"ignoreHostReplacement" binding:"required,min=1,max=255"`
+}
+
 type CreateWebhookRequest struct {
-	Label      string `json:"label" binding:"required,min=1,max=255"`
-	Type       string `json:"type" binding:"required,oneof=generic diun"`
-	IgnoreHost bool   `json:"ignoreHost"`
+	Label                 string `json:"label" binding:"required,min=1,max=255"`
+	Type                  string `json:"type" binding:"required,oneof=generic diun"`
+	IgnoreHost            bool   `json:"ignoreHost"`
+	IgnoreHostReplacement string `json:"ignoreHostReplacement" binding:"required,min=1,max=255"`
 }
 
 type CreateSecretRequest struct {
@@ -307,25 +312,27 @@ func NewUpdatePageResponse(content []*UpdateResponse, page int, pageSize int, or
 }
 
 type WebhookResponse struct {
-	ID         string    `json:"id"`
-	Label      string    `json:"label"`
-	Type       string    `json:"type"`
-	IgnoreHost bool      `json:"ignoreHost"`
-	Token      string    `json:"token,omitempty"`
-	CreatedAt  time.Time `json:"createdAt"`
-	UpdatedAt  time.Time `json:"updatedAt"`
+	ID                    string    `json:"id"`
+	Label                 string    `json:"label"`
+	Type                  string    `json:"type"`
+	IgnoreHost            bool      `json:"ignoreHost"`
+	IgnoreHostReplacement string    `json:"ignoreHostReplacement"`
+	Token                 string    `json:"token,omitempty"`
+	CreatedAt             time.Time `json:"createdAt"`
+	UpdatedAt             time.Time `json:"updatedAt"`
 }
 
 type WebhookSingleResponse struct {
 	Data WebhookResponse `json:"data"`
 }
 
-func NewWebhookSingleResponse(id string, label string, t string, ignoreHost bool, token string, createdAt time.Time, updatedAt time.Time) *WebhookSingleResponse {
+func NewWebhookSingleResponse(id string, label string, t string, ignoreHost bool, ignoreHostReplacement string, token string, createdAt time.Time, updatedAt time.Time) *WebhookSingleResponse {
 	e := new(WebhookSingleResponse)
 	e.Data.ID = id
 	e.Data.Label = label
 	e.Data.Type = t
 	e.Data.IgnoreHost = ignoreHost
+	e.Data.IgnoreHostReplacement = ignoreHostReplacement
 	e.Data.Token = token
 	e.Data.CreatedAt = createdAt
 	e.Data.UpdatedAt = updatedAt

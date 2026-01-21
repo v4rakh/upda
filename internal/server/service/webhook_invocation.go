@@ -8,11 +8,6 @@ import (
 	"strings"
 )
 
-const (
-	providerDiun          = "oci"
-	hostIgnoreReplacement = "global"
-)
-
 type WebhookInvocationService struct {
 	updateService  *UpdateService
 	webhookService *WebhookService
@@ -45,7 +40,7 @@ func (s *WebhookInvocationService) ExecuteGeneric(id string, token string, req a
 
 	host := req.Host
 	if e.IgnoreHost {
-		host = hostIgnoreReplacement
+		host = e.IgnoreHostReplacement
 	}
 
 	var provider string
@@ -80,7 +75,7 @@ func (s *WebhookInvocationService) ExecuteDiun(id string, token string, req api.
 
 	host := req.Hostname
 	if e.IgnoreHost {
-		host = hostIgnoreReplacement
+		host = e.IgnoreHostReplacement
 	}
 
 	// assume the "image" attribute has a : separator at the end
@@ -92,13 +87,7 @@ func (s *WebhookInvocationService) ExecuteDiun(id string, token string, req api.
 	if version == "" {
 		version = req.Digest
 	}
-
-	var provider string
-	if e.Label == "" {
-		provider = providerDiun
-	} else {
-		provider = e.Label
-	}
+	provider := e.Label
 
 	if _, err = s.updateService.Upsert(app, provider, host, version, req); err != nil {
 		return err

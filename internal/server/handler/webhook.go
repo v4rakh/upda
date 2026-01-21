@@ -36,12 +36,13 @@ func (h *WebhookHandler) Paginate(c *gin.Context) {
 
 	for _, e := range webhooks {
 		data = append(data, &api.WebhookResponse{
-			ID:         e.ID.String(),
-			Label:      e.Label,
-			Type:       e.Type,
-			IgnoreHost: e.IgnoreHost,
-			CreatedAt:  e.CreatedAt,
-			UpdatedAt:  e.UpdatedAt,
+			ID:                    e.ID.String(),
+			Label:                 e.Label,
+			Type:                  e.Type,
+			IgnoreHost:            e.IgnoreHost,
+			IgnoreHostReplacement: e.IgnoreHostReplacement,
+			CreatedAt:             e.CreatedAt,
+			UpdatedAt:             e.UpdatedAt,
 		})
 	}
 
@@ -70,7 +71,7 @@ func (h *WebhookHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.IgnoreHostReplacement, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) Create(c *gin.Context) {
@@ -84,12 +85,12 @@ func (h *WebhookHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if e, err = h.service.Create(req.Label, constant.WebhookType(req.Type), req.IgnoreHost); err != nil {
+	if e, err = h.service.Create(req.Label, constant.WebhookType(req.Type), req.IgnoreHost, req.IgnoreHostReplacement); err != nil {
 		_ = c.AbortWithError(ToHttpStatus(err), err)
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.Token, e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.IgnoreHostReplacement, e.Token, e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) UpdateLabel(c *gin.Context) {
@@ -115,7 +116,7 @@ func (h *WebhookHandler) UpdateLabel(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.IgnoreHostReplacement, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) UpdateIgnoreHost(c *gin.Context) {
@@ -141,7 +142,33 @@ func (h *WebhookHandler) UpdateIgnoreHost(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, "", e.CreatedAt, e.UpdatedAt))
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.IgnoreHostReplacement, "", e.CreatedAt, e.UpdatedAt))
+}
+
+func (h *WebhookHandler) UpdateIgnoreHostReplacement(c *gin.Context) {
+	var e *model.Webhook
+	var err error
+
+	var req api.ModifyWebhookIgnoreHostReplacementRequest
+
+	if err = c.ShouldBindJSON(&req); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	var pathParams api.IDUriRequest
+
+	if err = c.ShouldBindUri(&pathParams); err != nil {
+		AbortWithValidatorPayload(c, err)
+		return
+	}
+
+	if e, err = h.service.UpdateIgnoreHostReplacement(pathParams.ID, req.IgnoreHostReplacement); err != nil {
+		_ = c.AbortWithError(ToHttpStatus(err), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, api.NewWebhookSingleResponse(e.ID.String(), e.Label, e.Type, e.IgnoreHost, e.IgnoreHostReplacement, "", e.CreatedAt, e.UpdatedAt))
 }
 
 func (h *WebhookHandler) Delete(c *gin.Context) {

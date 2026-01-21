@@ -43,8 +43,9 @@ _Remember that changing a webhook's label won't be reflected in already created/
 ##### The `host` attribute
 
 _host_ should be set to the originating host name a webhook has been issued from. The _host_
-attribute can also be "ignored" (a setting in each webhook). If set to ignored, _upda_ sets _host_ to _global_, thus
-update versions can be grouped independent of the originating host. If set for all webhooks, you'll end up with a host
+attribute can also be "ignored" (a setting in each webhook). If set to ignored, _upda_ sets _host_ to the webhook's
+defined "ignore host replacement" which can be configured per webhook (by default "global"), thus update versions can be
+grouped (in a custom way) independent of the originating host. If set for all webhooks, you'll end up with a host
 independent update dashboard.
 
 ##### The `version` attribute

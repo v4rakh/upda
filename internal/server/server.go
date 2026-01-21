@@ -247,6 +247,7 @@ func (s *Server) Start() {
 	apiProtectedGroup.GET("/webhooks/:id", webhookHandler.Get)
 	apiProtectedGroup.PATCH("/webhooks/:id/label", middlewareEnforceJsonContentType(), webhookHandler.UpdateLabel)
 	apiProtectedGroup.PATCH("/webhooks/:id/ignore-host", middlewareEnforceJsonContentType(), webhookHandler.UpdateIgnoreHost)
+	apiProtectedGroup.PATCH("/webhooks/:id/ignore-host-replacement", middlewareEnforceJsonContentType(), webhookHandler.UpdateIgnoreHostReplacement)
 	apiProtectedGroup.DELETE("/webhooks/:id", webhookHandler.Delete)
 
 	apiProtectedGroup.GET("/events", eventHandler.Window)

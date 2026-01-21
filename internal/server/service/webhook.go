@@ -37,8 +37,8 @@ func (s *WebhookService) Get(id string) (*model.Webhook, error) {
 	return e, nil
 }
 
-func (s *WebhookService) Create(label string, t constant.WebhookType, ignoreHost bool) (*model.Webhook, error) {
-	if label == "" || t == "" {
+func (s *WebhookService) Create(label string, t constant.WebhookType, ignoreHost bool, ignoreHostReplacement string) (*model.Webhook, error) {
+	if label == "" || ignoreHostReplacement == "" || t == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
 
@@ -50,7 +50,7 @@ func (s *WebhookService) Create(label string, t constant.WebhookType, ignoreHost
 	}
 
 	var e *model.Webhook
-	if e, err = s.repo.Create(label, t.String(), token, ignoreHost); err != nil {
+	if e, err = s.repo.Create(label, t.String(), token, ignoreHost, ignoreHostReplacement); err != nil {
 		return nil, err
 	} else {
 		log.Info().Msg("Created webhook")
@@ -71,6 +71,26 @@ func (s *WebhookService) UpdateLabel(id string, label string) (*model.Webhook, e
 	}
 
 	if e, err = s.repo.UpdateLabel(id, label); err != nil {
+		return nil, err
+	}
+
+	log.Info().Msgf("Modified webhook '%v'", id)
+	return e, nil
+}
+
+func (s *WebhookService) UpdateIgnoreHostReplacement(id string, ignoreHostReplacement string) (*model.Webhook, error) {
+	if id == "" || ignoreHostReplacement == "" {
+		return nil, service_error.ErrValidationNotBlank
+	}
+
+	var e *model.Webhook
+	var err error
+
+	if e, err = s.Get(id); err != nil {
+		return nil, err
+	}
+
+	if e, err = s.repo.UpdateIgnoreHostReplacement(id, ignoreHostReplacement); err != nil {
 		return nil, err
 	}
 

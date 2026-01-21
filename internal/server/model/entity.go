@@ -82,13 +82,14 @@ func (wh *Webhook) AfterFind(tx *gorm.DB) (err error) {
 
 // Webhook entity holding information for webhooks
 type Webhook struct {
-	ID         uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
-	Type       string    `gorm:"not null"`
-	Label      string    `gorm:"not null"`
-	Token      string    `gorm:"not null"`
-	IgnoreHost bool      `gorm:"default:false;not null"`
-	CreatedAt  time.Time `gorm:"time;autoCreateTime;not null"`
-	UpdatedAt  time.Time `gorm:"time;autoUpdateTime;not null"`
+	ID                    uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
+	Type                  string    `gorm:"not null"`
+	Label                 string    `gorm:"not null"`
+	Token                 string    `gorm:"not null"`
+	IgnoreHost            bool      `gorm:"default:false;not null"`
+	IgnoreHostReplacement string    `gorm:"default:global;not null"`
+	CreatedAt             time.Time `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt             time.Time `gorm:"time;autoUpdateTime;not null"`
 }
 
 // BeforeCreate creates a new UUID

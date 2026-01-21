@@ -1,5 +1,6 @@
 import {
 	useDeleteWebhookMutation,
+	useModifyIgnoreHostReplacementWebhookMutation,
 	useModifyIgnoreHostWebhookMutation,
 	useModifyLabelWebhookMutation
 } from '../../api/webhooksApi';
@@ -33,6 +34,16 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 
 	const [modifyIgnoreHost, { isLoading: isIgnoreHostLoading, isError: isErrorIgnoreHost, error: ignoreHostError }] =
 		useModifyIgnoreHostWebhookMutation();
+
+	const [
+		modifyIgnoreHostReplacement,
+		{
+			isLoading: isIgnoreHostReplacementLoading,
+			isError: isErrorIgnoreHostReplacement,
+			isSuccess: isSuccessIgnoreHostReplacement,
+			error: ignoreHostReplacementError
+		}
+	] = useModifyIgnoreHostReplacementWebhookMutation();
 
 	const [
 		modifyLabel,
@@ -81,11 +92,34 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 		}
 	}, [isErrorIgnoreHost, ignoreHostError, t, apiError]);
 
+	useEffect(() => {
+		if (isErrorIgnoreHostReplacement) {
+			apiError({
+				i18n: {
+					notFound: t('error_unable_update_ignore_host_replacement'),
+					unAuthorized: t('error_unauthorized_update_ignore_host_replacement'),
+					forbidden: t('error_forbidden_update_ignore_host_replacement'),
+					default: t('error_default_update_ignore_host_replacement')
+				},
+				error: ignoreHostReplacementError
+			});
+		}
+	}, [apiError, ignoreHostReplacementError, isErrorIgnoreHostReplacement, t]);
+
 	const onIgnoreHostChange = useCallback(
 		(checked: boolean) => {
 			modifyIgnoreHost({ id: entity.id, body: { ignoreHost: checked } });
 		},
 		[entity.id, modifyIgnoreHost]
+	);
+
+	const submitIgnoreHostReplacementChange = useCallback(
+		(value?: string) => {
+			if (value && value !== entity.ignoreHostReplacement && value !== '') {
+				modifyIgnoreHostReplacement({ id: entity.id, body: { ignoreHostReplacement: value } });
+			}
+		},
+		[entity.id, entity.ignoreHostReplacement, modifyIgnoreHostReplacement]
 	);
 
 	const submitLabelChange = useCallback(
@@ -216,6 +250,23 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 									checkedChildren={<CheckOutlined />}
 									unCheckedChildren={<CloseOutlined />}
 									checked={entity.ignoreHost}
+								/>
+							</Space>
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							<Space>
+								<Text type="secondary" ellipsis>
+									{t('ignore_host_replacement')}
+								</Text>
+								<InlineInputValueEditor
+									initialValue={entity.ignoreHostReplacement}
+									allowBlank={false}
+									isLoading={isIgnoreHostReplacementLoading}
+									isSuccess={isSuccessIgnoreHostReplacement}
+									isError={isErrorIgnoreHostReplacement}
+									onSubmit={submitIgnoreHostReplacementChange}
 								/>
 							</Space>
 						</Col>

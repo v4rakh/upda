@@ -3,6 +3,7 @@ import WebhookFilterQueryParamNames from '../constants/api/webhookFilterQueryPar
 import ApiTags from '../constants/apiTags';
 import {
 	CreateWebhookRequest,
+	ModifyWebhookIgnoreHostReplacementRequest,
 	ModifyWebhookIgnoreHostRequest,
 	ModifyWebhookLabelRequest,
 	WebhookSingleResponse,
@@ -83,6 +84,22 @@ export const webhooksApi = injectEndpoints({
 					}
 					return [{ type: ApiTags.Webhooks, id: arg.id }];
 				}
+			}),
+			modifyIgnoreHostReplacementWebhook: build.mutation<
+				WebhookSingleResponse,
+				{ id: string; body: ModifyWebhookIgnoreHostReplacementRequest }
+			>({
+				query: ({ id, body }) => ({
+					url: `${ApiVersion.V1}/webhooks/${id}/ignore-host-replacement`,
+					method: 'PATCH',
+					body
+				}),
+				invalidatesTags: (result, error, arg) => {
+					if (error) {
+						return [];
+					}
+					return [{ type: ApiTags.Webhooks, id: arg.id }];
+				}
 			})
 		};
 	}
@@ -93,5 +110,6 @@ export const {
 	useDeleteWebhookMutation,
 	useCreateWebhookMutation,
 	useModifyLabelWebhookMutation,
-	useModifyIgnoreHostWebhookMutation
+	useModifyIgnoreHostWebhookMutation,
+	useModifyIgnoreHostReplacementWebhookMutation
 } = webhooksApi;

@@ -979,6 +979,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  '/v1/webhooks/{id}/ignore-host-replacement':
+    patch:
+      tags:
+        - webhooks
+      security:
+        - basicAuth: [ ]
+      summary: Modifies webhook's ignoreHostReplacement by ID
+      description: Modifies webhook's ignoreHostReplacement by ID
+      operationId: patchWebhookIgnoreHostReplacementById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Modifies a webhook
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyWebhookIgnoreHostReplacementRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /v1/events:
     get:
       tags:
@@ -2964,6 +3023,8 @@ components:
           nullable: true
         ignoreHost:
           type: boolean
+        ignoreHostReplacement:
+          type: string
     WebhookPageResponse:
       type: object
       properties:
@@ -3391,6 +3452,13 @@ components:
       properties:
         ignoreHost:
           type: boolean
+    ModifyWebhookIgnoreHostReplacementRequest:
+      type: object
+      required:
+        - ignoreHostReplacement
+      properties:
+        ignoreHostReplacement:
+          type: string
     CreateWebhookRequest:
       type: object
       required:
@@ -3406,6 +3474,8 @@ components:
             - diun
         ignoreHost:
           type: boolean
+        ignoreHostReplacement:
+          type: string
     WebhookGenericRequest:
       type: object
       required:

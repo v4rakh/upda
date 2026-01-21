@@ -10,9 +10,10 @@ type WebhookRepository interface {
 	Paginate(page int, pageSize int, orderBy string, order string) ([]*model.Webhook, error)
 	Count() (int64, error)
 	Find(id string) (*model.Webhook, error)
-	Create(label string, t string, token string, ignoreHost bool) (*model.Webhook, error)
+	Create(label string, t string, token string, ignoreHost bool, ignoreHostReplacement string) (*model.Webhook, error)
 	UpdateLabel(id string, label string) (*model.Webhook, error)
 	UpdateIgnoreHost(id string, ignoreHost bool) (*model.Webhook, error)
+	UpdateIgnoreHostReplacement(id string, ignoreHostReplacement string) (*model.Webhook, error)
 	Delete(id string) (int64, error)
 }
 
@@ -43,16 +44,17 @@ func (r *WebhookDbRepo) Find(id string) (*model.Webhook, error) {
 	return &e, nil
 }
 
-func (r *WebhookDbRepo) Create(label string, t string, token string, ignoreHost bool) (*model.Webhook, error) {
+func (r *WebhookDbRepo) Create(label string, t string, token string, ignoreHost bool, ignoreHostReplacement string) (*model.Webhook, error) {
 	if label == "" || t == "" || token == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
 
 	e := &model.Webhook{
-		Label:      label,
-		Type:       t,
-		Token:      token,
-		IgnoreHost: ignoreHost,
+		Label:                 label,
+		Type:                  t,
+		Token:                 token,
+		IgnoreHost:            ignoreHost,
+		IgnoreHostReplacement: ignoreHostReplacement,
 	}
 
 	var res *gorm.DB
@@ -104,6 +106,31 @@ func (r *WebhookDbRepo) UpdateIgnoreHost(id string, ignoreHost bool) (*model.Web
 	}
 
 	e.IgnoreHost = ignoreHost
+
+	var res *gorm.DB
+	if res = r.db.Save(&e); res.Error != nil {
+		return nil, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return e, service_error.ErrDatabaseRowsExpected
+	}
+
+	return e, nil
+}
+
+func (r *WebhookDbRepo) UpdateIgnoreHostReplacement(id string, ignoreHostReplacement string) (*model.Webhook, error) {
+	if id == "" || ignoreHostReplacement == "" {
+		return nil, service_error.ErrValidationNotBlank
+	}
+
+	var err error
+	var e *model.Webhook
+
+	if e, err = r.Find(id); err != nil {
+		return nil, err
+	}
+
+	e.IgnoreHostReplacement = ignoreHostReplacement
 
 	var res *gorm.DB
 	if res = r.db.Save(&e); res.Error != nil {

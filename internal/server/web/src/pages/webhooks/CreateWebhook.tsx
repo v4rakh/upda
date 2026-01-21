@@ -74,7 +74,11 @@ const CreateWebhook: FC = () => {
 							<Form
 								layout="inline"
 								form={form}
-								initialValues={{ type: WebhookType.GENERIC, ignore_host: false }}>
+								initialValues={{
+									type: WebhookType.GENERIC,
+									ignoreHost: false,
+									ignoreHostReplacement: t('ignore_host_replacement_default_value')
+								}}>
 								<Form.Item
 									label={t('label')}
 									name="label"
@@ -103,6 +107,19 @@ const CreateWebhook: FC = () => {
 
 								<Form.Item label={t('ignore_host')} name="ignoreHost" valuePropName="checked">
 									<Switch loading={isLoading} />
+								</Form.Item>
+								<Form.Item
+									label={t('ignore_host_replacement')}
+									name="ignoreHostReplacement"
+									rules={[
+										{ required: true, message: t('ignore_host_replacement_required') },
+										{ min: 1, max: 255, message: t('ignore_host_replacement_size') }
+									]}>
+									<Input
+										variant="filled"
+										allowClear
+										placeholder={t('ignore_host_replacement_placeholder')}
+									/>
 								</Form.Item>
 								<Form.Item>
 									<Button
