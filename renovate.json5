@@ -11,9 +11,6 @@
   separateMultipleMinor: false,
   separateMinorPatch: true,
   baseBranchPatterns: ["master"],
-  "env": {
-    "GOPROXY": "direct",
-  },
   extends: [
     ":ignoreUnstable",
     ":rebaseStalePrs",
