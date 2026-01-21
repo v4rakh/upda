@@ -18,8 +18,8 @@ import {
 	InteractionOutlined,
 	StopOutlined
 } from '@ant-design/icons';
-import { Badge, Button, Card, Col, Popconfirm, Row, Space, Tooltip, Typography } from 'antd';
-import React, { FC, ReactNode, useCallback, useEffect } from 'react';
+import { Badge, Button, Card, Descriptions, DescriptionsProps, Popconfirm, Space, Tooltip, Typography } from 'antd';
+import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -158,9 +158,87 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 	buttons.push(delAction);
 	buttons.push(detailsAction);
 
+	const updateDescriptions = useMemo(() => {
+		const descriptions: DescriptionsProps['items'] = [
+			{
+				key: 'version',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('version')}
+					</Text>
+				),
+				children: <Text>{entity.version}</Text>
+			},
+			{
+				key: 'provider',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('provider')}
+					</Text>
+				),
+				children: <UpdateFilterLink label={entity.provider} searchIn={UpdateSearchIn.PROVIDER} />
+			},
+			{
+				key: 'host',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('host')}
+					</Text>
+				),
+				children: <UpdateFilterLink label={entity.host} searchIn={UpdateSearchIn.HOST} />
+			},
+			{
+				key: 'state',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('state')}
+					</Text>
+				),
+				children: <UpdateStateTag state={entity.state} />
+			},
+			{
+				key: 'created',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('created')}
+					</Text>
+				),
+				children: (
+					<Text>
+						{formatDateTimeWithTimeZone(entity.createdAt, DateTimeStyle.SHORT, DateTimeStyle.SHORT, locale)}
+					</Text>
+				)
+			},
+			{
+				key: 'updated',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('updated')}
+					</Text>
+				),
+				children: (
+					<Text>
+						{formatDateTimeWithTimeZone(entity.updatedAt, DateTimeStyle.SHORT, DateTimeStyle.SHORT, locale)}
+					</Text>
+				)
+			}
+		];
+
+		return (
+			<Descriptions
+				items={descriptions}
+				colon={false}
+				layout="vertical"
+				size="small"
+				column={{ xs: 2, sm: 3, md: 3, lg: 4, xl: 4, xxl: 4 }}
+			/>
+		);
+	}, [entity.createdAt, entity.host, entity.provider, entity.state, entity.updatedAt, entity.version, locale, t]);
+
 	return (
 		<>
 			<Card
+				size="small"
 				style={{ borderColor: color }}
 				styles={{ header: { backgroundColor: color, borderColor: color } }}
 				loading={isDeleteLoading || isModifyLoading}
@@ -172,7 +250,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 								<Badge dot />
 							</Tooltip>
 						)}
-						<Button type="text" onClick={redirectToDetails}>
+						<Button type="link" onClick={redirectToDetails}>
 							<Text ellipsis={{ tooltip: entity.application }}>{entity.application}</Text>
 						</Button>
 					</Space>
@@ -186,7 +264,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,
 										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
+										DateTimeStyle.LONG,
 										locale
 									)
 								})}>
@@ -200,13 +278,13 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,
 										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
+										DateTimeStyle.LONG,
 										locale
 									),
 									updated: formatDateTimeWithTimeZone(
 										entity.updatedAt,
 										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
+										DateTimeStyle.LONG,
 										locale
 									)
 								})}>
@@ -216,82 +294,7 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 					</>
 				}
 				actions={buttons}>
-				<Space orientation="vertical">
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('version')}
-								</Text>
-								<Text>{entity.version}</Text>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('provider')}
-								</Text>
-								<UpdateFilterLink label={entity.provider} searchIn={UpdateSearchIn.PROVIDER} />
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('host')}
-								</Text>
-								<UpdateFilterLink label={entity.host} searchIn={UpdateSearchIn.HOST} />
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('state')}
-								</Text>
-								<UpdateStateTag state={entity.state} />
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('created')}
-								</Text>
-								<Text>
-									{formatDateTimeWithTimeZone(
-										entity.createdAt,
-										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
-										locale
-									)}
-								</Text>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('updated')}
-								</Text>
-								<Text>
-									{formatDateTimeWithTimeZone(
-										entity.updatedAt,
-										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
-										locale
-									)}
-								</Text>
-							</Space>
-						</Col>
-					</Row>
-				</Space>
+				{updateDescriptions}
 			</Card>
 		</>
 	);

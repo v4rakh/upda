@@ -142,7 +142,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 					children: (
 						<Space orientation="vertical">
 							<Form layout="inline" form={form} disabled={loading}>
-								<Form.Item label={t('search_term')} name="searchTerm">
+								<Form.Item label={t('search_term')} name="searchTerm" tooltip={t('search_term_help')}>
 									<Search
 										variant="filled"
 										loading={loading}
@@ -153,7 +153,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 										onSearch={onSearchTermChange}
 									/>
 								</Form.Item>
-								<Form.Item label={t('search_in')} name="searchIn">
+								<Form.Item label={t('search_in')} name="searchIn" tooltip={t('search_in_help')}>
 									<Select
 										variant="filled"
 										style={{ width: 120 }}
@@ -174,7 +174,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 										]}
 									/>
 								</Form.Item>
-								<Form.Item label={t('state')} name="state">
+								<Form.Item label={t('state')} name="state" tooltip={t('state_help')}>
 									<Select
 										variant="filled"
 										mode="multiple"
@@ -198,7 +198,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 										]}
 									/>
 								</Form.Item>
-								<Form.Item label={t('order_by')} name="orderBy">
+								<Form.Item label={t('order_by')} name="orderBy" tooltip={t('order_by_help')}>
 									<Select
 										variant="filled"
 										style={{ width: 120 }}

@@ -62,13 +62,14 @@ const CreateFilterPreset = ({ type }: CreateFilterPresetProps) => {
 			<Form.Item
 				label={t('label')}
 				name="label"
+				tooltip={t('label_help')}
 				rules={[
 					{ required: true, message: t('label_required') },
 					{ min: 1, max: 255, message: t('label_size') }
 				]}>
 				<Input minLength={1} maxLength={255} allowClear placeholder={t('label_placeholder')} />
 			</Form.Item>
-			<Form.Item label={t('color')} name="color">
+			<Form.Item label={t('color')} name="color" tooltip={t('color_help')}>
 				<ColorPicker mode="single" format="hex" />
 			</Form.Item>
 			<Form.Item>

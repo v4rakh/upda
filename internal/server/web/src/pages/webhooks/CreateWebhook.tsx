@@ -82,13 +82,14 @@ const CreateWebhook: FC = () => {
 								<Form.Item
 									label={t('label')}
 									name="label"
+									tooltip={t('label_help')}
 									rules={[
 										{ required: true, message: t('label_required') },
 										{ min: 1, max: 255, message: t('label_size') }
 									]}>
 									<Input variant="filled" allowClear placeholder={t('label_placeholder')} />
 								</Form.Item>
-								<Form.Item label={t('type')} name="type" required={true}>
+								<Form.Item label={t('type')} name="type" required={true} tooltip={t('type_help')}>
 									<Select
 										variant="filled"
 										style={{ width: 100 }}
@@ -105,12 +106,17 @@ const CreateWebhook: FC = () => {
 									/>
 								</Form.Item>
 
-								<Form.Item label={t('ignore_host')} name="ignoreHost" valuePropName="checked">
+								<Form.Item
+									label={t('ignore_host')}
+									name="ignoreHost"
+									valuePropName="checked"
+									tooltip={t('ignore_host_help')}>
 									<Switch loading={isLoading} />
 								</Form.Item>
 								<Form.Item
 									label={t('ignore_host_replacement')}
 									name="ignoreHostReplacement"
+									tooltip={t('ignore_host_replacement_help')}
 									rules={[
 										{ required: true, message: t('ignore_host_replacement_required') },
 										{ min: 1, max: 255, message: t('ignore_host_replacement_size') }

@@ -12,7 +12,19 @@ import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import InlineInputValueEditor from '../common/InlineInputValueEditor';
 import { CheckOutlined, CloseOutlined, DeleteOutlined, FieldTimeOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Popconfirm, Row, Space, Switch, Tag, Tooltip, Typography } from 'antd';
+import {
+	Button,
+	Card,
+	Collapse,
+	CollapseProps,
+	Descriptions,
+	DescriptionsProps,
+	Popconfirm,
+	Switch,
+	Tag,
+	Tooltip,
+	Typography
+} from 'antd';
 import parse from 'html-react-parser';
 import linkifyHtml from 'linkify-html';
 import { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
@@ -132,16 +144,36 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 	);
 
 	const commandPreview = useMemo(() => {
-		return (
-			<Text code copyable>
-				{parse(
-					linkifyHtml(
-						`upda webhook send --url ${window.location.protocol}//${window.location.host} --webhook-id ${entity.id} --webhook-token "$TOKEN" --application "Test Application" --application-version "3.0.23"`
-					)
-				)}
-			</Text>
-		);
-	}, [entity.id]);
+		const items: CollapseProps['items'] = [
+			{
+				label: <Text>{t('preview_cli_show')}</Text>,
+				children: (
+					<Text copyable style={{ fontFamily: 'monospace' }}>
+						{parse(
+							linkifyHtml(
+								`upda webhook send --url ${window.location.protocol}//${window.location.host} --webhook-id ${entity.id} --webhook-token "$TOKEN" --application "Test Application" --application-version "3.0.23"`
+							)
+						)}
+					</Text>
+				)
+			}
+		];
+		return <Collapse size="small" items={items} bordered={false} expandIconPlacement="end" />;
+	}, [entity.id, t]);
+
+	const urlPreview = useMemo(() => {
+		const items: CollapseProps['items'] = [
+			{
+				label: <Text>{t('url_show')}</Text>,
+				children: (
+					<Text copyable style={{ fontFamily: 'monospace' }}>
+						{parse(linkifyHtml(`${getConfiguration().VITE_API_URL}webhooks/${entity.id}`))}
+					</Text>
+				)
+			}
+		];
+		return <Collapse size="small" items={items} bordered={false} expandIconPlacement="end" />;
+	}, [entity.id, t]);
 
 	const buttons = [];
 	const delAction = (
@@ -159,9 +191,142 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 	);
 	buttons.push(delAction);
 
+	const webhookDescriptions = useMemo(() => {
+		const descriptions: DescriptionsProps['items'] = [
+			{
+				key: 'label',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('label')}
+					</Text>
+				),
+				children: (
+					<InlineInputValueEditor
+						initialValue={entity.label}
+						allowBlank={false}
+						isLoading={isLabelLoading}
+						isSuccess={isSuccessLabel}
+						isError={isErrorLabel}
+						onSubmit={submitLabelChange}
+					/>
+				)
+			},
+			{
+				key: 'ignore_host',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('ignore_host')}
+					</Text>
+				),
+				children: (
+					<Switch
+						onChange={onIgnoreHostChange}
+						loading={isIgnoreHostLoading}
+						checkedChildren={<CheckOutlined />}
+						unCheckedChildren={<CloseOutlined />}
+						checked={entity.ignoreHost}
+					/>
+				)
+			},
+			{
+				key: 'ignore_host_replacement',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('ignore_host_replacement')}
+					</Text>
+				),
+				children: (
+					<InlineInputValueEditor
+						initialValue={entity.ignoreHostReplacement}
+						allowBlank={false}
+						isLoading={isIgnoreHostReplacementLoading}
+						isSuccess={isSuccessIgnoreHostReplacement}
+						isError={isErrorIgnoreHostReplacement}
+						onSubmit={submitIgnoreHostReplacementChange}
+					/>
+				)
+			},
+			{
+				key: 'created',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('created')}
+					</Text>
+				),
+				children: (
+					<Text>
+						{formatDateTimeWithTimeZone(entity.createdAt, DateTimeStyle.SHORT, DateTimeStyle.SHORT, locale)}
+					</Text>
+				)
+			},
+			{
+				key: 'updated',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('updated')}
+					</Text>
+				),
+				children: (
+					<Text>
+						{formatDateTimeWithTimeZone(entity.updatedAt, DateTimeStyle.SHORT, DateTimeStyle.SHORT, locale)}
+					</Text>
+				)
+			},
+			{
+				key: 'url',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('url')}
+					</Text>
+				),
+				children: urlPreview
+			},
+			{
+				key: 'preview_cli',
+				label: (
+					<Text type="secondary" ellipsis>
+						{t('preview_cli')}
+					</Text>
+				),
+				children: commandPreview
+			}
+		];
+
+		return (
+			<Descriptions
+				items={descriptions}
+				colon={false}
+				layout="vertical"
+				size="small"
+				column={{ xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 4 }}
+			/>
+		);
+	}, [
+		commandPreview,
+		entity.createdAt,
+		entity.ignoreHost,
+		entity.ignoreHostReplacement,
+		entity.label,
+		entity.updatedAt,
+		isErrorIgnoreHostReplacement,
+		isErrorLabel,
+		isIgnoreHostLoading,
+		isIgnoreHostReplacementLoading,
+		isLabelLoading,
+		isSuccessIgnoreHostReplacement,
+		isSuccessLabel,
+		locale,
+		onIgnoreHostChange,
+		submitIgnoreHostReplacementChange,
+		submitLabelChange,
+		t,
+		urlPreview
+	]);
+
 	return (
 		<>
 			<Card
+				size="small"
 				loading={isDeleteLoading}
 				key={entity.id}
 				title={
@@ -178,7 +343,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,
 										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
+										DateTimeStyle.LONG,
 										locale
 									)
 								})}>
@@ -192,13 +357,13 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 									created: formatDateTimeWithTimeZone(
 										entity.createdAt,
 										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
+										DateTimeStyle.LONG,
 										locale
 									),
 									updated: formatDateTimeWithTimeZone(
 										entity.updatedAt,
 										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
+										DateTimeStyle.LONG,
 										locale
 									)
 								})}>
@@ -208,114 +373,7 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 					</>
 				}
 				actions={buttons}>
-				<Space orientation="vertical">
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('label')}
-								</Text>
-								<InlineInputValueEditor
-									initialValue={entity.label}
-									allowBlank={false}
-									isLoading={isLabelLoading}
-									isSuccess={isSuccessLabel}
-									isError={isErrorLabel}
-									onSubmit={submitLabelChange}
-								/>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('url')}
-								</Text>
-								<Text code copyable>
-									{`${getConfiguration().VITE_API_URL}webhooks/${entity.id}`}
-								</Text>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('ignore_host')}
-								</Text>
-								<Switch
-									onChange={onIgnoreHostChange}
-									loading={isIgnoreHostLoading}
-									checkedChildren={<CheckOutlined />}
-									unCheckedChildren={<CloseOutlined />}
-									checked={entity.ignoreHost}
-								/>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('ignore_host_replacement')}
-								</Text>
-								<InlineInputValueEditor
-									initialValue={entity.ignoreHostReplacement}
-									allowBlank={false}
-									isLoading={isIgnoreHostReplacementLoading}
-									isSuccess={isSuccessIgnoreHostReplacement}
-									isError={isErrorIgnoreHostReplacement}
-									onSubmit={submitIgnoreHostReplacementChange}
-								/>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('created')}
-								</Text>
-								<Text>
-									{formatDateTimeWithTimeZone(
-										entity.createdAt,
-										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
-										locale
-									)}
-								</Text>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('updated')}
-								</Text>
-								<Text>
-									{formatDateTimeWithTimeZone(
-										entity.updatedAt,
-										DateTimeStyle.LONG,
-										DateTimeStyle.MEDIUM,
-										locale
-									)}
-								</Text>
-							</Space>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<Space>
-								<Text type="secondary" ellipsis>
-									{t('preview_cli')}
-								</Text>
-								{commandPreview}
-							</Space>
-						</Col>
-					</Row>
-				</Space>
+				{webhookDescriptions}
 			</Card>
 		</>
 	);

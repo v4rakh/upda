@@ -75,6 +75,7 @@ const CreateSecret: FC = () => {
 							<Form layout="inline" form={form}>
 								<Form.Item
 									label={t('key')}
+									tooltip={t('key_help')}
 									name="key"
 									rules={[
 										{ required: true, message: t('key_required') },
@@ -84,6 +85,7 @@ const CreateSecret: FC = () => {
 								</Form.Item>
 								<Form.Item
 									label={t('value')}
+									tooltip={t('value_help')}
 									name="value"
 									rules={[
 										{ required: true, message: t('value_required') },
