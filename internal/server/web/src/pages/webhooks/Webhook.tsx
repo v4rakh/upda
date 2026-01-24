@@ -144,16 +144,18 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 	);
 
 	const commandPreview = useMemo(() => {
+		const url = `upda webhook send --url ${window.location.protocol}//${window.location.host} --webhook-id ${entity.id} --webhook-token "$TOKEN" --application "Test Application" --application-version "3.0.23"`;
+		const preview = parse(linkifyHtml(url));
 		const items: CollapseProps['items'] = [
 			{
 				label: <Text>{t('preview_cli_show')}</Text>,
 				children: (
-					<Text copyable style={{ fontFamily: 'monospace' }}>
-						{parse(
-							linkifyHtml(
-								`upda webhook send --url ${window.location.protocol}//${window.location.host} --webhook-id ${entity.id} --webhook-token "$TOKEN" --application "Test Application" --application-version "3.0.23"`
-							)
-						)}
+					<Text
+						copyable={{
+							text: url
+						}}
+						style={{ fontFamily: 'monospace' }}>
+						{preview}
 					</Text>
 				)
 			}
@@ -162,12 +164,14 @@ const Webhook: FC<WebhookProps> = ({ entity }): ReactNode => {
 	}, [entity.id, t]);
 
 	const urlPreview = useMemo(() => {
+		const url = `${getConfiguration().VITE_API_URL}webhooks/${entity.id}`;
+		const preview = parse(linkifyHtml(url));
 		const items: CollapseProps['items'] = [
 			{
 				label: <Text>{t('url_show')}</Text>,
 				children: (
-					<Text copyable style={{ fontFamily: 'monospace' }}>
-						{parse(linkifyHtml(`${getConfiguration().VITE_API_URL}webhooks/${entity.id}`))}
+					<Text copyable={{ text: url }} style={{ fontFamily: 'monospace' }}>
+						{preview}
 					</Text>
 				)
 			}
