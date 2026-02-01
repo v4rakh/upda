@@ -80,7 +80,7 @@
 		"postcss-less": "6.0.0",
 		"prettier": "3.8.1",
 		"rimraf": "6.1.2",
-		"stylelint": "17.0.0",
+		"stylelint": "17.1.0",
 		"stylelint-checkstyle-formatter": "0.1.2",
 		"stylelint-config-standard": "40.0.0",
 		"stylelint-declaration-block-no-ignored-properties": "2.8.0",
