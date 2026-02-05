@@ -16,19 +16,19 @@ importers:
         version: 7.22.7(antd@6.2.3(moment@2.30.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@reduxjs/toolkit':
         specifier: 2.11.2
-        version: 2.11.2(react-redux@9.2.0(@types/react@19.2.10)(react@19.2.4)(redux@5.0.1))(react@19.2.4)
+        version: 2.11.2(react-redux@9.2.0(@types/react@19.2.13)(react@19.2.4)(redux@5.0.1))(react@19.2.4)
       '@uiw/react-md-editor':
         specifier: 4.0.11
-        version: 4.0.11(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 4.0.11(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       antd:
         specifier: 6.2.3
         version: 6.2.3(moment@2.30.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       html-react-parser:
         specifier: 5.2.16
-        version: 5.2.16(@types/react@19.2.10)(react@19.2.4)
+        version: 5.2.16(@types/react@19.2.13)(react@19.2.4)
       i18next:
-        specifier: 25.8.1
-        version: 25.8.1(typescript@5.9.3)
+        specifier: 25.8.4
+        version: 25.8.4(typescript@5.9.3)
       i18next-browser-languagedetector:
         specifier: 8.2.0
         version: 8.2.0
@@ -52,13 +52,13 @@ importers:
         version: 19.2.4(react@19.2.4)
       react-i18next:
         specifier: 16.5.4
-        version: 16.5.4(i18next@25.8.1(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+        version: 16.5.4(i18next@25.8.4(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       react-markdown:
         specifier: 10.1.0
-        version: 10.1.0(@types/react@19.2.10)(react@19.2.4)
+        version: 10.1.0(@types/react@19.2.13)(react@19.2.4)
       react-redux:
         specifier: 9.2.0
-        version: 9.2.0(@types/react@19.2.10)(react@19.2.4)(redux@5.0.1)
+        version: 9.2.0(@types/react@19.2.13)(react@19.2.4)(redux@5.0.1)
       react-router:
         specifier: 7.13.0
         version: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -82,11 +82,11 @@ importers:
         specifier: 4.17.23
         version: 4.17.23
       '@types/react':
-        specifier: 19.2.10
-        version: 19.2.10
+        specifier: 19.2.13
+        version: 19.2.13
       '@types/react-dom':
         specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.10)
+        version: 19.2.3(@types/react@19.2.13)
       '@typescript-eslint/eslint-plugin':
         specifier: 8.54.0
         version: 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.2)(typescript@5.9.3))(eslint@9.39.2)(typescript@5.9.3)
@@ -1451,8 +1451,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.2.0
 
-  '@types/react@19.2.10':
-    resolution: {integrity: sha512-WPigyYuGhgZ/cTPRXB2EwUw+XvsRA3GqHlsP4qteqrnnjDrApbS7MxcGr/hke5iUoeB7E/gQtrs9I37zAJ0Vjw==}
+  '@types/react@19.2.13':
+    resolution: {integrity: sha512-KkiJeU6VbYbUOp5ITMIc7kBfqlYkKA5KhEHVrGMmUUMt7NeaZg65ojdPk+FtNrBAOXNVM5QM72jnADjM+XVRAQ==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -2694,8 +2694,8 @@ packages:
     resolution: {integrity: sha512-svJXk7Zt40ddLZPJjRpDx2acEmvbyua9/ijiBc3LoR5urmOQpPf/vYJEBxbCoZKRXRVaj4S+Jqv1yPQ5pk3Zlg==}
     hasBin: true
 
-  i18next@25.8.1:
-    resolution: {integrity: sha512-nFFxhwcRNggIrkv2hx/xMYVMG7Z8iMUA4ZuH4tgcbZiI0bK1jn3kSDIXNWuQDt1xVAu7mb7Qn82TpH7ZAk/okA==}
+  i18next@25.8.4:
+    resolution: {integrity: sha512-a9A0MnUjKvzjEN/26ZY1okpra9kA8MEwzYEz1BNm+IyxUKPRH6ihf0p7vj8YvULwZHKHl3zkJ6KOt4hewxBecQ==}
     peerDependencies:
       typescript: ^5
     peerDependenciesMeta:
@@ -5525,7 +5525,7 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  '@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.10)(react@19.2.4)(redux@5.0.1))(react@19.2.4)':
+  '@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.13)(react@19.2.4)(redux@5.0.1))(react@19.2.4)':
     dependencies:
       '@standard-schema/spec': 1.0.0
       '@standard-schema/utils': 0.3.0
@@ -5535,7 +5535,7 @@ snapshots:
       reselect: 5.1.1
     optionalDependencies:
       react: 19.2.4
-      react-redux: 9.2.0(@types/react@19.2.10)(react@19.2.4)(redux@5.0.1)
+      react-redux: 9.2.0(@types/react@19.2.13)(react@19.2.4)(redux@5.0.1)
 
   '@rolldown/pluginutils@1.0.0-rc.2': {}
 
@@ -5769,11 +5769,11 @@ snapshots:
 
   '@types/prismjs@1.26.5': {}
 
-  '@types/react-dom@19.2.3(@types/react@19.2.10)':
+  '@types/react-dom@19.2.3(@types/react@19.2.13)':
     dependencies:
-      '@types/react': 19.2.10
+      '@types/react': 19.2.13
 
-  '@types/react@19.2.10':
+  '@types/react@19.2.13':
     dependencies:
       csstype: 3.2.3
 
@@ -5933,13 +5933,13 @@ snapshots:
 
   '@uiw/copy-to-clipboard@1.0.17': {}
 
-  '@uiw/react-markdown-preview@5.1.5(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@uiw/react-markdown-preview@5.1.5(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@uiw/copy-to-clipboard': 1.0.17
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      react-markdown: 9.0.3(@types/react@19.2.10)(react@19.2.4)
+      react-markdown: 9.0.3(@types/react@19.2.13)(react@19.2.4)
       rehype-attr: 3.0.3
       rehype-autolink-headings: 7.1.0
       rehype-ignore: 2.0.2
@@ -5954,10 +5954,10 @@ snapshots:
       - '@types/react'
       - supports-color
 
-  '@uiw/react-md-editor@4.0.11(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@uiw/react-md-editor@4.0.11(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@babel/runtime': 7.28.4
-      '@uiw/react-markdown-preview': 5.1.5(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@uiw/react-markdown-preview': 5.1.5(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       rehype: 13.0.2
@@ -7392,7 +7392,7 @@ snapshots:
     dependencies:
       void-elements: 3.1.0
 
-  html-react-parser@5.2.16(@types/react@19.2.10)(react@19.2.4):
+  html-react-parser@5.2.16(@types/react@19.2.13)(react@19.2.4):
     dependencies:
       domhandler: 5.0.3
       html-dom-parser: 5.1.7
@@ -7400,7 +7400,7 @@ snapshots:
       react-property: 2.0.2
       style-to-js: 1.1.21
     optionalDependencies:
-      '@types/react': 19.2.10
+      '@types/react': 19.2.13
 
   html-tags@5.1.0: {}
 
@@ -7439,7 +7439,7 @@ snapshots:
       json-stable-stringify: 1.2.1
       yargs: 17.7.2
 
-  i18next@25.8.1(typescript@5.9.3):
+  i18next@25.8.4(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.28.4
     optionalDependencies:
@@ -8469,11 +8469,11 @@ snapshots:
       react: 19.2.4
       scheduler: 0.27.0
 
-  react-i18next@16.5.4(i18next@25.8.1(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3):
+  react-i18next@16.5.4(i18next@25.8.4(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.28.4
       html-parse-stringify: 3.0.1
-      i18next: 25.8.1(typescript@5.9.3)
+      i18next: 25.8.4(typescript@5.9.3)
       react: 19.2.4
       use-sync-external-store: 1.6.0(react@19.2.4)
     optionalDependencies:
@@ -8484,11 +8484,11 @@ snapshots:
 
   react-is@18.3.1: {}
 
-  react-markdown@10.1.0(@types/react@19.2.10)(react@19.2.4):
+  react-markdown@10.1.0(@types/react@19.2.13)(react@19.2.4):
     dependencies:
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.4
-      '@types/react': 19.2.10
+      '@types/react': 19.2.13
       devlop: 1.1.0
       hast-util-to-jsx-runtime: 2.3.6
       html-url-attributes: 3.0.1
@@ -8502,10 +8502,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  react-markdown@9.0.3(@types/react@19.2.10)(react@19.2.4):
+  react-markdown@9.0.3(@types/react@19.2.13)(react@19.2.4):
     dependencies:
       '@types/hast': 3.0.4
-      '@types/react': 19.2.10
+      '@types/react': 19.2.13
       devlop: 1.1.0
       hast-util-to-jsx-runtime: 2.3.6
       html-url-attributes: 3.0.1
@@ -8521,13 +8521,13 @@ snapshots:
 
   react-property@2.0.2: {}
 
-  react-redux@9.2.0(@types/react@19.2.10)(react@19.2.4)(redux@5.0.1):
+  react-redux@9.2.0(@types/react@19.2.13)(react@19.2.4)(redux@5.0.1):
     dependencies:
       '@types/use-sync-external-store': 0.0.6
       react: 19.2.4
       use-sync-external-store: 1.4.0(react@19.2.4)
     optionalDependencies:
-      '@types/react': 19.2.10
+      '@types/react': 19.2.13
       redux: 5.0.1
 
   react-refresh@0.18.0: {}
