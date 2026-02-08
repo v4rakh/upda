@@ -90,7 +90,7 @@
 		"vite-plugin-eslint2": "5.0.4",
 		"vite-plugin-stylelint": "6.0.4",
 		"vite-plugin-svgr": "4.5.0",
-		"vite-tsconfig-paths": "6.0.5",
+		"vite-tsconfig-paths": "6.1.0",
 		"vitest": "4.0.18"
 	},
 	"browserslist": {
