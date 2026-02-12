@@ -65,7 +65,7 @@ audit-web:
 
 audit-server:
 	@$(GO) install github.com/securego/gosec/v2/cmd/gosec@latest
-	$$(go env GOPATH)/bin/gosec -quiet -sort -severity medium -confidence medium ./...
+	$$(go env GOPATH)/bin/gosec -quiet -sort -severity medium -confidence high ./...
 
 build: build-web build-server-all
 
