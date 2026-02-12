@@ -3,7 +3,7 @@ module git.myservermanager.com/varakh/upda
 go 1.25
 
 require (
-	github.com/Depado/ginprom v1.8.2
+	github.com/Depado/ginprom v1.8.3
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/docker/go-connections v0.6.0
 	github.com/gin-contrib/cors v1.7.6
