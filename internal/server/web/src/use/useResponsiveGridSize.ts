@@ -38,6 +38,8 @@ export const useResponsiveGridSize = ({
 				return sm;
 			case 'xs':
 				return xs;
+			default:
+				return xxl;
 		}
 	}, [largest]);
 
