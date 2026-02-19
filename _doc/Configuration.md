@@ -119,7 +119,7 @@ The following tables describe available configuration values.
 
 | Env Var                           | Default | Description                          |
 |-----------------------------------|---------|--------------------------------------|
-| TASK_UPDATE_CLEAN_STALE_ENABLED   | true    | Enables cleaning of stale updates.   |
+| TASK_UPDATE_CLEAN_STALE_ENABLED   | false   | Enables cleaning of stale updates.   |
 | TASK_EVENT_CLEAN_STALE_INTERVAL   | 1h      | Interval for cleaning stale updates. |
 | TASK_UPDATE_CLEAN_STALE_MAX_AGE   | 720h    | Max age for stale updates.           |
 | TASK_EVENT_CLEAN_STALE_ENABLED    | false   | Enables cleaning of stale events.    |
