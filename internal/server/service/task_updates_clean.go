@@ -43,8 +43,21 @@ func (s *UpdatesCleanTask) configureUpdatesCleanTask() error {
 		var err error
 		var c int64
 
-		if c, err = s.updateService.CleanStale(t, constant.UpdateStateApproved, constant.UpdateStateIgnored); err != nil {
-			log.Error().Msgf("Could not clean up ignored or approved updates older than %s (%s). Reason: %s", s.taskConfig.UpdateCleanStaleMaxAge, t, err.Error())
+		cleanupStateTargets := make([]constant.UpdateState, 0)
+
+		for _, state := range s.taskConfig.UpdateCleanStaleStates {
+			var updateState constant.UpdateState
+
+			if updateState, err = constant.ParseUpdateState(state); err != nil {
+				log.Warn().Msgf("Skipping stale update cleanup for unknown state '%s'. Reason: %s", state, err.Error())
+				continue
+			}
+
+			cleanupStateTargets = append(cleanupStateTargets, updateState)
+		}
+
+		if c, err = s.updateService.CleanStale(t, cleanupStateTargets...); err != nil {
+			log.Error().Msgf("Could not clean up updates in state '%s' older than %s (%s). Reason: %s", cleanupStateTargets, s.taskConfig.UpdateCleanStaleMaxAge, t, err.Error())
 			return
 		}
 

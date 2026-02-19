@@ -117,24 +117,25 @@ The following tables describe available configuration values.
 
 ### Task
 
-| Env Var                           | Default | Description                          |
-|-----------------------------------|---------|--------------------------------------|
-| TASK_UPDATE_CLEAN_STALE_ENABLED   | false   | Enables cleaning of stale updates.   |
-| TASK_EVENT_CLEAN_STALE_INTERVAL   | 1h      | Interval for cleaning stale updates. |
-| TASK_UPDATE_CLEAN_STALE_MAX_AGE   | 720h    | Max age for stale updates.           |
-| TASK_EVENT_CLEAN_STALE_ENABLED    | false   | Enables cleaning of stale events.    |
-| TASK_EVENT_CLEAN_STALE_INTERVAL   | 8h      | Interval for cleaning stale events.  |
-| TASK_EVENT_CLEAN_STALE_MAX_AGE    | 2190h   | Max age for stale events.            |
-| TASK_ACTIONS_ENQUEUE_ENABLED      | true    | Enables action enqueuing.            |
-| TASK_ACTIONS_ENQUEUE_INTERVAL     | 10s     | Interval for enqueueing actions.     |
-| TASK_ACTIONS_ENQUEUE_BATCH_SIZE   | 1       | Batch size for action enqueueing.    |
-| TASK_ACTIONS_INVOKE_ENABLED       | true    | Enables invoking actions.            |
-| TASK_ACTIONS_INVOKE_INTERVAL      | 10s     | Interval for invoking actions.       |
-| TASK_ACTIONS_INVOKE_BATCH_SIZE    | 1       | Batch size for action invocation.    |
-| TASK_ACTIONS_INVOKE_MAX_RETRIES   | 3       | Max retries for failed actions.      |
-| TASK_ACTIONS_CLEAN_STALE_ENABLED  | true    | Enables cleanup of stale actions.    |
-| TASK_ACTIONS_CLEAN_STALE_INTERVAL | 12h     | Interval for cleaning stale actions. |
-| TASK_ACTIONS_CLEAN_STALE_MAX_AGE  | 720h    | Max age for stale actions.           |
+| Env Var                           | Default          | Description                                                                                         |
+|-----------------------------------|------------------|-----------------------------------------------------------------------------------------------------|
+| TASK_UPDATE_CLEAN_STALE_ENABLED   | false            | Enables cleaning of stale updates.                                                                  |
+| TASK_EVENT_CLEAN_STALE_INTERVAL   | 1h               | Interval for cleaning stale updates.                                                                |
+| TASK_UPDATE_CLEAN_STALE_MAX_AGE   | 720h             | Max age for stale updates.                                                                          |
+| TASK_UPDATE_CLEAN_STALE_STATES    | ignored,approved | States to handle on stale updates cleanup (any of `pending`, `approved`, `ignored` as list syntax). |
+| TASK_EVENT_CLEAN_STALE_ENABLED    | false            | Enables cleaning of stale events.                                                                   |
+| TASK_EVENT_CLEAN_STALE_INTERVAL   | 8h               | Interval for cleaning stale events.                                                                 |
+| TASK_EVENT_CLEAN_STALE_MAX_AGE    | 2190h            | Max age for stale events.                                                                           |
+| TASK_ACTIONS_ENQUEUE_ENABLED      | true             | Enables action enqueuing.                                                                           |
+| TASK_ACTIONS_ENQUEUE_INTERVAL     | 10s              | Interval for enqueueing actions.                                                                    |
+| TASK_ACTIONS_ENQUEUE_BATCH_SIZE   | 1                | Batch size for action enqueueing.                                                                   |
+| TASK_ACTIONS_INVOKE_ENABLED       | true             | Enables invoking actions.                                                                           |
+| TASK_ACTIONS_INVOKE_INTERVAL      | 10s              | Interval for invoking actions.                                                                      |
+| TASK_ACTIONS_INVOKE_BATCH_SIZE    | 1                | Batch size for action invocation.                                                                   |
+| TASK_ACTIONS_INVOKE_MAX_RETRIES   | 3                | Max retries for failed actions.                                                                     |
+| TASK_ACTIONS_CLEAN_STALE_ENABLED  | true             | Enables cleanup of stale actions.                                                                   |
+| TASK_ACTIONS_CLEAN_STALE_INTERVAL | 12h              | Interval for cleaning stale actions.                                                                |
+| TASK_ACTIONS_CLEAN_STALE_MAX_AGE  | 720h             | Max age for stale actions.                                                                          |
 
 ### Lock
 
