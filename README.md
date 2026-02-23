@@ -152,12 +152,12 @@ time.Sleep(20 * time.Second)
 
 There are multiple test targets defined in the `Makefile`
 
-- Go: Unit tests.
-- Go: Integration tests require an argument `image=...`, a built OCI image reference of _upda_, to work.
+- Go: Default tests skipping integration tests if certain environment variables not provided, see `make test-server`.
+- Go: Full tests including integration tests, see `make test-server-coverage`.
 - Web: Executed together with Go unit tests.
 
 If you're running on rootless docker or podman, set `DOCKER_HOST=unix:///run/user/1000/podman/podman.sock` (adapt for
-docker).
+your user and/or docker).
 
 ### Git workflow
 

@@ -1,0 +1,7 @@
+runs:
+  using: "composite"
+  steps:
+    - name: Native - test
+      shell: bash
+      run: |
+        VERSION=${{ github.sha }} make test-coverage

@@ -11,8 +11,11 @@ CMD_GO_FILES ?= ./cmd/upda/main.go
 export GO111MODULE=on
 
 PNPM ?= pnpm
+GOSEC ?= gosec
+GRYPE ?= grype
 
 BIN_DIR = $(shell pwd)/bin
+TEST_DIR = "$(shell pwd)/coverage"
 WEB_DIR = $(shell pwd)/internal/server/web
 WEB_BUILD_DIR = $(shell pwd)/internal/server/web/build
 WEB_NODE_DIR = $(shell pwd)/internal/server/web/node_modules
@@ -22,6 +25,7 @@ WEB_CI_DIR = $(shell pwd)/internal/server/web/ci/*.xml
 clean: clean-server clean-web
 clean-server:
 	@rm -rf ${BIN_DIR}
+	@rm -rf ${TEST_DIR}
 	@$(GO) clean -testcache
 clean-web:
 	@rm -rf ${WEB_BUILD_DIR}
@@ -48,9 +52,24 @@ generate-server:
 	$(GO) generate ./...
 
 test: test-web test-server
-test-server:
-	IMAGE=$(image) $(GO_TEST) test -race -shuffle on ./...
 test-web:
+	cd ${WEB_DIR}; $(PNPM) run test
+test-server:
+	@echo "⚠️ Skipping tests requiring environment variables, use 'make test-coverage' to run full test suite."
+	$(GO_TEST) test -race -shuffle on -v ./...
+
+test-coverage: test-web-coverage test-server-coverage
+test-server-coverage:
+	@make clean
+	@mkdir -p ${TEST_DIR}
+	$(GO_TEST) build -cover -o ${BIN_DIR}/testapp ./cmd/upda
+	TEST_DIR=${TEST_DIR} TEST_BINARY=${BIN_DIR}/testapp $(GO_TEST) test -coverprofile ${TEST_DIR}/coverage.unit.out -race -shuffle on -v ./...
+	$(GO_TEST) tool covdata textfmt -i=${TEST_DIR} -o=${TEST_DIR}/coverage.integration.out
+	@cat ${TEST_DIR}/coverage.unit.out > ${TEST_DIR}/coverage.out
+	@tail -n +2 ${TEST_DIR}/coverage.integration.out >> ${TEST_DIR}/coverage.out
+	@grep -v -E "_generated.go|_test.go|main.go" ${TEST_DIR}/coverage.out > ${TEST_DIR}/coverage.final.out || true
+	$(GO_TEST) tool cover -func=${TEST_DIR}/coverage.final.out
+test-web-coverage:
 	cd ${WEB_DIR}; $(PNPM) run test:coverage
 
 run-server:
@@ -64,8 +83,12 @@ audit-web:
 	cd ${WEB_DIR}; $(PNPM) audit -P --audit-level high;
 
 audit-server:
-	@$(GO) install github.com/securego/gosec/v2/cmd/gosec@latest
-	$$(go env GOPATH)/bin/gosec -quiet -sort -severity medium -confidence high ./...
+	$(GOSEC) -quiet -sort -severity medium -confidence high ./...
+
+scan:
+	# don't make the build fail
+	@NO_COLOR=1 $(GRYPE) -v -o table --file bin/grype.txt --fail-on critical bin/ || true
+	cat ./bin/grype.txt
 
 build: build-web build-server-all
 
@@ -95,4 +118,4 @@ build-server-windows-arm64:
 build-web:
 	cd ${WEB_DIR}; $(PNPM) run build; rm -rf build/conf
 
-.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web checkstyle checkstyle-server checkstyle-web build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web run run-server run-web generate generate-server audit audit-web audit-server
+.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web generate generate-server build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web checkstyle checkstyle-server checkstyle-web audit audit-web audit-server scan test test-server test-web test-coverage test-server-coverage test-web-coverage run run-server run-web
