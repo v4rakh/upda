@@ -1,7 +1,7 @@
 runs:
   using: "composite"
   steps:
-    - name: Native - checkstyle, audit, build
+    - name: Native - security scan
       shell: bash
       run: |
         make scan
