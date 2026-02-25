@@ -4,9 +4,9 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
-type FilterResetButtonProps = {
+interface FilterResetButtonProps {
 	enabled?: boolean;
-};
+}
 
 const FilterResetButton = ({ enabled }: FilterResetButtonProps) => {
 	const [t] = useTranslation('filter_reset_button');

@@ -3,10 +3,10 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Col, Row, Spin } from 'antd';
 import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 
-type AuthProviderRehydrateState = {
+interface AuthProviderRehydrateState {
 	initialLoad: boolean;
 	isRehydrating: boolean;
-};
+}
 
 const initialAuthProviderRehydrateState = {
 	initialLoad: true,

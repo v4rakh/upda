@@ -11,10 +11,10 @@ import rehypeSanitize from 'rehype-sanitize';
 
 const COLLAPSE_KEY = 'create';
 
-type CreateCommentProps = {
+interface CreateCommentProps {
 	updateId: string;
 	onCreateSuccess?: (response: CommentSingleResponse) => void;
-};
+}
 
 const CreateComment = ({ updateId, onCreateSuccess }: CreateCommentProps): ReactNode => {
 	const [t] = useTranslation('comment_create');

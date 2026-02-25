@@ -9,14 +9,14 @@ import moment from 'moment-timezone';
 import React, { createContext, FC, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type LocaleProviderContextType = {
+export interface LocaleProviderContextType {
 	language: string;
 	locale: string;
-};
+}
 
-type LocaleProviderProviderProps = {
+interface LocaleProviderProviderProps {
 	children: ReactNode | ReactNode[];
-};
+}
 
 const LocaleContext = createContext<LocaleProviderContextType | undefined>(undefined);
 

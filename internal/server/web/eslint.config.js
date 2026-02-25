@@ -12,13 +12,18 @@ import { fixupPluginRules } from '@eslint/compat';
 
 // eslint.config.js
 export default [
+	jsRecommendedLib.configs.recommended,
 	{
+		...reactHooksPlugin.configs.flat.recommended,
+		...importPlugin.flatConfigs.recommended,
+		...jsxA11yPlugin.flatConfigs.recommended,
 		files: ['**/styles/**', '**/__tests__/**', '**/*.test.tsx', '**/*.test.ts', '*.less', 'src/**/*.tsx'],
 		languageOptions: {
 			parserOptions: {
 				ecmaFeatures: {
 					jsx: true
-				}
+				},
+				project: './tsconfig.json'
 			},
 			parser: typescriptParser
 		},
@@ -46,27 +51,60 @@ export default [
 			}
 		},
 		rules: {
-			...jsRecommendedLib.configs.recommended.rules,
+			// Imports which don't support flat config, directly inject recommended rules
 			...reactPlugin.configs.recommended.rules,
 			...reactPlugin.configs['jsx-runtime'].rules,
-			...reactHooksPlugin.configs.recommended.rules,
-			...importPlugin.configs.recommended.rules,
-			...jsxA11yPlugin.flatConfigs.recommended.rules,
-			semi: 'error',
-			'no-unused-vars': 'off',
+
+			// Disable ESLint 10 incompatible React rules which should be fine to disable (mostly class without TS)
+			'react/display-name': 'off',
+			'react/no-direct-mutation-state': 'off',
+			'react/no-render-return-value': 'off',
+			'react/no-string-refs': 'off',
+			'react/no-unknown-property': 'off',
+			'react/prop-types': 'off',
+			'react/require-render-return': 'off',
+
+			// Explicit React rules
+			'react/jsx-uses-react': 'off',
+			'react/react-in-jsx-scope': 'off',
+
+			// Explicit React Hooks rules
+			'react-hooks/exhaustive-deps': 'warn',
+			'react-hooks/rules-of-hooks': 'error',
+			'react-hooks/set-state-in-effect': 'off',
+
+			// Explicit TypeScript rules
+			'@typescript-eslint/consistent-type-assertions': 'error',
+			'@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+			'@typescript-eslint/explicit-function-return-type': 'off',
+			'@typescript-eslint/explicit-member-accessibility': 'warn',
+			'@typescript-eslint/no-empty-function': 'warn',
+			'@typescript-eslint/no-empty-interface': 'warn',
+			'@typescript-eslint/no-explicit-any': 'off',
+			'@typescript-eslint/no-inferrable-types': 'warn',
+			'@typescript-eslint/no-misused-promises': 'off',
+			'@typescript-eslint/no-non-null-assertion': 'warn',
+			'@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+			'@typescript-eslint/no-unsafe-argument': 'off',
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-call': 'warn',
+			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unsafe-return': 'warn',
+			'@typescript-eslint/no-unused-expressions': 'warn',
 			'@typescript-eslint/no-unused-vars': 'error',
+			'@typescript-eslint/strict-boolean-expressions': 'off',
+
+			// Explicit other rules
+			'no-console': 'warn',
+			'no-duplicate-imports': 'warn',
 			'no-undef': 'off',
+			'no-unused-vars': 'off',
 			'prefer-const': 'error',
 			'testing-library/no-debugging-utils': 'warn',
 			'testing-library/no-dom-import': 'off',
-			'@typescript-eslint/no-explicit-any': 'off',
-			'@typescript-eslint/no-empty-function': 'off',
-			'react/react-in-jsx-scope': 'off',
-			'react/jsx-uses-react': 'off',
-			'react-hooks/set-state-in-effect': 'off',
-			'no-console': 'warn',
-			'no-duplicate-imports': 'warn',
-			'jsx-a11y/no-autofocus': 'off',
+			semi: 'error',
+
+			// Explicit SonarJS rules
 			'sonarjs/cognitive-complexity': 'off',
 			'sonarjs/elseif-without-else': 'off',
 			'sonarjs/max-switch-cases': 'error',
@@ -98,6 +136,16 @@ export default [
 			'sonarjs/prefer-object-literal': 'error',
 			'sonarjs/prefer-single-boolean-return': 'error',
 			'sonarjs/prefer-while': 'error',
+
+			// Explicit import rules
+			'import/default': 'error',
+			'import/export': 'error',
+			'import/named': 'error',
+			'import/namespace': 'error',
+			'import/no-duplicates': 'error',
+			'import/no-named-as-default-member': 'warn',
+			'import/no-named-as-default': 'warn',
+			'import/no-unresolved': 'error',
 			'import/order': [
 				'warn',
 				{

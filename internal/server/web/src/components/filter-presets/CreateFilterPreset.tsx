@@ -8,14 +8,14 @@ import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
-type CreateFilterPresetProps = {
+interface CreateFilterPresetProps {
 	type: FilterPresetType;
-};
+}
 
-type FilterPresetFormValues = {
+interface FilterPresetFormValues {
 	label: string;
 	color?: Color;
-};
+}
 
 const CreateFilterPreset = ({ type }: CreateFilterPresetProps) => {
 	const [t] = useTranslation('filter_presets_create');

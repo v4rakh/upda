@@ -8,11 +8,11 @@ import { ReactNode, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
-type FilterPresetsProps = {
+interface FilterPresetsProps {
 	type: FilterPresetType;
 	showFilterReset?: boolean;
 	filtersActive?: boolean;
-};
+}
 
 const FilterPresets = ({ type, showFilterReset, filtersActive }: FilterPresetsProps): ReactNode => {
 	const [t] = useTranslation('filter_presets');

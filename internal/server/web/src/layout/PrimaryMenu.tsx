@@ -21,9 +21,9 @@ import { forEach, noop } from 'lodash';
 import { FC, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-export type PrimaryMenuProps = {
+export interface PrimaryMenuProps {
 	t: TFunction;
-};
+}
 
 const { Text } = Typography;
 

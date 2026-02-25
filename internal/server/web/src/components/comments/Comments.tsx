@@ -14,9 +14,9 @@ import { filter, map, unionBy } from 'lodash';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type CommentProps = {
+interface CommentProps {
 	updateId: string;
-};
+}
 
 const Comments = ({ updateId }: CommentProps): ReactNode => {
 	const [t] = useTranslation('comments');

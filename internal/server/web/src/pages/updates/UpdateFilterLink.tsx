@@ -6,10 +6,10 @@ import { Typography } from 'antd';
 import React, { ReactNode, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-type UpdateFilterLinkProps = {
+interface UpdateFilterLinkProps {
 	label: string;
 	searchIn: UpdateSearchIn;
-};
+}
 
 const { Link } = Typography;
 
