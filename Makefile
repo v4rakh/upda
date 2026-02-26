@@ -86,9 +86,8 @@ audit-server:
 	$(GOSEC) -quiet -sort -severity medium -confidence high ./...
 
 scan:
-	# don't make the build fail
 	@NO_COLOR=1 $(GRYPE) -v -o table --file bin/grype.txt --fail-on critical bin/ || true
-	cat ./bin/grype.txt
+	@cat ./bin/grype.txt
 
 build: build-web build-server-all
 
