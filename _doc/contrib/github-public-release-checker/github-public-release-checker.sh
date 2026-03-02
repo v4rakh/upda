@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+# Checks public releases from GitHub
+# Requires: curl, jq
 
+set -e;
 REPOS=(
     "promhippie/hcloud_exporter"
     "crazy-max/diun"
@@ -8,11 +11,17 @@ REPOS=(
 for REPO in "${REPOS[@]}"; do
     SAFE_REPO_NAME=$(echo "$REPO" | tr '/' '_')
     LAST_RELEASE_FILE="last_release_${SAFE_REPO_NAME}.txt"
+    JSON=$(curl -s "https://api.github.com/repos/${REPO}/releases/latest")
 
-    LATEST_TAG=$(curl -s "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if echo "$JSON" | jq -e '.message? // empty' >/dev/null; then
+        echo "[$REPO] Failed to fetch latest release: $(echo "$JSON" | jq -r '.message')"
+        continue
+    fi
 
-    if [ -z "$LATEST_TAG" ]; then
-        echo "[$REPO] Failed to fetch latest release tag."
+    LATEST_TAG=$(echo "$JSON" | jq -r '.tag_name // empty')
+
+    if [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" = "null" ]; then
+        echo "[$REPO] No tag_name in latest release."
         continue
     fi
 
