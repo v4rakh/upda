@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react';
 import eslint from 'vite-plugin-eslint2';
 import stylelint from 'vite-plugin-stylelint';
 import svgrPlugin from 'vite-plugin-svgr';
-import viteTsconfigPaths from 'vite-tsconfig-paths';
 
 const stylelintOptions = {
 	dev: true
@@ -17,7 +16,7 @@ const eslintOptions = {
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 	return {
-		plugins: [react(), viteTsconfigPaths(), svgrPlugin(), stylelint(stylelintOptions), eslint(eslintOptions)],
+		plugins: [react(), svgrPlugin(), stylelint(stylelintOptions), eslint(eslintOptions)],
 		base: './',
 		server: {
 			open: false,
@@ -29,6 +28,9 @@ export default defineConfig(({ mode }) => {
 					changeOrigin: true
 				}
 			}
+		},
+		resolve: {
+			tsconfigPaths: true
 		},
 		build: {
 			outDir: 'build'
