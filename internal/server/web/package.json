@@ -31,11 +31,11 @@
 		"clean": "npx --quiet rimraf build && npx --quiet rimraf ci/*.xml && npx --quiet rimraf coverage && npx --quiet rimraf node_modules"
 	},
 	"dependencies": {
-		"@ant-design/icons": "6.1.0",
+		"@ant-design/icons": "6.1.1",
 		"@ant-design/pro-layout": "7.22.7",
 		"@reduxjs/toolkit": "2.11.2",
 		"@uiw/react-md-editor": "4.0.11",
-		"antd": "6.3.3",
+		"antd": "6.3.4",
 		"html-react-parser": "5.2.17",
 		"i18next": "25.8.20",
 		"i18next-browser-languagedetector": "8.2.1",
@@ -48,7 +48,7 @@
 		"react-i18next": "16.5.8",
 		"react-markdown": "10.1.0",
 		"react-redux": "9.2.0",
-		"react-router": "7.13.1",
+		"react-router": "7.13.2",
 		"rehype-sanitize": "6.0.0",
 		"remark-gfm": "4.0.1",
 		"typescript": "5.9.3"
@@ -59,10 +59,10 @@
 		"@types/lodash": "4.17.24",
 		"@types/react": "19.2.14",
 		"@types/react-dom": "19.2.3",
-		"@typescript-eslint/eslint-plugin": "8.57.1",
-		"@typescript-eslint/parser": "8.57.1",
+		"@typescript-eslint/eslint-plugin": "8.57.2",
+		"@typescript-eslint/parser": "8.57.2",
 		"@vitejs/plugin-react": "6.0.1",
-		"@vitest/coverage-v8": "4.1.0",
+		"@vitest/coverage-v8": "4.1.2",
 		"eslint": "10.0.3",
 		"eslint-config-prettier": "10.1.8",
 		"eslint-formatter-checkstyle": "9.0.1",
@@ -73,9 +73,9 @@
 		"eslint-plugin-react": "7.37.5",
 		"eslint-plugin-react-hooks": "7.0.1",
 		"eslint-plugin-sonarjs": "4.0.2",
-		"eslint-plugin-testing-library": "7.16.1",
+		"eslint-plugin-testing-library": "7.16.2",
 		"i18next-json-sync": "3.1.2",
-		"jsdom": "29.0.0",
+		"jsdom": "29.0.1",
 		"less": "4.6.4",
 		"postcss-less": "6.0.0",
 		"prettier": "3.8.1",
@@ -86,11 +86,11 @@
 		"stylelint-declaration-block-no-ignored-properties": "3.0.0",
 		"stylelint-order": "8.1.1",
 		"stylelint-prettier": "5.0.3",
-		"vite": "8.0.1",
+		"vite": "8.0.3",
 		"vite-plugin-eslint2": "5.0.5",
 		"vite-plugin-stylelint": "6.1.0",
 		"vite-plugin-svgr": "4.5.0",
-		"vitest": "4.1.0"
+		"vitest": "4.1.2"
 	},
 	"browserslist": {
 		"production": [
