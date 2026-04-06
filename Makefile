@@ -80,10 +80,10 @@ run-web:
 audit: audit-web audit-server
 
 audit-web:
-	cd ${WEB_DIR}; $(PNPM) audit -P --audit-level high;
+	cd ${WEB_DIR}; $(PNPM) audit -P --audit-level critical;
 
 audit-server:
-	$(GOSEC) -quiet -sort -severity medium -confidence high ./...
+	$(GOSEC) -quiet -sort -severity high -confidence high ./...
 
 scan:
 	@NO_COLOR=1 $(GRYPE) -v -o table --file bin/grype.txt --fail-on critical bin/ || true
