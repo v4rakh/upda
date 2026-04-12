@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 	"time"
 
@@ -157,4 +158,12 @@ func newContainerVerboseLogConsumerConfig(name string, timeout time.Duration) *t
 // randomUserPort generates a random port number in the user port range (1024-65535) to avoid conflicts with well-known ports during testing.
 func randomUserPort() int {
 	return rand.Intn(65535-1024+1) + 1024
+}
+
+// stripPortSuffix strips any port suffix from $port/...
+func stripPortSuffix(s string) string {
+	if i := strings.IndexByte(s, '/'); i >= 0 {
+		return s[:i]
+	}
+	return s
 }

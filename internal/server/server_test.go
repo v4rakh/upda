@@ -7,7 +7,6 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/str"
-	"github.com/docker/go-connections/nat"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -21,8 +20,6 @@ import (
 const (
 	envTestDir    = "TEST_DIR"
 	envTestBinary = "TEST_BINARY"
-
-	natPortFormat = "%s/tcp"
 
 	appHost = "localhost"
 
@@ -51,7 +48,7 @@ func createDatabaseContainer(ctx context.Context, t *testing.T) testcontainers.C
 
 	req := testcontainers.ContainerRequest{
 		Image:          postgresImage,
-		ExposedPorts:   []string{fmt.Sprintf(natPortFormat, postgresPort)},
+		ExposedPorts:   []string{postgresPort},
 		LogConsumerCfg: newContainerVerboseLogConsumerConfig(postgresContainerName, containerLogTimeout),
 		Env: map[string]string{
 			"POSTGRES_USER":     postgresUser,
@@ -61,10 +58,11 @@ func createDatabaseContainer(ctx context.Context, t *testing.T) testcontainers.C
 		WaitingFor: wait.ForAll(
 			wait.ForLog("database system is ready to accept connections").WithStartupTimeout(containerStartupTimeout),
 			wait.ForSQL("5432/tcp", "postgres",
-				func(host string, port nat.Port) string {
+				func(host string, port string) string {
+					strippedPort := stripPortSuffix(port)
 					return fmt.Sprintf(
 						"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-						postgresUser, postgresPass, host, port.Port(), postgresDb,
+						postgresUser, postgresPass, host, strippedPort, postgresDb,
 					)
 				},
 			).WithStartupTimeout(containerStartupTimeout),
@@ -110,7 +108,7 @@ func TestApplication(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get database container host: %v", err)
 	}
-	dbMappedPort, err := dbContainer.MappedPort(ctx, nat.Port(fmt.Sprintf(natPortFormat, postgresPort)))
+	dbMappedPort, err := dbContainer.MappedPort(ctx, postgresPort)
 	if err != nil {
 		t.Fatalf("failed to get database container mapped port: %v", err)
 	}
