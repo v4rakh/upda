@@ -9,3 +9,4 @@ export * from './comment';
 export * from './actions';
 export * from './actionInvocations';
 export * from './common';
+export * from './updateStateDefinition';

@@ -12,6 +12,8 @@ import {
 	LoadingOutlined,
 	LockOutlined,
 	LogoutOutlined,
+	PartitionOutlined,
+	SwapOutlined,
 	UnorderedListOutlined,
 	UserOutlined
 } from '@ant-design/icons';
@@ -81,6 +83,18 @@ const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 				key: AppPaths.CONSTANTS,
 				icon: <FolderOutlined />,
 				onClick: () => navigate(getPageFullPath(AppPaths.CONSTANTS))
+			},
+			isAuthenticated && {
+				label: t('state_definitions'),
+				key: AppPaths.STATE_DEFINITIONS,
+				icon: <PartitionOutlined />,
+				onClick: () => navigate(getPageFullPath(AppPaths.STATE_DEFINITIONS))
+			},
+			isAuthenticated && {
+				label: t('state_transitions'),
+				key: AppPaths.STATE_TRANSITIONS,
+				icon: <SwapOutlined />,
+				onClick: () => navigate(getPageFullPath(AppPaths.STATE_TRANSITIONS))
 			},
 			isAuthenticated && {
 				label: t('events'),

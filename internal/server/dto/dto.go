@@ -13,4 +13,11 @@ type EventPayloadInformationDto struct {
 	Provider    string
 	Version     string
 	State       string
+	StateLabel  string
+}
+
+// UpdateStateReorderItem represents an item to reorder with its new sort order
+type UpdateStateReorderItem struct {
+	ID        string
+	SortOrder int
 }

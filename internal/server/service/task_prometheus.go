@@ -8,28 +8,30 @@ import (
 )
 
 type PrometheusTask struct {
-	updateService     *UpdateService
-	eventService      *EventService
-	actionService     *ActionService
-	webhookService    *WebhookService
-	prometheusService *PrometheusService
-	taskService       *TaskService
-	prometheusConfig  *config.Prometheus
+	updateService          *UpdateService
+	stateDefinitionService *UpdateStateDefinitionService
+	eventService           *EventService
+	actionService          *ActionService
+	webhookService         *WebhookService
+	prometheusService      *PrometheusService
+	taskService            *TaskService
+	prometheusConfig       *config.Prometheus
 }
 
 const (
 	jobNamePrometheusRefresh = "PROMETHEUS_REFRESH"
 )
 
-func NewPrometheusTask(u *UpdateService, e *EventService, w *WebhookService, a *ActionService, p *PrometheusService, t *TaskService, c *config.Prometheus) *PrometheusTask {
+func NewPrometheusTask(u *UpdateService, sd *UpdateStateDefinitionService, e *EventService, w *WebhookService, a *ActionService, p *PrometheusService, t *TaskService, c *config.Prometheus) *PrometheusTask {
 	return &PrometheusTask{
-		updateService:     u,
-		eventService:      e,
-		actionService:     a,
-		webhookService:    w,
-		prometheusService: p,
-		taskService:       t,
-		prometheusConfig:  c,
+		updateService:          u,
+		stateDefinitionService: sd,
+		eventService:           e,
+		actionService:          a,
+		webhookService:         w,
+		prometheusService:      p,
+		taskService:            t,
+		prometheusConfig:       c,
 	}
 }
 
@@ -46,13 +48,7 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 	if err := s.prometheusService.RegisterGaugeNoLabels(constant.MetricUpdatesTotal, constant.MetricUpdatesTotalHelp); err != nil {
 		return err
 	}
-	if err := s.prometheusService.RegisterGaugeNoLabels(constant.MetricUpdatesPending, constant.MetricUpdatesPendingHelp); err != nil {
-		return err
-	}
-	if err := s.prometheusService.RegisterGaugeNoLabels(constant.MetricUpdatesIgnored, constant.MetricUpdatesIgnoredHelp); err != nil {
-		return err
-	}
-	if err := s.prometheusService.RegisterGaugeNoLabels(constant.MetricUpdatesApproved, constant.MetricUpdatesApprovedHelp); err != nil {
+	if err := s.prometheusService.RegisterGauge(constant.MetricUpdatesByState, constant.MetricUpdatesByStateHelp, []string{constant.MetricUpdatesByStateLabel}); err != nil {
 		return err
 	}
 	if err := s.prometheusService.RegisterGaugeNoLabels(constant.MetricWebhooks, constant.MetricWebhooksHelp); err != nil {
@@ -72,28 +68,23 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 			log.Error().Msgf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
 		}
 
-		var pendingTotal int64
-		var ignoredTotal int64
-		var ackTotal int64
-
+		// Count updates by state dynamically
+		stateCounters := make(map[string]int64)
 		for _, update := range updates {
-			if constant.UpdateStatePending.String() == update.State {
-				pendingTotal += 1
-			} else if constant.UpdateStateIgnored.String() == update.State {
-				ignoredTotal += 1
-			} else if constant.UpdateStateApproved.String() == update.State {
-				ackTotal += 1
-			}
+			stateCounters[update.State]++
 		}
 
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesPending, float64(pendingTotal)); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates pending prometheus metric. Reason: %s", updatesError.Error())
-		}
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesIgnored, float64(ignoredTotal)); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates ignored prometheus metric. Reason: %s", updatesError.Error())
-		}
-		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesApproved, float64(ackTotal)); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates approved prometheus metric. Reason: %s", updatesError.Error())
+		// Get all state definitions to ensure we report 0 for states with no updates
+		stateDefs, stateErr := s.stateDefinitionService.GetAll()
+		if stateErr != nil {
+			log.Error().Msgf("Could not get state definitions for prometheus metrics. Reason: %s", stateErr.Error())
+		} else {
+			for _, stateDef := range stateDefs {
+				count := stateCounters[stateDef.Name]
+				if err := s.prometheusService.SetGauge(constant.MetricUpdatesByState, []string{stateDef.Name}, float64(count)); err != nil {
+					log.Error().Msgf("Could not refresh updates by state prometheus metric for state '%s'. Reason: %s", stateDef.Name, err.Error())
+				}
+			}
 		}
 
 		var webhooksTotal int64

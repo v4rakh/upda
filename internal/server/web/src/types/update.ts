@@ -2,11 +2,8 @@ import { PaginatedRequestParams, PaginatedResponse } from './common';
 import UpdateOrder from '../constants/api/updateOrder';
 import UpdateOrderBy from '../constants/api/updateOrderBy';
 
-export enum UpdateState {
-	PENDING = 'pending',
-	APPROVED = 'approved',
-	IGNORED = 'ignored'
-}
+// Type alias for dynamic state values from the API
+export type UpdateStateValue = string;
 
 export type UpdatesResponse = {
 	data: {
@@ -19,7 +16,7 @@ export type UpdatesResponse = {
 export type UpdatesRequestParams = {
 	searchTerm?: string;
 	searchIn?: string;
-	state?: UpdateState[];
+	state?: UpdateStateValue[];
 	orderBy?: UpdateOrderBy;
 	order?: UpdateOrder;
 } & PaginatedRequestParams;
@@ -30,7 +27,7 @@ export interface UpdateResponse {
 	provider: string;
 	host: string;
 	version: string;
-	state: UpdateState;
+	state: UpdateStateValue;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -44,5 +41,5 @@ export interface UpdateSingleResponse {
 }
 
 export type ModifyUpdateStateRequest = {
-	state: UpdateState;
+	state: UpdateStateValue;
 };

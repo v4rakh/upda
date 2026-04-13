@@ -2,23 +2,25 @@ package service
 
 import (
 	"errors"
-	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/rs/zerolog/log"
-	"time"
 )
 
 type UpdateService struct {
-	repo         repository.UpdateRepository
-	eventService *EventService
+	repo                   repository.UpdateRepository
+	eventService           *EventService
+	stateDefService        *UpdateStateDefinitionService
+	stateTransitionService *UpdateStateTransitionService
 }
 
-func NewUpdateService(r repository.UpdateRepository, e *EventService) *UpdateService {
+func NewUpdateService(r repository.UpdateRepository, e *EventService, stateDefService *UpdateStateDefinitionService, stateTransitionService *UpdateStateTransitionService) *UpdateService {
 	return &UpdateService{
-		repo:         r,
-		eventService: e,
+		repo:                   r,
+		eventService:           e,
+		stateDefService:        stateDefService,
+		stateTransitionService: stateTransitionService,
 	}
 }
 
@@ -47,17 +49,25 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 	if err != nil && !errors.Is(err, service_error.ErrResourceNotFound) {
 		return nil, err
 	} else if err != nil && errors.Is(err, service_error.ErrResourceNotFound) {
-		if e, err = s.repo.Create(application, provider, host, version, constant.UpdateStatePending.String(), metadata); err != nil {
+		// Get dynamic initial state - required
+		initialState, err := s.stateDefService.GetInitial()
+		if err != nil {
+			return nil, service_error.ErrInitialStateRequired
+		}
+		if e, err = s.repo.Create(application, provider, host, version, initialState.Name, metadata); err != nil {
 			return nil, err
 		}
 		s.eventService.CreateUpdateCreated(e)
 		log.Info().Msgf("Created update '%v'", e)
 	} else {
 		old := e
-		skip := e.State == constant.UpdateStateIgnored.String()
 
-		if skip {
-			log.Info().Msgf("Skipping ignored update '%v'", e.ID)
+		// Check if current state has SkipOnNewVersion flag
+		currentStateDef, stateErr := s.stateDefService.GetByName(e.State)
+		if stateErr != nil {
+			log.Warn().Msgf("Could not find state definition for '%s', proceeding with update", e.State)
+		} else if currentStateDef.SkipOnNewVersion {
+			log.Info().Msgf("Skipping update '%v' in state '%s' (skipOnNewVersion=true)", e.ID, e.State)
 			return nil, nil
 		}
 
@@ -68,9 +78,13 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 		s.eventService.CreateUpdateUpdated(old, e)
 		log.Info().Msgf("Updated update '%v'", e)
 
-		if constant.UpdateStateApproved.String() == e.State {
-			log.Info().Msgf("Setting update '%v' state to '%v'", e.ID, constant.UpdateStatePending)
-			if e, err = s.repo.UpdateState(e.ID.String(), constant.UpdateStatePending.String()); err != nil {
+		// If current state is NOT the initial state, reset to initial state
+		initialState, initErr := s.stateDefService.GetInitial()
+		if initErr != nil {
+			log.Warn().Msg("Could not find initial state for reset")
+		} else if e.State != initialState.Name {
+			log.Info().Msgf("Setting update '%v' state from '%s' to initial state '%s'", e.ID, e.State, initialState.Name)
+			if e, err = s.repo.UpdateState(e.ID.String(), initialState.Name); err != nil {
 				return nil, err
 			}
 		}
@@ -79,7 +93,7 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 	return e, err
 }
 
-func (s *UpdateService) UpdateState(id string, state constant.UpdateState) (*model.Update, error) {
+func (s *UpdateService) UpdateState(id string, state string) (*model.Update, error) {
 	if id == "" || state == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
@@ -91,8 +105,26 @@ func (s *UpdateService) UpdateState(id string, state constant.UpdateState) (*mod
 		return nil, err
 	}
 
+	// Validate target state exists
+	_, err = s.stateDefService.GetByName(state)
+	if err != nil {
+		if errors.Is(err, service_error.ErrResourceNotFound) {
+			return nil, service_error.ErrStateNotFound
+		}
+		return nil, err
+	}
+
+	// Validate transition is allowed
+	allowed, err := s.stateTransitionService.IsTransitionAllowed(e.State, state)
+	if err != nil {
+		return nil, err
+	}
+	if !allowed {
+		return nil, service_error.ErrStateTransitionNotAllowed
+	}
+
 	oldUpdate := e
-	if e, err = s.repo.UpdateState(id, state.String()); err != nil {
+	if e, err = s.repo.UpdateState(id, state); err != nil {
 		return nil, err
 	}
 
@@ -123,18 +155,10 @@ func (s *UpdateService) Delete(id string) error {
 	return nil
 }
 
-func (s *UpdateService) CleanStale(time time.Time, state ...constant.UpdateState) (int64, error) {
-	if len(state) == 0 {
-		return 0, service_error.ErrValidationNotEmpty
-	}
-
-	return s.repo.DeleteByUpdatedAtBeforeAndStates(time, constant.FromVariadicToStr(state...)...)
+func (s *UpdateService) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...string) ([]*model.Update, error) {
+	return s.repo.Paginate(page, pageSize, orderBy, order, searchTerm, searchIn, state...)
 }
 
-func (s *UpdateService) Paginate(page int, pageSize int, orderBy string, order string, searchTerm string, searchIn string, state ...constant.UpdateState) ([]*model.Update, error) {
-	return s.repo.Paginate(page, pageSize, orderBy, order, searchTerm, searchIn, constant.FromVariadicToStr(state...)...)
-}
-
-func (s *UpdateService) Count(searchTerm string, searchIn string, state ...constant.UpdateState) (int64, error) {
-	return s.repo.Count(searchTerm, searchIn, constant.FromVariadicToStr(state...)...)
+func (s *UpdateService) Count(searchTerm string, searchIn string, state ...string) (int64, error) {
+	return s.repo.Count(searchTerm, searchIn, state...)
 }

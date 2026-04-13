@@ -1,23 +1,19 @@
 import UpdateFilterLink from './UpdateFilterLink';
 import UpdateStateTag from './UpdateStateTag';
 import { useDeleteUpdateMutation, useModifyUpdateStateMutation } from '../../api/updatesApi';
+import { useGetUpdateStateDefinitionsQuery } from '../../api/updateStateDefinitionsApi';
+import { useGetUpdateStateTransitionsQuery } from '../../api/updateStateTransitionsApi';
 import UpdateSearchIn from '../../constants/api/updateSearchIn';
 import AppPaths from '../../constants/appPaths';
 import DateTimeStyle from '../../constants/dateTimeStyle';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
-import { UpdateResponse, UpdateState } from '../../types';
+import { UpdateResponse, UpdateStateDefinition } from '../../types';
 import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
-import { getUpdateStateColor } from '../../utils/updateHelper';
+import { renderIcon } from '../../utils/iconHelper';
+import { getUpdateStateColorFromDefinitions } from '../../utils/updateHelper';
 import { getPageFullPath } from '../../utils/urlHelper';
-import {
-	CheckCircleOutlined,
-	DeleteOutlined,
-	FieldTimeOutlined,
-	InfoCircleOutlined,
-	InteractionOutlined,
-	StopOutlined
-} from '@ant-design/icons';
+import { SwapOutlined, DeleteOutlined, FieldTimeOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Badge, Button, Card, Descriptions, DescriptionsProps, Popconfirm, Space, Tooltip, Typography } from 'antd';
 import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +30,9 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 	const { apiError } = useNotification();
 	const { locale } = useLocaleProviderContext();
 	const navigate = useNavigate();
+
+	const { data: statesData } = useGetUpdateStateDefinitionsQuery();
+	const { data: transitionsData } = useGetUpdateStateTransitionsQuery();
 
 	const redirectToDetails = useCallback(() => {
 		navigate(getPageFullPath(`${AppPaths.UPDATES}/${entity.id}`));
@@ -72,59 +71,56 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 		}
 	}, [apiError, isErrorModify, modifyError, t]);
 
-	const buttons = [];
-	const ackAction = (
-		<Tooltip placement="bottom" title={t('help_approve')}>
-			<Button
-				key="ack"
-				disabled={isModifyLoading || isDeleteLoading}
-				loading={isModifyLoading}
-				icon={<CheckCircleOutlined style={{ color: 'green' }} />}
-				type="text"
-				onClick={() => modifyUpdateState({ id: entity.id, body: { state: UpdateState.APPROVED } })}
-			/>
-		</Tooltip>
-	);
-	const ignoreAction = (
-		<Tooltip placement="bottom" title={t('help_ignore')}>
-			<Button
-				key="ignore"
-				disabled={isModifyLoading || isDeleteLoading}
-				loading={isModifyLoading}
-				icon={<StopOutlined style={{ color: 'orange' }} />}
-				type="text"
-				onClick={() => modifyUpdateState({ id: entity.id, body: { state: UpdateState.IGNORED } })}
-			/>
-		</Tooltip>
-	);
-	const pendingAction = (
-		<Tooltip placement="bottom" title={t('help_pending')}>
-			<Button
-				key="pending"
-				disabled={isModifyLoading || isDeleteLoading}
-				loading={isModifyLoading}
-				icon={<InteractionOutlined style={{ color: 'blue' }} />}
-				type="text"
-				onClick={() => modifyUpdateState({ id: entity.id, body: { state: UpdateState.PENDING } })}
-			/>
-		</Tooltip>
-	);
+	// Get allowed transitions for the current state
+	const allowedTransitions = useMemo(() => {
+		if (!transitionsData?.data?.content || !statesData?.data?.content) {
+			return [];
+		}
 
-	const color = getUpdateStateColor(entity.state);
-	switch (entity.state) {
-		case UpdateState.PENDING:
-			buttons.push(ackAction);
-			buttons.push(ignoreAction);
-			break;
-		case UpdateState.APPROVED:
-			buttons.push(pendingAction);
-			buttons.push(ignoreAction);
-			break;
-		case UpdateState.IGNORED:
-			buttons.push(ackAction);
-			buttons.push(pendingAction);
-			break;
-	}
+		const currentStateDef = statesData.data.content.find((s) => s.name === entity.state);
+		if (!currentStateDef) {
+			return [];
+		}
+
+		// Find transitions from current state
+		const transitions = transitionsData.data.content.filter((t) => t.fromState.id === currentStateDef.id);
+
+		// If no transitions defined from this state, allow all other states (fallback)
+		if (transitions.length === 0) {
+			return statesData.data.content.filter((s) => s.name !== entity.state);
+		}
+
+		return transitions.map((t) => t.toState);
+	}, [transitionsData, statesData, entity.state]);
+
+	const stateDefinitions = statesData?.data?.content;
+	const color = getUpdateStateColorFromDefinitions(entity.state, stateDefinitions);
+	const currentStateDef = stateDefinitions?.find((s) => s.name === entity.state);
+	const isInitialState = currentStateDef?.isInitial ?? false;
+
+	// Build transition buttons dynamically
+	const transitionButtons = useMemo(() => {
+		return allowedTransitions.map((targetState: UpdateStateDefinition) => (
+			<Tooltip
+				placement="bottom"
+				title={t('transition_to', { state: targetState.label, description: targetState.description })}
+				key={targetState.id}>
+				<Button
+					disabled={isModifyLoading || isDeleteLoading}
+					loading={isModifyLoading}
+					icon={
+						renderIcon(targetState.icon, { color: targetState.color }) || (
+							<SwapOutlined style={{ color: targetState.color }} />
+						)
+					}
+					type="text"
+					onClick={() => modifyUpdateState({ id: entity.id, body: { state: targetState.name } })}
+				/>
+			</Tooltip>
+		));
+	}, [allowedTransitions, isModifyLoading, isDeleteLoading, modifyUpdateState, entity.id, t]);
+
+	const buttons = [...transitionButtons];
 
 	const delAction = (
 		<Popconfirm
@@ -245,8 +241,8 @@ const Update: FC<UpdateProps> = ({ entity }): ReactNode => {
 				key={entity.id}
 				title={
 					<Space>
-						{UpdateState.PENDING === entity.state && (
-							<Tooltip title={t('handle_pending')}>
+						{isInitialState && (
+							<Tooltip title={t('recently_ingested')}>
 								<Badge dot />
 							</Tooltip>
 						)}

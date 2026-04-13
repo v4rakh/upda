@@ -2,6 +2,8 @@ import UpdateFilterLink from './UpdateFilterLink';
 import UpdateMetadata from './UpdateMetadata';
 import UpdateStateTag from './UpdateStateTag';
 import { useGetUpdateByIdQuery, useModifyUpdateStateMutation } from '../../api/updatesApi';
+import { useGetUpdateStateDefinitionsQuery } from '../../api/updateStateDefinitionsApi';
+import { useGetUpdateStateTransitionsQuery } from '../../api/updateStateTransitionsApi';
 import Comments from '../../components/comments/Comments';
 import UpdateSearchIn from '../../constants/api/updateSearchIn';
 import UpdateTabQueryParamNames from '../../constants/api/updateTabQueryParamNames';
@@ -11,22 +13,21 @@ import AppPaths from '../../constants/appPaths';
 import DateTimeStyle from '../../constants/dateTimeStyle';
 import UpdateTabNames from '../../constants/updateTabNames';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
-import { UpdateState } from '../../types';
+import { UpdateStateDefinition } from '../../types';
 import { useNotification } from '../../use/useNotification';
 import useUpdateTabQueryParams from '../../use/useUpdateTabQueryParams';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
+import { renderIcon } from '../../utils/iconHelper';
 import { getPageFullPath } from '../../utils/urlHelper';
 import AppBreadcrumb from '../common/AppBreadcrumb';
 import EventsTree from '../events/EventsTree';
 import {
-	CheckCircleOutlined,
 	ClockCircleOutlined,
 	CloseOutlined,
 	CommentOutlined,
 	InfoCircleOutlined,
-	InteractionOutlined,
 	MoreOutlined,
-	StopOutlined
+	SwapOutlined
 } from '@ant-design/icons';
 import { PageHeader } from '@ant-design/pro-layout';
 import { Descriptions, FloatButton, Result, Skeleton, Tabs, Tooltip, Typography } from 'antd';
@@ -40,6 +41,7 @@ const { Item } = Descriptions;
 
 const UpdateSinglePage: FC = (): ReactNode => {
 	const [t] = useTranslation('updates_single');
+	const [tUpdate] = useTranslation('update');
 	const { locale } = useLocaleProviderContext();
 	const { apiError } = useNotification();
 
@@ -65,6 +67,9 @@ const UpdateSinglePage: FC = (): ReactNode => {
 		}
 	);
 
+	const { data: statesData } = useGetUpdateStateDefinitionsQuery();
+	const { data: transitionsData } = useGetUpdateStateTransitionsQuery();
+
 	const [modifyUpdateState, { isLoading: isModifyLoading, isError: isErrorModify, error: modifyError }] =
 		useModifyUpdateStateMutation();
 
@@ -82,14 +87,27 @@ const UpdateSinglePage: FC = (): ReactNode => {
 		}
 	}, [apiError, isErrorModify, modifyError, t]);
 
-	const onClickState = useCallback(
-		(state: UpdateState) => {
-			if (updateId) {
-				modifyUpdateState({ id: updateId, body: { state: state } });
-			}
-		},
-		[modifyUpdateState, updateId]
-	);
+	// Get allowed transitions for the current state
+	const allowedTransitions = useMemo(() => {
+		if (!transitionsData?.data?.content || !statesData?.data?.content || !data?.data?.state) {
+			return [];
+		}
+
+		const currentStateDef = statesData.data.content.find((s) => s.name === data.data.state);
+		if (!currentStateDef) {
+			return [];
+		}
+
+		// Find transitions from current state
+		const transitions = transitionsData.data.content.filter((t) => t.fromState.id === currentStateDef.id);
+
+		// If no transitions defined from this state, allow all other states (fallback)
+		if (transitions.length === 0) {
+			return statesData.data.content.filter((s) => s.name !== data.data.state);
+		}
+
+		return transitions.map((t) => t.toState);
+	}, [transitionsData, statesData, data?.data?.state]);
 
 	const tabs = useMemo(
 		() => [
@@ -167,30 +185,32 @@ const UpdateSinglePage: FC = (): ReactNode => {
 	);
 
 	const floatingActions = useMemo(() => {
+		const transitionButtons = allowedTransitions.map((targetState: UpdateStateDefinition) => (
+			<Tooltip
+				placement="left"
+				title={tUpdate('transition_to', { state: targetState.label, description: targetState.description })}
+				key={targetState.id}>
+				<FloatButton
+					icon={
+						renderIcon(targetState.icon, { color: targetState.color }) || (
+							<SwapOutlined style={{ color: targetState.color }} />
+						)
+					}
+					onClick={() => {
+						if (updateId) {
+							modifyUpdateState({ id: updateId, body: { state: targetState.name } });
+						}
+					}}
+				/>
+			</Tooltip>
+		));
+
 		return (
 			<Group trigger="click" type="primary" icon={<MoreOutlined />} closeIcon={<CloseOutlined />}>
-				<Tooltip placement="left" title={t('help_approve')}>
-					<FloatButton
-						icon={<CheckCircleOutlined style={{ color: 'green' }} />}
-						key="ack"
-						onClick={() => onClickState(UpdateState.APPROVED)}
-					/>
-				</Tooltip>
-				<Tooltip placement="left" title={t('help_ignore')}>
-					<FloatButton
-						icon={<StopOutlined style={{ color: 'orange' }} />}
-						onClick={() => onClickState(UpdateState.IGNORED)}
-					/>
-				</Tooltip>
-				<Tooltip placement="left" title={t('help_pending')}>
-					<FloatButton
-						icon={<InteractionOutlined style={{ color: 'blue' }} />}
-						onClick={() => onClickState(UpdateState.PENDING)}
-					/>
-				</Tooltip>
+				{transitionButtons}
 			</Group>
 		);
-	}, [onClickState, t]);
+	}, [allowedTransitions, tUpdate, updateId, modifyUpdateState]);
 
 	return (
 		<>

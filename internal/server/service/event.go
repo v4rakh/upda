@@ -14,13 +14,30 @@ import (
 )
 
 type EventService struct {
-	repo repository.EventRepository
+	repo                   repository.EventRepository
+	stateDefinitionService *UpdateStateDefinitionService
 }
 
-func NewEventService(r repository.EventRepository) *EventService {
+func NewEventService(r repository.EventRepository, stateDefinitionService *UpdateStateDefinitionService) *EventService {
 	return &EventService{
-		repo: r,
+		repo:                   r,
+		stateDefinitionService: stateDefinitionService,
 	}
+}
+
+// resolveStateLabel looks up the label for a state name. Returns the name itself as fallback.
+func (s *EventService) resolveStateLabel(stateName string) string {
+	if stateName == "" {
+		return ""
+	}
+	if s.stateDefinitionService == nil {
+		return stateName
+	}
+	def, err := s.stateDefinitionService.GetByName(stateName)
+	if err != nil || def == nil {
+		return stateName
+	}
+	return def.Label
 }
 
 func (s *EventService) CreateUpdateCreated(e *model.Update) *model.Event {
@@ -35,6 +52,7 @@ func (s *EventService) CreateUpdateCreated(e *model.Update) *model.Event {
 		Host:        e.Host,
 		Version:     e.Version,
 		State:       e.State,
+		StateLabel:  s.resolveStateLabel(e.State),
 	})
 
 	return nil
@@ -56,14 +74,16 @@ func (s *EventService) CreateUpdateUpdated(old *model.Update, new *model.Update)
 	}
 
 	s.CreateWithWarnOnly(eventName, &api.EventPayloadUpdateUpdatedDto{
-		ID:           new.ID.String(),
-		Application:  new.Application,
-		Provider:     new.Provider,
-		Host:         new.Host,
-		VersionPrior: old.Version,
-		Version:      new.Version,
-		StatePrior:   old.State,
-		State:        new.State,
+		ID:              new.ID.String(),
+		Application:     new.Application,
+		Provider:        new.Provider,
+		Host:            new.Host,
+		VersionPrior:    old.Version,
+		Version:         new.Version,
+		StatePrior:      old.State,
+		StatePriorLabel: s.resolveStateLabel(old.State),
+		State:           new.State,
+		StateLabel:      s.resolveStateLabel(new.State),
 	})
 
 	return nil
@@ -80,6 +100,7 @@ func (s *EventService) CreateUpdateDeleted(e *model.Update) *model.Event {
 		Host:        e.Host,
 		Version:     e.Version,
 		State:       e.State,
+		StateLabel:  s.resolveStateLabel(e.State),
 	})
 
 	return nil
@@ -208,31 +229,31 @@ func (s *EventService) ExtractPayloadInfo(event *model.Event) (*dto.EventPayload
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateCreatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
-		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
+		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel}, nil
 	case constant.EventNameUpdateDeleted.String():
 		var p api.EventPayloadUpdateDeletedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateDeletedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
-		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
+		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel}, nil
 	case constant.EventNameUpdateUpdatedState.String():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
-		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
+		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel}, nil
 	case constant.EventNameUpdateUpdatedVersion.String():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
-		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
+		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel}, nil
 	case constant.EventNameUpdateUpdated.String():
 		var p api.EventPayloadUpdateUpdatedDto
 		if p, err = json.UnmarshalGenericJSON[api.EventPayloadUpdateUpdatedDto](bytes); err != nil {
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
-		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State}, nil
+		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel}, nil
 	}
 
 	return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, errors.New("no matching event found"))

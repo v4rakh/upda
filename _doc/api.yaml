@@ -31,6 +31,10 @@ tags:
     description: Application related endpoints
   - name: auth
     description: Application authorization related endpoints
+  - name: update-state-definitions
+    description: Update state definitions endpoints
+  - name: update-state-transitions
+    description: Update state transitions endpoints
 paths:
   '/v1/info':
     get:
@@ -110,16 +114,12 @@ paths:
               - updated_at
         - name: state
           in: query
-          description: the state (list, added with &state=...&state=...
+          description: the state name (from update-state-definitions, list via &state=...&state=...)
           required: false
           schema:
             type: array
             items:
               type: string
-              enum:
-                - pending
-                - ignored
-                - approved
         - name: searchTerm
           in: query
           description: the search term
@@ -2852,6 +2852,467 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /v1/update-state-definitions:
+    get:
+      tags:
+        - update-state-definitions
+      security:
+        - basicAuth: [ ]
+      summary: Finds update state definitions
+      description: Finds update state definitions
+      operationId: findUpdateStateDefinitions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateDefinitionPageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - update-state-definitions
+      security:
+        - basicAuth: [ ]
+      summary: Creates update state definition
+      description: Creates update state definition
+      operationId: createUpdateStateDefinition
+      requestBody:
+        description: Creates an update state definition
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateStateDefinitionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateDefinitionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v1/update-state-definitions/{id}':
+    get:
+      tags:
+        - update-state-definitions
+      security:
+        - basicAuth: [ ]
+      summary: Finds an update state definition by ID
+      description: Finds an update state definition by ID
+      operationId: findUpdateStateDefinitionById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateDefinitionSingleResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - update-state-definitions
+      security:
+        - basicAuth: [ ]
+      summary: Updates an update state definition by ID
+      description: Updates an update state definition by ID
+      operationId: updateUpdateStateDefinitionById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updates an update state definition
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyUpdateStateDefinitionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateDefinitionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - update-state-definitions
+      security:
+        - basicAuth: [ ]
+      summary: Deletes an update state definition by ID
+      description: Deletes an update state definition by ID
+      operationId: deleteUpdateStateDefinitionById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/update-state-definitions/reorder:
+    patch:
+      tags:
+        - update-state-definitions
+      security:
+        - basicAuth: [ ]
+      summary: Reorders update state definitions
+      description: Reorders update state definitions by updating their sort orders
+      operationId: reorderUpdateStateDefinitions
+      requestBody:
+        description: List of state definitions with new sort orders
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderUpdateStateDefinitionsRequest'
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/update-state-transitions:
+    get:
+      tags:
+        - update-state-transitions
+      security:
+        - basicAuth: [ ]
+      summary: Finds update state transitions
+      description: Finds update state transitions
+      operationId: findUpdateStateTransitions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateTransitionPageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - update-state-transitions
+      security:
+        - basicAuth: [ ]
+      summary: Creates update state transition
+      description: Creates update state transition
+      operationId: createUpdateStateTransition
+      requestBody:
+        description: Creates an update state transition
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpdateStateTransitionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateTransitionSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v1/update-state-transitions/from/{stateId}':
+    get:
+      tags:
+        - update-state-transitions
+      security:
+        - basicAuth: [ ]
+      summary: Finds update state transitions by from state ID
+      description: Finds update state transitions by from state ID
+      operationId: findUpdateStateTransitionsByFromStateId
+      parameters:
+        - name: stateId
+          in: path
+          description: the from state id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStateTransitionPageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v1/update-state-transitions/{id}':
+    delete:
+      tags:
+        - update-state-transitions
+      security:
+        - basicAuth: [ ]
+      summary: Deletes an update state transition by ID
+      description: Deletes an update state transition by ID
+      operationId: deleteUpdateStateTransitionById
+      parameters:
+        - name: id
+          in: path
+          description: the id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful operation
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   securitySchemes:
     basicAuth:
@@ -2908,10 +3369,7 @@ components:
           type: string
         state:
           type: string
-          enum:
-            - pending
-            - approved
-            - ignored
+          description: state name from update-state-definitions
         createdAt:
           type: string
         updatedAt:
@@ -3131,10 +3589,7 @@ components:
           type: string
         state:
           type: string
-          enum:
-            - pending
-            - approved
-            - ignored
+          description: state name from update-state-definitions
     EventPayloadUpdateUpdatedResponse:
       type: object
       properties:
@@ -3152,16 +3607,10 @@ components:
           type: string
         statePrior:
           type: string
-          enum:
-            - pending
-            - approved
-            - ignored
+          description: prior state name from update-state-definitions
         state:
           type: string
-          enum:
-            - pending
-            - approved
-            - ignored
+          description: state name from update-state-definitions
     EventPayloadUpdateDeletedResponse:
       type: object
       properties:
@@ -3175,10 +3624,7 @@ components:
           type: string
         state:
           type: string
-          enum:
-            - pending
-            - approved
-            - ignored
+          description: state name from update-state-definitions
     ActionResponse:
       type: object
       properties:
@@ -3434,10 +3880,7 @@ components:
       properties:
         state:
           type: string
-          enum:
-            - pending
-            - approved
-            - ignored
+          description: state name from update-state-definitions
     ModifyWebhookLabelRequest:
       type: object
       required:
@@ -3724,3 +4167,162 @@ components:
       properties:
         enabled:
           type: boolean
+    UpdateStateDefinitionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        label:
+          type: string
+        color:
+          type: string
+        icon:
+          type: string
+        description:
+          type: string
+          nullable: true
+        isInitial:
+          type: boolean
+        skipOnNewVersion:
+          type: boolean
+          description: when true, updates in this state skip processing new versions
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    UpdateStateDefinitionSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/UpdateStateDefinitionResponse'
+    UpdateStateDefinitionPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateStateDefinitionResponse'
+    CreateUpdateStateDefinitionRequest:
+      type: object
+      required:
+        - name
+        - label
+        - color
+        - icon
+        - isInitial
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        color:
+          type: string
+        icon:
+          type: string
+        description:
+          type: string
+          nullable: true
+        isInitial:
+          type: boolean
+        skipOnNewVersion:
+          type: boolean
+          description: when true, updates in this state skip processing new versions
+    ReorderUpdateStateDefinitionItem:
+      type: object
+      required:
+        - id
+        - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+        sortOrder:
+          type: integer
+          minimum: 0
+    ReorderUpdateStateDefinitionsRequest:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ReorderUpdateStateDefinitionItem'
+    ModifyUpdateStateDefinitionRequest:
+      type: object
+      required:
+        - name
+        - label
+        - color
+        - icon
+        - isInitial
+        - sortOrder
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        color:
+          type: string
+        icon:
+          type: string
+        description:
+          type: string
+          nullable: true
+        isInitial:
+          type: boolean
+        skipOnNewVersion:
+          type: boolean
+          description: when true, updates in this state skip processing new versions
+        sortOrder:
+          type: integer
+    UpdateStateTransitionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        fromState:
+          $ref: '#/components/schemas/UpdateStateDefinitionResponse'
+        toState:
+          $ref: '#/components/schemas/UpdateStateDefinitionResponse'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+    UpdateStateTransitionSingleResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/UpdateStateTransitionResponse'
+    UpdateStateTransitionPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/UpdateStateTransitionResponse'
+    CreateUpdateStateTransitionRequest:
+      type: object
+      required:
+        - fromStateId
+        - toStateId
+      properties:
+        fromStateId:
+          type: string
+        toStateId:
+          type: string

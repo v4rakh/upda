@@ -1,10 +1,11 @@
+import { useGetUpdateStateDefinitionsQuery } from '../../api/updateStateDefinitionsApi';
 import CreateFilterPreset from '../../components/filter-presets/CreateFilterPreset';
 import FilterResetButton from '../../components/filter-presets/FilterResetButton';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
 import UpdateOrder from '../../constants/api/updateOrder';
 import UpdateOrderBy from '../../constants/api/updateOrderBy';
 import UpdateSearchIn from '../../constants/api/updateSearchIn';
-import { UpdateState } from '../../types';
+import { UpdateStateValue } from '../../types';
 import { FilterPresetType } from '../../types/filterPreset';
 import useUpdatesFilterQueryParams from '../../use/useUpdatesFilterQueryParams';
 import useUpdateFiltersActive from '../../use/useUpdatesFiltersActive';
@@ -31,6 +32,9 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 	const [queryParams, setSearchQueryParams] = useSearchParams();
 	const { searchTerm, searchIn, orderBy, order, state } = useUpdatesFilterQueryParams();
 	const { filtersActive } = useUpdateFiltersActive();
+
+	const { data: stateDefinitionsData } = useGetUpdateStateDefinitionsQuery();
+	const stateDefinitions = stateDefinitionsData?.data?.content;
 
 	useEffect(() => {
 		form.setFieldsValue({
@@ -67,7 +71,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 	);
 
 	const onFilterStateChange = useCallback(
-		(values: UpdateState[] | undefined) => {
+		(values: UpdateStateValue[] | undefined) => {
 			const all = queryParams.getAll(UpdateFilterQueryParamNames.STATE);
 			forEach(all, (v) => {
 				queryParams.delete(UpdateFilterQueryParamNames.STATE, v);
@@ -81,6 +85,16 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 		},
 		[queryParams, setSearchQueryParams]
 	);
+
+	const stateFilterOptions = useMemo(() => {
+		if (!stateDefinitions) {
+			return [];
+		}
+		return stateDefinitions.map((stateDef) => ({
+			value: stateDef.name,
+			label: stateDef.label
+		}));
+	}, [stateDefinitions]);
 
 	const onOrderByChange = useCallback(
 		(value: UpdateOrderBy | undefined) => {
@@ -182,20 +196,7 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 										placeholder={t('state_placeholder')}
 										style={{ width: '100%', minWidth: 200 }}
 										onChange={onFilterStateChange}
-										options={[
-											{
-												value: UpdateState.PENDING,
-												label: t(`state_${UpdateState.PENDING.toLowerCase()}`)
-											},
-											{
-												value: UpdateState.IGNORED,
-												label: t(`state_${UpdateState.IGNORED.toLowerCase()}`)
-											},
-											{
-												value: UpdateState.APPROVED,
-												label: t(`state_${UpdateState.APPROVED.toLowerCase()}`)
-											}
-										]}
+										options={stateFilterOptions}
 									/>
 								</Form.Item>
 								<Form.Item label={t('order_by')} name="orderBy" tooltip={t('order_by_help')}>

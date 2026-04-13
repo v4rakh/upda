@@ -96,6 +96,8 @@ func (s *Server) Start() {
 	actionInvocationRepo := repository.NewActionInvocationDbRepo(db)
 	filterPresetRepo := repository.NewFilterPresetDbRepo(db)
 	commentRepo := repository.NewCommentDbRepo(db)
+	updateStateDefinitionRepo := repository.NewUpdateStateDefinitionDbRepo(db)
+	updateStateTransitionRepo := repository.NewUpdateStateTransitionDbRepo(db)
 
 	// services init
 	lockService := service.NewLockMemService()
@@ -111,8 +113,10 @@ func (s *Server) Start() {
 		log.Fatal().Msgf("Task service creation failed: %v", err)
 	}
 
-	eventService := service.NewEventService(eventRepo)
-	updateService := service.NewUpdateService(updateRepo, eventService)
+	updateStateDefinitionService := service.NewUpdateStateDefinitionService(updateStateDefinitionRepo, updateRepo)
+	updateStateTransitionService := service.NewUpdateStateTransitionService(updateStateTransitionRepo, updateStateDefinitionRepo)
+	eventService := service.NewEventService(eventRepo, updateStateDefinitionService)
+	updateService := service.NewUpdateService(updateRepo, eventService, updateStateDefinitionService, updateStateTransitionService)
 	webhookService := service.NewWebhookService(webhookRepo, cfg.Webhook)
 	webhookInvocationService := service.NewWebhookInvocationService(webhookService, updateService, cfg.Webhook)
 	secretService := service.NewSecretService(secretRepo)
@@ -123,10 +127,6 @@ func (s *Server) Start() {
 	commentService := service.NewCommentService(commentRepo)
 
 	// tasks init
-	updatesCleanTask := service.NewUpdatesCleanTask(updateService, taskService, cfg.Task)
-	if err = updatesCleanTask.Init(); err != nil {
-		log.Fatal().Msgf("Task updates clean initialization failed: %v", err)
-	}
 	eventsCleanTask := service.NewEventsCleanTask(eventService, taskService, cfg.Task)
 	if err = eventsCleanTask.Init(); err != nil {
 		log.Fatal().Msgf("Task events clean initialization failed: %v", err)
@@ -143,7 +143,7 @@ func (s *Server) Start() {
 	if err = actionsInvokeTask.Init(); err != nil {
 		log.Fatal().Msgf("Task actions invoke initialization failed: %v", err)
 	}
-	prometheusTask := service.NewPrometheusTask(updateService, eventService, webhookService, actionService, prometheusService, taskService, cfg.Prometheus)
+	prometheusTask := service.NewPrometheusTask(updateService, updateStateDefinitionService, eventService, webhookService, actionService, prometheusService, taskService, cfg.Prometheus)
 	if err = prometheusTask.Init(); err != nil {
 		log.Fatal().Msgf("Task prometheus task initialization failed: %v", err)
 	}
@@ -161,6 +161,8 @@ func (s *Server) Start() {
 	actionInvocationHandler := handler.NewActionInvocationHandler(actionService, actionInvocationService)
 	filterPresetHandler := handler.NewFilterPresetHandler(filterPresetService)
 	commentHandler := handler.NewCommentHandler(updateService, commentService)
+	updateStateDefinitionHandler := handler.NewUpdateStateDefinitionHandler(updateStateDefinitionService)
+	updateStateTransitionHandler := handler.NewUpdateStateTransitionHandler(updateStateTransitionService)
 
 	infoHandler := handler.NewInfoHandler(cfg.App)
 	healthHandler := handler.NewHealthHandler()
@@ -291,6 +293,18 @@ func (s *Server) Start() {
 	apiProtectedGroup.POST("/comments/:updateId", middlewareEnforceJsonContentType(), commentHandler.Create)
 	apiProtectedGroup.PATCH("/comments/:id/content", middlewareEnforceJsonContentType(), commentHandler.UpdateContent)
 	apiProtectedGroup.DELETE("/comments/:id", commentHandler.Delete)
+
+	apiProtectedGroup.GET("/update-state-definitions", updateStateDefinitionHandler.GetAll)
+	apiProtectedGroup.GET("/update-state-definitions/:id", updateStateDefinitionHandler.Get)
+	apiProtectedGroup.POST("/update-state-definitions", middlewareEnforceJsonContentType(), updateStateDefinitionHandler.Create)
+	apiProtectedGroup.PUT("/update-state-definitions/:id", middlewareEnforceJsonContentType(), updateStateDefinitionHandler.Update)
+	apiProtectedGroup.DELETE("/update-state-definitions/:id", updateStateDefinitionHandler.Delete)
+	apiProtectedGroup.PATCH("/update-state-definitions/reorder", middlewareEnforceJsonContentType(), updateStateDefinitionHandler.Reorder)
+
+	apiProtectedGroup.GET("/update-state-transitions", updateStateTransitionHandler.GetAll)
+	apiProtectedGroup.GET("/update-state-transitions/from/:stateId", updateStateTransitionHandler.GetByFromStateId)
+	apiProtectedGroup.POST("/update-state-transitions", middlewareEnforceJsonContentType(), updateStateTransitionHandler.Create)
+	apiProtectedGroup.DELETE("/update-state-transitions/:id", updateStateTransitionHandler.Delete)
 
 	// start servers (run in separate goroutines)
 	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port))

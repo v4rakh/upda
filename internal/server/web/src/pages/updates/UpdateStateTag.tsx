@@ -1,16 +1,30 @@
-import { UpdateState } from '../../types';
-import { getUpdateStateColor } from '../../utils/updateHelper';
+import { useGetUpdateStateDefinitionsQuery } from '../../api/updateStateDefinitionsApi';
+import { UpdateStateValue } from '../../types';
+import { renderIcon } from '../../utils/iconHelper';
+import {
+	getUpdateStateColorFromDefinitions,
+	getUpdateStateIconFromDefinitions,
+	getUpdateStateLabelFromDefinitions
+} from '../../utils/updateHelper';
 import { Tag } from 'antd';
 import { FC, ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export interface UpdateStateProps {
-	state: UpdateState;
+	state: UpdateStateValue;
 }
 
 const UpdateStateTag: FC<UpdateStateProps> = ({ state }): ReactNode => {
-	const [t] = useTranslation('update_state_tag');
+	const { data: statesData } = useGetUpdateStateDefinitionsQuery();
+	const definitions = statesData?.data?.content;
 
-	return <Tag color={getUpdateStateColor(state)}>{t(`state_${state.toLocaleLowerCase()}`)}</Tag>;
+	const color = getUpdateStateColorFromDefinitions(state, definitions);
+	const label = getUpdateStateLabelFromDefinitions(state, definitions);
+	const icon = getUpdateStateIconFromDefinitions(state, definitions);
+
+	return (
+		<Tag color={color} icon={renderIcon(icon, { marginRight: 4 })}>
+			{label}
+		</Tag>
+	);
 };
 export default UpdateStateTag;

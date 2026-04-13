@@ -7,7 +7,9 @@ enum AppPaths {
 	CONSTANTS = 'constants',
 	ACTIONS = 'actions',
 	ACTION_INVOCATIONS = 'action-invocations',
-	EVENTS = 'events'
+	EVENTS = 'events',
+	STATE_DEFINITIONS = 'state-definitions',
+	STATE_TRANSITIONS = 'state-transitions'
 }
 
 export default AppPaths;

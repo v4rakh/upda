@@ -19,6 +19,10 @@ var (
 	ErrResourceConflict                = NewServiceError(ErrCodeConflict, errors.New("resource already exists"))
 	ErrDatabaseRowsExpected            = NewServiceDatabaseError(errors.New("action failed, expected affected rows, but got none"))
 	ErrUnauthorized                    = NewServiceError(ErrCodeUnauthorized, errors.New("unauthorized"))
+	ErrStateTransitionNotAllowed       = NewServiceError(ErrCodeIllegalArgument, errors.New("state transition not allowed"))
+	ErrStateNotFound                   = NewServiceError(ErrCodeIllegalArgument, errors.New("state not found"))
+	ErrStateInUse                      = NewServiceError(ErrCodeConflict, errors.New("state is in use by updates and cannot be deleted"))
+	ErrInitialStateRequired            = NewServiceError(ErrCodeIllegalArgument, errors.New("at least one initial state is required"))
 )
 
 type ErrorCode string

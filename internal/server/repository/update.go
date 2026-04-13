@@ -5,7 +5,6 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
-	"time"
 )
 
 type UpdateRepository interface {
@@ -18,7 +17,6 @@ type UpdateRepository interface {
 	Update(id string, version string, metadata interface{}) (*model.Update, error)
 	UpdateState(id string, state string) (*model.Update, error)
 	Delete(id string) (int64, error)
-	DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...string) (int64, error)
 }
 
 type UpdateDbRepo struct {
@@ -179,19 +177,6 @@ func (r *UpdateDbRepo) Delete(id string) (int64, error) {
 	if res = r.db.Delete(&model.Update{}, "id = ?", id); res.Error != nil {
 		return 0, service_error.NewServiceDatabaseError(res.Error)
 	}
-	return res.RowsAffected, nil
-}
-
-func (r *UpdateDbRepo) DeleteByUpdatedAtBeforeAndStates(time time.Time, state ...string) (int64, error) {
-	if len(state) == 0 {
-		return 0, service_error.ErrValidationNotEmpty
-	}
-
-	var res *gorm.DB
-	if res = r.db.Where("state IN ?", state).Where("updated_at < ?", time).Delete(&model.Update{}); res.Error != nil {
-		return 0, service_error.NewServiceDatabaseError(res.Error)
-	}
-
 	return res.RowsAffected, nil
 }
 

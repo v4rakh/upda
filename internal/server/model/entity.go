@@ -257,3 +257,41 @@ type Comment struct {
 	Update    Update    `gorm:"foreignKey:UpdateID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	UpdateID  string    `gorm:"not null"`
 }
+
+// BeforeCreate creates a new UUID
+func (e *UpdateStateDefinition) BeforeCreate(tx *gorm.DB) (err error) {
+	e.ID = uuid.New()
+	return
+}
+
+// UpdateStateDefinition entity holding information for update state definitions
+type UpdateStateDefinition struct {
+	ID               uuid.UUID `gorm:"type:uuid;primary_key;unique;not null"`
+	Name             string    `gorm:"unique;not null"`
+	Label            string    `gorm:"not null"`
+	Color            string    `gorm:"not null;default:gray"`
+	Icon             string    `gorm:"not null;default:TagOutlined"`
+	Description      *string
+	IsInitial        bool      `gorm:"not null;default:false"`
+	SkipOnNewVersion bool      `gorm:"not null;default:false"`
+	SortOrder        int       `gorm:"not null;default:0"`
+	CreatedAt        time.Time `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt        time.Time `gorm:"time;autoUpdateTime;not null"`
+}
+
+// BeforeCreate creates a new UUID
+func (e *UpdateStateTransition) BeforeCreate(tx *gorm.DB) (err error) {
+	e.ID = uuid.New()
+	return
+}
+
+// UpdateStateTransition entity holding information for update state transitions
+type UpdateStateTransition struct {
+	ID          uuid.UUID             `gorm:"type:uuid;primary_key;unique;not null"`
+	FromStateID string                `gorm:"not null"`
+	FromState   UpdateStateDefinition `gorm:"foreignKey:FromStateID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	ToStateID   string                `gorm:"not null"`
+	ToState     UpdateStateDefinition `gorm:"foreignKey:ToStateID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedAt   time.Time             `gorm:"time;autoCreateTime;not null"`
+	UpdatedAt   time.Time             `gorm:"time;autoUpdateTime;not null"`
+}

@@ -20,9 +20,6 @@ type ConfigAuthSessionProvider string
 // ENUM(lax, strict)
 type ConfigAuthSessionSameSite string
 
-// ENUM(pending, approved, ignored)
-type UpdateState string
-
 // ENUM(generic, diun)
 type WebhookType string
 

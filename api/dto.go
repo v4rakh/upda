@@ -9,7 +9,7 @@ import (
 // json/body
 
 type ModifyUpdateStateRequest struct {
-	State string `json:"state" binding:"required,oneof=pending approved ignored"`
+	State string `json:"state" binding:"required,min=1,max=50"`
 }
 
 type ModifyWebhookLabelRequest struct {
@@ -399,17 +399,20 @@ type EventPayloadUpdateCreatedDto struct {
 	Host        string `json:"host,omitempty"`
 	Version     string `json:"version,omitempty"`
 	State       string `json:"state,omitempty"`
+	StateLabel  string `json:"stateLabel,omitempty"`
 }
 
 type EventPayloadUpdateUpdatedDto struct {
-	ID           string `json:"id,omitempty"`
-	Application  string `json:"application,omitempty"`
-	Provider     string `json:"provider,omitempty"`
-	Host         string `json:"host,omitempty"`
-	VersionPrior string `json:"versionPrior,omitempty"`
-	Version      string `json:"version,omitempty"`
-	StatePrior   string `json:"statePrior,omitempty"`
-	State        string `json:"state,omitempty"`
+	ID              string `json:"id,omitempty"`
+	Application     string `json:"application,omitempty"`
+	Provider        string `json:"provider,omitempty"`
+	Host            string `json:"host,omitempty"`
+	VersionPrior    string `json:"versionPrior,omitempty"`
+	Version         string `json:"version,omitempty"`
+	StatePrior      string `json:"statePrior,omitempty"`
+	StatePriorLabel string `json:"statePriorLabel,omitempty"`
+	State           string `json:"state,omitempty"`
+	StateLabel      string `json:"stateLabel,omitempty"`
 }
 
 type EventPayloadUpdateDeletedDto struct {
@@ -418,6 +421,7 @@ type EventPayloadUpdateDeletedDto struct {
 	Host        string `json:"host,omitempty"`
 	Version     string `json:"version,omitempty"`
 	State       string `json:"state,omitempty"`
+	StateLabel  string `json:"stateLabel,omitempty"`
 }
 
 func NewEventWindowResponse(content []*EventResponse, size int, skip int, orderBy string, order string, hasNext bool) *EventWindowResponse {
@@ -708,5 +712,132 @@ func NewCommentPageResponse(content []*CommentResponse, page int, pageSize int, 
 	e.PageSize = pageSize
 	e.TotalElements = totalElements
 	e.TotalPages = totalPages
+	return e
+}
+
+// Update State Definition DTOs
+
+type CreateUpdateStateDefinitionRequest struct {
+	Name             string  `json:"name" binding:"required,min=1,max=50,alphanum"`
+	Label            string  `json:"label" binding:"required,min=1,max=100"`
+	Color            string  `json:"color" binding:"required,min=1,max=50"`
+	Icon             string  `json:"icon" binding:"required,min=1,max=100"`
+	Description      *string `json:"description"`
+	IsInitial        bool    `json:"isInitial"`
+	SkipOnNewVersion bool    `json:"skipOnNewVersion"`
+}
+
+type ModifyUpdateStateDefinitionRequest struct {
+	Name             string  `json:"name" binding:"required,min=1,max=50,alphanum"`
+	Label            string  `json:"label" binding:"required,min=1,max=100"`
+	Color            string  `json:"color" binding:"required,min=1,max=50"`
+	Icon             string  `json:"icon" binding:"required,min=1,max=100"`
+	Description      *string `json:"description"`
+	IsInitial        bool    `json:"isInitial"`
+	SkipOnNewVersion bool    `json:"skipOnNewVersion"`
+	SortOrder        int     `json:"sortOrder"`
+}
+
+type ReorderUpdateStateDefinitionItem struct {
+	ID        string `json:"id" binding:"required,uuid4"`
+	SortOrder int    `json:"sortOrder" binding:"min=0"`
+}
+
+type ReorderUpdateStateDefinitionsRequest struct {
+	Items []ReorderUpdateStateDefinitionItem `json:"items" binding:"required,min=1,dive"`
+}
+
+type UpdateStateDefinitionResponse struct {
+	ID               string    `json:"id"`
+	Name             string    `json:"name"`
+	Label            string    `json:"label"`
+	Color            string    `json:"color"`
+	Icon             string    `json:"icon"`
+	Description      *string   `json:"description,omitempty"`
+	IsInitial        bool      `json:"isInitial"`
+	SkipOnNewVersion bool      `json:"skipOnNewVersion"`
+	SortOrder        int       `json:"sortOrder"`
+	CreatedAt        time.Time `json:"createdAt"`
+	UpdatedAt        time.Time `json:"updatedAt"`
+}
+
+type UpdateStateDefinitionSingleResponse struct {
+	Data UpdateStateDefinitionResponse `json:"data"`
+}
+
+func NewUpdateStateDefinitionSingleResponse(id string, name string, label string, color string, icon string, description *string, isInitial bool, skipOnNewVersion bool, sortOrder int, createdAt time.Time, updatedAt time.Time) *UpdateStateDefinitionSingleResponse {
+	e := new(UpdateStateDefinitionSingleResponse)
+	e.Data.ID = id
+	e.Data.Name = name
+	e.Data.Label = label
+	e.Data.Color = color
+	e.Data.Icon = icon
+	e.Data.Description = description
+	e.Data.IsInitial = isInitial
+	e.Data.SkipOnNewVersion = skipOnNewVersion
+	e.Data.SortOrder = sortOrder
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type UpdateStateDefinitionPageResponse struct {
+	Content []*UpdateStateDefinitionResponse `json:"content"`
+}
+
+type UpdateStateDefinitionDataPageResponse struct {
+	Data *UpdateStateDefinitionPageResponse `json:"data"`
+}
+
+func NewUpdateStateDefinitionPageResponse(content []*UpdateStateDefinitionResponse) *UpdateStateDefinitionPageResponse {
+	e := new(UpdateStateDefinitionPageResponse)
+	e.Content = content
+	return e
+}
+
+// Update State Transition DTOs
+
+type CreateUpdateStateTransitionRequest struct {
+	FromStateId string `json:"fromStateId" binding:"required,uuid4"`
+	ToStateId   string `json:"toStateId" binding:"required,uuid4"`
+}
+
+type StateIdUriRequest struct {
+	StateID string `uri:"stateId" binding:"required,uuid4"`
+}
+
+type UpdateStateTransitionResponse struct {
+	ID        string                        `json:"id"`
+	FromState UpdateStateDefinitionResponse `json:"fromState"`
+	ToState   UpdateStateDefinitionResponse `json:"toState"`
+	CreatedAt time.Time                     `json:"createdAt"`
+	UpdatedAt time.Time                     `json:"updatedAt"`
+}
+
+type UpdateStateTransitionSingleResponse struct {
+	Data UpdateStateTransitionResponse `json:"data"`
+}
+
+func NewUpdateStateTransitionSingleResponse(id string, fromState UpdateStateDefinitionResponse, toState UpdateStateDefinitionResponse, createdAt time.Time, updatedAt time.Time) *UpdateStateTransitionSingleResponse {
+	e := new(UpdateStateTransitionSingleResponse)
+	e.Data.ID = id
+	e.Data.FromState = fromState
+	e.Data.ToState = toState
+	e.Data.CreatedAt = createdAt
+	e.Data.UpdatedAt = updatedAt
+	return e
+}
+
+type UpdateStateTransitionPageResponse struct {
+	Content []*UpdateStateTransitionResponse `json:"content"`
+}
+
+type UpdateStateTransitionDataPageResponse struct {
+	Data *UpdateStateTransitionPageResponse `json:"data"`
+}
+
+func NewUpdateStateTransitionPageResponse(content []*UpdateStateTransitionResponse) *UpdateStateTransitionPageResponse {
+	e := new(UpdateStateTransitionPageResponse)
+	e.Content = content
 	return e
 }

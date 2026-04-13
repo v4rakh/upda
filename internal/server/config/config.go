@@ -134,11 +134,6 @@ type Auth struct {
 }
 
 type Task struct {
-	UpdateCleanStaleEnabled  bool          `env:"TASK_UPDATE_CLEAN_STALE_ENABLED,default=false"`
-	UpdateCleanStaleInterval time.Duration `env:"TASK_EVENT_CLEAN_STALE_INTERVAL,default=1h" validate:"required_if=UpdateCleanStaleEnabled true,gt=0"`
-	UpdateCleanStaleMaxAge   time.Duration `env:"TASK_UPDATE_CLEAN_STALE_MAX_AGE,default=720h" validate:"required_if=UpdateCleanStaleEnabled true,gt=0"`
-	UpdateCleanStaleStates   []string      `env:"TASK_UPDATE_CLEAN_STALE_STATES,default=ignored,approved"`
-
 	EventCleanStaleEnabled  bool          `env:"TASK_EVENT_CLEAN_STALE_ENABLED,default=false"`
 	EventCleanStaleInterval time.Duration `env:"TASK_EVENT_CLEAN_STALE_INTERVAL,default=8h" validate:"required_if=EventCleanStaleEnabled true,gt=0"`
 	EventCleanStaleMaxAge   time.Duration `env:"TASK_EVENT_CLEAN_STALE_MAX_AGE,default=2190h" validate:"required_if=EventCleanStaleEnabled true,gt=0"`

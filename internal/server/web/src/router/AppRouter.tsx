@@ -12,6 +12,9 @@ import EventsPage from '../pages/events/EventsPage';
 import Home from '../pages/home/Home';
 import SessionLogin from '../pages/login/SessionLogin';
 import SecretsPage from '../pages/secrets/SecretsPage';
+import StateDefinitionSinglePage from '../pages/state-definitions/StateDefinitionSinglePage';
+import StateDefinitionsPage from '../pages/state-definitions/StateDefinitionsPage';
+import StateTransitionsPage from '../pages/state-transitions/StateTransitionsPage';
 import UpdateSinglePage from '../pages/updates/UpdateSinglePage';
 import UpdatesPage from '../pages/updates/UpdatesPage';
 import WebhooksPage from '../pages/webhooks/WebhooksPage';
@@ -88,6 +91,30 @@ const AppRouter = () => {
 					element={
 						<RequireAuth>
 							<EventsPage />
+						</RequireAuth>
+					}
+				/>
+				<Route
+					path={AppPaths.STATE_DEFINITIONS}
+					element={
+						<RequireAuth>
+							<StateDefinitionsPage />
+						</RequireAuth>
+					}
+				/>
+				<Route
+					path={`${AppPaths.STATE_DEFINITIONS}/:${AppPathParamNames.STATE_DEFINITION_ID}`}
+					element={
+						<RequireAuth>
+							<StateDefinitionSinglePage />
+						</RequireAuth>
+					}
+				/>
+				<Route
+					path={AppPaths.STATE_TRANSITIONS}
+					element={
+						<RequireAuth>
+							<StateTransitionsPage />
 						</RequireAuth>
 					}
 				/>
