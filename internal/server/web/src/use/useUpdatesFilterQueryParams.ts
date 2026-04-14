@@ -1,7 +1,7 @@
 import UpdateFilterQueryParamNames from '../constants/api/updateFilterQueryParamNames';
 import {
-	CARD_PAGE_DEFAULT,
-	CARD_PAGE_SIZE_DEFAULT,
+	UPDATES_CARD_PAGE_DEFAULT,
+	UPDATES_CARD_PAGE_SIZE_DEFAULT,
 	TABLE_PAGE_DEFAULT,
 	TABLE_PAGE_SIZE_DEFAULT
 } from '../constants/pagination';
@@ -30,10 +30,10 @@ const useUpdatesFilterQueryParams = (): UseUpdatesFilterQueryParams => {
 		order: replaceNullValue(queryParams.get(UpdateFilterQueryParamNames.ORDER)),
 		page: queryParams.get(UpdateFilterQueryParamNames.PAGE)
 			? parseInt(queryParams.get(UpdateFilterQueryParamNames.PAGE) as string)
-			: CARD_PAGE_DEFAULT,
+			: UPDATES_CARD_PAGE_DEFAULT,
 		pageSize: queryParams.get(UpdateFilterQueryParamNames.PAGE_SIZE)
 			? parseInt(queryParams.get(UpdateFilterQueryParamNames.PAGE_SIZE) as string)
-			: CARD_PAGE_SIZE_DEFAULT
+			: UPDATES_CARD_PAGE_SIZE_DEFAULT
 	};
 };
 

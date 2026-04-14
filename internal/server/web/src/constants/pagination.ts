@@ -1,6 +1,10 @@
-export const CARD_PAGE_SIZE_DEFAULT = 8;
-export const CARD_PAGE_DEFAULT = 1;
-export const CARD_PAGE_DEFAULT_OPTIONS = ['4', '8', '16', '32', '64', '128', '256', '512'];
+export const UPDATES_CARD_PAGE_SIZE_DEFAULT = 8;
+export const UPDATES_CARD_PAGE_DEFAULT = 1;
+export const UPDATES_CARD_PAGE_DEFAULT_OPTIONS = ['4', '8', '16', '32', '64', '128', '256', '512'];
+
+export const WEBHOOKS_CARD_PAGE_SIZE_DEFAULT = 4;
+export const WEBHOOKS_CARD_PAGE_DEFAULT = 1;
+export const WEBHOOKS_CARD_PAGE_DEFAULT_OPTIONS = ['2', '4', '8', '16', '32', '64', '128', '256', '512'];
 
 export const TABLE_PAGE_SIZE_DEFAULT = 15;
 export const TABLE_PAGE_DEFAULT = 1;

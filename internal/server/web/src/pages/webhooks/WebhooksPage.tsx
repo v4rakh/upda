@@ -3,7 +3,11 @@ import Webhook from './Webhook';
 import WebhookPageFilter from './WebhookPageFilter';
 import { useGetWebhooksQuery } from '../../api/webhooksApi';
 import WebhookFilterQueryParamNames from '../../constants/api/webhookFilterQueryParamNames';
-import { CARD_PAGE_DEFAULT, CARD_PAGE_DEFAULT_OPTIONS, CARD_PAGE_SIZE_DEFAULT } from '../../constants/pagination';
+import {
+	WEBHOOKS_CARD_PAGE_DEFAULT,
+	WEBHOOKS_CARD_PAGE_DEFAULT_OPTIONS,
+	WEBHOOKS_CARD_PAGE_SIZE_DEFAULT
+} from '../../constants/pagination';
 import { WebhooksRequestParams } from '../../types';
 import { useResponsiveGridSize } from '../../use/useResponsiveGridSize';
 import useWebhooksFilterQueryParams from '../../use/useWebhooksFilterQueryParams';
@@ -23,7 +27,7 @@ const DEFAULT_POLLING_INTERVAL = 10000;
 const WebhooksPage: FC = () => {
 	const [t] = useTranslation('webhooks');
 
-	const { gridSize } = useResponsiveGridSize({ xxl: 4, xl: 3, lg: 2, md: 2, sm: 1, xs: 1 });
+	const { gridSize } = useResponsiveGridSize({ xxl: 2, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 });
 
 	const [pollingInterval, setPollingInterval] = useState<number>(0);
 	const [queryParams, setSearchQueryParams] = useSearchParams();
@@ -123,10 +127,10 @@ const WebhooksPage: FC = () => {
 							pagination={{
 								position: 'bottom',
 								align: 'center',
-								pageSize: data?.data.pageSize || CARD_PAGE_SIZE_DEFAULT,
-								pageSizeOptions: CARD_PAGE_DEFAULT_OPTIONS,
+								pageSize: data?.data.pageSize || WEBHOOKS_CARD_PAGE_SIZE_DEFAULT,
+								pageSizeOptions: WEBHOOKS_CARD_PAGE_DEFAULT_OPTIONS,
 								total: data?.data.totalElements || 0,
-								current: page || CARD_PAGE_DEFAULT,
+								current: page || WEBHOOKS_CARD_PAGE_DEFAULT,
 								onChange: onPaginationChange,
 								showSizeChanger: true
 							}}

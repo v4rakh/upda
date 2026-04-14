@@ -3,7 +3,11 @@ import UpdatePageFilter from './UpdatePageFilter';
 import { useGetUpdatesQuery } from '../../api/updatesApi';
 import FilterPreset from '../../components/filter-presets/FilterPresets';
 import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryParamNames';
-import { CARD_PAGE_DEFAULT, CARD_PAGE_DEFAULT_OPTIONS, CARD_PAGE_SIZE_DEFAULT } from '../../constants/pagination';
+import {
+	UPDATES_CARD_PAGE_DEFAULT,
+	UPDATES_CARD_PAGE_DEFAULT_OPTIONS,
+	UPDATES_CARD_PAGE_SIZE_DEFAULT
+} from '../../constants/pagination';
 import { UpdatesRequestParams } from '../../types';
 import { FilterPresetType } from '../../types/filterPreset';
 import { useResponsiveGridSize } from '../../use/useResponsiveGridSize';
@@ -132,10 +136,10 @@ const UpdatesPage: FC = () => {
 							pagination={{
 								position: 'bottom',
 								align: 'center',
-								pageSize: data?.data.pageSize || CARD_PAGE_SIZE_DEFAULT,
-								pageSizeOptions: CARD_PAGE_DEFAULT_OPTIONS,
+								pageSize: data?.data.pageSize || UPDATES_CARD_PAGE_SIZE_DEFAULT,
+								pageSizeOptions: UPDATES_CARD_PAGE_DEFAULT_OPTIONS,
 								total: data?.data.totalElements || 0,
-								current: page || CARD_PAGE_DEFAULT,
+								current: page || UPDATES_CARD_PAGE_DEFAULT,
 								onChange: onPaginationChange,
 								showSizeChanger: true
 							}}
