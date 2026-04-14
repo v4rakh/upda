@@ -22,3 +22,9 @@ coverage.out
 .run
 *.iws
 out/
+
+### AI ###
+.claude
+CLAUDE.md
+.agents/
+skills-lock.json
