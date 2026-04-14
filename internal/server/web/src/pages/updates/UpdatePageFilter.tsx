@@ -7,16 +7,18 @@ import UpdateOrderBy from '../../constants/api/updateOrderBy';
 import UpdateSearchIn from '../../constants/api/updateSearchIn';
 import { UpdateStateValue } from '../../types';
 import { FilterPresetType } from '../../types/filterPreset';
+import { useLocalStorage } from '../../use/useLocalStorage';
 import useUpdatesFilterQueryParams from '../../use/useUpdatesFilterQueryParams';
 import useUpdateFiltersActive from '../../use/useUpdatesFiltersActive';
 import { FilterOutlined, SearchOutlined } from '@ant-design/icons';
 import { Badge, Button, Collapse, Divider, Form, Input, Select, Space } from 'antd';
 import { compact, forEach, uniq } from 'lodash';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
-const COLLAPSE_KEY = 'filter';
+const COLLAPSE_KEY = 'updatesFilterExpanded';
+const STORAGE_KEY = 'updatesFilterExpanded';
 
 const { Search } = Input;
 
@@ -27,7 +29,7 @@ export interface UpdatePageFilterProps {
 const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 	const [t] = useTranslation('updates_filters');
 	const [form] = Form.useForm();
-	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
+	const [expanded, setExpanded] = useLocalStorage<boolean>(STORAGE_KEY, false);
 
 	const [queryParams, setSearchQueryParams] = useSearchParams();
 	const { searchTerm, searchIn, orderBy, order, state } = useUpdatesFilterQueryParams();
@@ -141,13 +143,13 @@ const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 	return (
 		<Collapse
 			onChange={(keys) => {
-				setCollapseActiveKeys(keys);
+				setExpanded(keys.includes(COLLAPSE_KEY));
 			}}
 			expandIconPlacement="end"
 			bordered={false}
 			ghost
 			size="small"
-			activeKey={collapseActiveKeys}
+			activeKey={expanded ? [COLLAPSE_KEY] : []}
 			items={[
 				{
 					key: COLLAPSE_KEY,
