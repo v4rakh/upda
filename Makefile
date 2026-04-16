@@ -15,7 +15,7 @@ GOSEC ?= gosec
 GRYPE ?= grype
 
 BIN_DIR = $(shell pwd)/bin
-TEST_DIR = "$(shell pwd)/coverage"
+TEST_DIR = $(shell pwd)/coverage
 WEB_DIR = $(shell pwd)/internal/server/web
 WEB_BUILD_DIR = $(shell pwd)/internal/server/web/build
 WEB_NODE_DIR = $(shell pwd)/internal/server/web/node_modules
