@@ -5,13 +5,12 @@ go 1.25.0
 require (
 	github.com/Depado/ginprom v1.8.3
 	github.com/containrrr/shoutrrr v0.8.0
-	github.com/docker/go-connections v0.6.0
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-contrib/sessions v1.1.0
 	github.com/gin-contrib/static v1.1.6
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.2.1
-	github.com/go-co-op/gocron/v2 v2.20.0
+	github.com/go-co-op/gocron/v2 v2.21.0
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/go-redsync/redsync/v4 v4.16.0
 	github.com/go-resty/resty/v2 v2.17.2
@@ -53,6 +52,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v28.5.2+incompatible // indirect
+	github.com/docker/go-connections v0.6.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/ebitengine/purego v0.10.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
