@@ -1,3 +1,4 @@
+import { EventName } from '../../types/event';
 import useActionAutoSuggestion from '../../use/useActionAutoSuggestion';
 import { MinusCircleOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { Alert, Button, Flex, Form, FormInstance, Mentions } from 'antd';
@@ -8,14 +9,15 @@ import { useTranslation } from 'react-i18next';
 export interface ActionFormShoutrrrProps {
 	isLoading: boolean;
 	form: FormInstance;
+	matchEvent?: EventName | string;
 }
 
 const KEY_ENTER = 'Enter';
 const PREFIX_TRIGGER = ['<'];
 
-const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading, form }): ReactNode => {
+const ActionFormPayloadShoutrrr: FC<ActionFormShoutrrrProps> = ({ isLoading, form, matchEvent }): ReactNode => {
 	const [t] = useTranslation('action_form_shoutrrrr');
-	const { mentionOptions, reloadMentionOptions } = useActionAutoSuggestion();
+	const { mentionOptions, reloadMentionOptions } = useActionAutoSuggestion({ matchEvent });
 
 	// Prevents line breaks
 	const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {

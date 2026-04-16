@@ -59,6 +59,7 @@ const EventsTree: FC<EventsTreeProps> = ({ updateId }) => {
 			case EventName.UPDATE_DELETED:
 				return 'red';
 			case EventName.UPDATE_CREATED:
+			case EventName.COMMENT_CREATED:
 				return 'green';
 			default:
 				return 'blue';

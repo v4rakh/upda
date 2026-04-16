@@ -75,6 +75,7 @@ Supported events for Actions are the following:
 | `update_updated_state`   | An update's state changed                                           |
 | `update_updated_version` | An update's version changed                                         |
 | `update_deleted`         | An update has been removed                                          |
+| `comment_created`        | A comment has been added to an update                               |
 
 All actions support the usage of `<TAG NAME>KEY<TAG NAME>` in their action specific payload. In general, `<CONST>` tags
 are evaluated first, meaning that they can contain other tags as shortcuts.
@@ -95,13 +96,15 @@ The same works for _Constants_.
 
 Available **variables** which can be used with the `<VAR>VARIABLE_NAME</VAR>` syntax are:
 
-| Variable name            | Description                                       |
-|:-------------------------|:--------------------------------------------------|
-| `<VAR>APPLICATION</VAR>` | The update's application name invoking the action |
-| `<VAR>PROVIDER</VAR>`    | The update's provider name invoking the action    |
-| `<VAR>HOST</VAR>`        | The update's host invoking the action             |
-| `<VAR>VERSION</VAR>`     | The update's version (latest) invoking the action |
-| `<VAR>STATE</VAR>`       | The update's state invoking the action            |
+| Variable name                | Description                                                         |
+|:-----------------------------|:--------------------------------------------------------------------|
+| `<VAR>APPLICATION</VAR>`     | The update's application name invoking the action                   |
+| `<VAR>PROVIDER</VAR>`        | The update's provider name invoking the action                      |
+| `<VAR>HOST</VAR>`            | The update's host invoking the action                               |
+| `<VAR>VERSION</VAR>`         | The update's version (latest) invoking the action                   |
+| `<VAR>STATE</VAR>`           | The update's state invoking the action                              |
+| `<VAR>COMMENT_AUTHOR</VAR>`  | The comment's author (only available for `comment_created` events)  |
+| `<VAR>COMMENT_CONTENT</VAR>` | The comment's content (only available for `comment_created` events) |
 
 #### shoutrrr
 

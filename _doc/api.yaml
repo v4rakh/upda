@@ -3562,6 +3562,7 @@ components:
             - update_updated_state
             - update_updated_version
             - update_deleted
+            - comment_created
         createdAt:
           type: string
         updatedAt:
@@ -3574,6 +3575,7 @@ components:
             - $ref: '#/components/schemas/EventPayloadUpdateCreatedResponse'
             - $ref: '#/components/schemas/EventPayloadUpdateUpdatedResponse'
             - $ref: '#/components/schemas/EventPayloadUpdateDeletedResponse'
+            - $ref: '#/components/schemas/EventPayloadCommentCreatedResponse'
     EventPayloadUpdateCreatedResponse:
       type: object
       properties:
@@ -3590,6 +3592,9 @@ components:
         state:
           type: string
           description: state name from update-state-definitions
+        stateLabel:
+          type: string
+          description: human-readable state label from update-state-definitions
     EventPayloadUpdateUpdatedResponse:
       type: object
       properties:
@@ -3608,9 +3613,15 @@ components:
         statePrior:
           type: string
           description: prior state name from update-state-definitions
+        statePriorLabel:
+          type: string
+          description: prior human-readable state label from update-state-definitions
         state:
           type: string
           description: state name from update-state-definitions
+        stateLabel:
+          type: string
+          description: human-readable state label from update-state-definitions
     EventPayloadUpdateDeletedResponse:
       type: object
       properties:
@@ -3625,6 +3636,42 @@ components:
         state:
           type: string
           description: state name from update-state-definitions
+        stateLabel:
+          type: string
+          description: human-readable state label from update-state-definitions
+    EventPayloadCommentCreatedResponse:
+      type: object
+      properties:
+        commentId:
+          type: string
+          description: the comment's unique identifier
+        author:
+          type: string
+          description: the comment's author
+        content:
+          type: string
+          description: the comment's content
+        updateId:
+          type: string
+          description: the update's unique identifier
+        application:
+          type: string
+          description: the update's application name
+        provider:
+          type: string
+          description: the update's provider name
+        host:
+          type: string
+          description: the update's host name
+        version:
+          type: string
+          description: the update's version
+        state:
+          type: string
+          description: state name from update-state-definitions
+        stateLabel:
+          type: string
+          description: human-readable state label from update-state-definitions
     ActionResponse:
       type: object
       properties:

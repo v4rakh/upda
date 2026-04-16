@@ -34,7 +34,8 @@ const ActionSelectEvent: FC<ActionSelectEventProps> = ({ name, onChange = noop, 
 					value: EventName.UPDATE_UPDATED_VERSION,
 					label: `${t(EventName.UPDATE_UPDATED_VERSION.toLowerCase())}`
 				},
-				{ value: EventName.UPDATE_DELETED, label: `${t(EventName.UPDATE_DELETED.toLowerCase())}` }
+				{ value: EventName.UPDATE_DELETED, label: `${t(EventName.UPDATE_DELETED.toLowerCase())}` },
+				{ value: EventName.COMMENT_CREATED, label: `${t(EventName.COMMENT_CREATED.toLowerCase())}` }
 			]}
 		/>
 	);

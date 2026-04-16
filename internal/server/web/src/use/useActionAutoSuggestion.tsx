@@ -1,13 +1,17 @@
 import { useLazyGetConstantsQuery } from '../api/constantsApi';
 import { useLazyGetSecretsQuery } from '../api/secretsApi';
+import { EventName } from '../types/event';
 import { CalculatorOutlined, FolderOutlined, LockOutlined } from '@ant-design/icons';
 import { Space } from 'antd';
 import { MentionsOptionProps } from 'antd/lib/mentions';
 import { concat, map } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const VAR_OPTIONS = map(['APPLICATION', 'PROVIDER', 'HOST', 'VERSION', 'STATE'], (e) => {
-	return {
+const BASE_VAR_OPTIONS = ['APPLICATION', 'PROVIDER', 'HOST', 'VERSION', 'STATE'];
+const COMMENT_VAR_OPTIONS = ['COMMENT_AUTHOR', 'COMMENT_CONTENT'];
+
+const createVarOptions = (vars: string[]): MentionsOptionProps[] =>
+	map(vars, (e) => ({
 		value: `VAR>${e}</VAR>`,
 		label: (
 			<Space>
@@ -15,19 +19,31 @@ const VAR_OPTIONS = map(['APPLICATION', 'PROVIDER', 'HOST', 'VERSION', 'STATE'],
 				{e}
 			</Space>
 		)
-	};
-}) as MentionsOptionProps[];
+	})) as MentionsOptionProps[];
 
 export interface AutoSuggestionHook {
 	mentionOptions: MentionsOptionProps[];
 	reloadMentionOptions: () => void;
 }
 
-const useActionAutoSuggestion = (): AutoSuggestionHook => {
+export interface UseActionAutoSuggestionProps {
+	matchEvent?: EventName | string;
+}
+
+const useActionAutoSuggestion = (props?: UseActionAutoSuggestionProps): AutoSuggestionHook => {
+	const { matchEvent } = props || {};
 	const [suggestions, setSuggestions] = useState<MentionsOptionProps[]>([]);
 	const [getConstants, constantsResult] = useLazyGetConstantsQuery();
 	const [getSecrets, secretsResult] = useLazyGetSecretsQuery();
 	const [optionsReady, setOptionsReady] = useState(false);
+
+	const varOptions = useMemo(() => {
+		const vars =
+			!matchEvent || matchEvent === EventName.COMMENT_CREATED
+				? concat(BASE_VAR_OPTIONS, COMMENT_VAR_OPTIONS)
+				: BASE_VAR_OPTIONS;
+		return createVarOptions(vars);
+	}, [matchEvent]);
 
 	useEffect(() => {
 		if (!optionsReady) {
@@ -62,10 +78,10 @@ const useActionAutoSuggestion = (): AutoSuggestionHook => {
 				};
 			}) as MentionsOptionProps[];
 
-			setSuggestions(concat(VAR_OPTIONS, constantOptions, secretOptions));
+			setSuggestions(concat(varOptions, constantOptions, secretOptions));
 			setOptionsReady(true);
 		}
-	}, [constantsResult, secretsResult]);
+	}, [constantsResult, secretsResult, varOptions]);
 
 	const onRefresh = useCallback(() => {
 		setOptionsReady(false);

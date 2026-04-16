@@ -106,6 +106,27 @@ func (s *EventService) CreateUpdateDeleted(e *model.Update) *model.Event {
 	return nil
 }
 
+func (s *EventService) CreateCommentCreated(comment *model.Comment, update *model.Update) *model.Event {
+	if comment == nil || update == nil {
+		return nil
+	}
+
+	s.CreateWithWarnOnly(constant.EventNameCommentCreated, &api.EventPayloadCommentCreatedDto{
+		CommentID:   comment.ID.String(),
+		Author:      comment.Author,
+		Content:     comment.Content,
+		UpdateID:    update.ID.String(),
+		Application: update.Application,
+		Provider:    update.Provider,
+		Host:        update.Host,
+		Version:     update.Version,
+		State:       update.State,
+		StateLabel:  s.resolveStateLabel(update.State),
+	})
+
+	return nil
+}
+
 func (s *EventService) CreateWithWarnOnly(name constant.EventName, payload interface{}) *model.Event {
 	var e *model.Event
 	var err error
@@ -254,6 +275,12 @@ func (s *EventService) ExtractPayloadInfo(event *model.Event) (*dto.EventPayload
 			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
 		}
 		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel}, nil
+	case constant.EventNameCommentCreated.String():
+		var p api.EventPayloadCommentCreatedDto
+		if p, err = json.UnmarshalGenericJSON[api.EventPayloadCommentCreatedDto](bytes); err != nil {
+			return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, err)
+		}
+		return &dto.EventPayloadInformationDto{Host: p.Host, Application: p.Application, Provider: p.Provider, Version: p.Version, State: p.State, StateLabel: p.StateLabel, CommentAuthor: p.Author, CommentContent: p.Content}, nil
 	}
 
 	return nil, service_error.NewServiceError(service_error.ErrCodeGeneral, errors.New("no matching event found"))

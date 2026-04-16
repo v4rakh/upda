@@ -16,6 +16,7 @@ const CreateAction = (): ReactNode => {
 	const { apiError } = useNotification();
 	const [form] = Form.useForm();
 	const type = Form.useWatch('type', form);
+	const matchEvent = Form.useWatch('matchEvent', form);
 	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
 
 	const [save, { isSuccess, isError, reset, error, isLoading }] = useCreateActionMutation();
@@ -124,7 +125,7 @@ const CreateAction = (): ReactNode => {
 									<Input placeholder={t('all')} variant="filled" />
 								</Form.Item>
 								<ActionFormType isLoading={isLoading} initialValue={ActionType.SHOUTRRR} />
-								<ActionFormPayloadSwitch isLoading={isLoading} type={type} form={form} />
+								<ActionFormPayloadSwitch isLoading={isLoading} type={type} form={form} matchEvent={matchEvent} />
 								<Form.Item
 									label={t('enabled_label')}
 									tooltip={t('enabled_help')}

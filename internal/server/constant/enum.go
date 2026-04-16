@@ -23,7 +23,7 @@ type ConfigAuthSessionSameSite string
 // ENUM(generic, diun)
 type WebhookType string
 
-// ENUM(update_created, update_updated, update_updated_state, update_updated_version, update_deleted)
+// ENUM(update_created, update_updated, update_updated_state, update_updated_version, update_deleted, comment_created)
 type EventName string
 
 // ENUM(created, enqueued)

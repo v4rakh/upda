@@ -124,7 +124,7 @@ func (s *Server) Start() {
 	actionService := service.NewActionService(actionRepo, eventService)
 	actionInvocationService := service.NewActionInvocationService(actionInvocationRepo, actionService, eventService, secretService, constantService)
 	filterPresetService := service.NewFilterPresetService(filterPresetRepo)
-	commentService := service.NewCommentService(commentRepo)
+	commentService := service.NewCommentService(commentRepo, eventService)
 
 	// tasks init
 	eventsCleanTask := service.NewEventsCleanTask(eventService, taskService, cfg.Task)

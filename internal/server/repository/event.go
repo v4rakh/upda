@@ -218,13 +218,9 @@ func CriterionEventUpdateID(updateId *string) func(db *gorm.DB) *gorm.DB {
 		}
 	}
 
-	names := []string{constant.EventNameUpdateCreated.String(),
-		constant.EventNameUpdateUpdated.String(),
-		constant.EventNameUpdateUpdatedVersion.String(),
-		constant.EventNameUpdateUpdatedState.String(),
-		constant.EventNameUpdateDeleted.String()}
-
+	names := constant.EventNameNames()
 	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("name IN (?)", names).Where("payload @> ?", fmt.Sprintf(`{"id": "%s"}`, *updateId))
+		return db.Where("name IN (?)", names).Where("payload @> ?", fmt.Sprintf(`{"id": "%s"}`, *updateId)).
+			Or("name IN (?)", names).Where("payload @> ?", fmt.Sprintf(`{"updateId": "%s"}`, *updateId))
 	}
 }

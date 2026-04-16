@@ -7,7 +7,8 @@ export enum EventName {
 	UPDATE_UPDATED = 'update_updated',
 	UPDATE_UPDATED_STATE = 'update_updated_state',
 	UPDATE_UPDATED_VERSION = 'update_updated_version',
-	UPDATE_DELETED = 'update_deleted'
+	UPDATE_DELETED = 'update_deleted',
+	COMMENT_CREATED = 'comment_created'
 }
 
 export type EventsResponse = {

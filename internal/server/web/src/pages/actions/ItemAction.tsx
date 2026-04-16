@@ -39,7 +39,7 @@ const ItemActionInvocation: FC<ItemActionProps> = ({ e }): ReactNode => {
 					<UpdateMatchProviderAction id={e.id} matchProvider={e.matchProvider} />
 				</Item>
 			</Descriptions>
-			<UpdatePayloadAction id={e.id} type={e.type} payload={e.payload} />
+			<UpdatePayloadAction id={e.id} type={e.type} payload={e.payload} matchEvent={e.matchEvent} />
 			<TestAction id={e.id} />
 			<DeleteAction id={e.id} />
 		</Space>

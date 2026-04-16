@@ -289,6 +289,8 @@ func (s *ActionInvocationService) replaceVars(str string, eventPayloadInfo *dto.
 	str = strings.ReplaceAll(str, "<VAR>HOST</VAR>", eventPayloadInfo.Host)
 	str = strings.ReplaceAll(str, "<VAR>VERSION</VAR>", eventPayloadInfo.Version)
 	str = strings.ReplaceAll(str, "<VAR>STATE</VAR>", eventPayloadInfo.State)
+	str = strings.ReplaceAll(str, "<VAR>COMMENT_AUTHOR</VAR>", eventPayloadInfo.CommentAuthor)
+	str = strings.ReplaceAll(str, "<VAR>COMMENT_CONTENT</VAR>", eventPayloadInfo.CommentContent)
 
 	return str
 }

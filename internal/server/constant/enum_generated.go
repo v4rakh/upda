@@ -730,6 +730,8 @@ const (
 	EventNameUpdateUpdatedVersion EventName = "update_updated_version"
 	// EventNameUpdateDeleted is a EventName of type update_deleted.
 	EventNameUpdateDeleted EventName = "update_deleted"
+	// EventNameCommentCreated is a EventName of type comment_created.
+	EventNameCommentCreated EventName = "comment_created"
 )
 
 var ErrInvalidEventName = fmt.Errorf("not a valid EventName, try [%s]", strings.Join(_EventNameNames, ", "))
@@ -740,6 +742,7 @@ var _EventNameNames = []string{
 	string(EventNameUpdateUpdatedState),
 	string(EventNameUpdateUpdatedVersion),
 	string(EventNameUpdateDeleted),
+	string(EventNameCommentCreated),
 }
 
 // EventNameNames returns a list of possible string values of EventName.
@@ -757,6 +760,7 @@ func EventNameValues() []EventName {
 		EventNameUpdateUpdatedState,
 		EventNameUpdateUpdatedVersion,
 		EventNameUpdateDeleted,
+		EventNameCommentCreated,
 	}
 }
 
@@ -778,6 +782,7 @@ var _EventNameValue = map[string]EventName{
 	"update_updated_state":   EventNameUpdateUpdatedState,
 	"update_updated_version": EventNameUpdateUpdatedVersion,
 	"update_deleted":         EventNameUpdateDeleted,
+	"comment_created":        EventNameCommentCreated,
 }
 
 // ParseEventName attempts to convert a string to a EventName.

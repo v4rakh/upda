@@ -424,6 +424,19 @@ type EventPayloadUpdateDeletedDto struct {
 	StateLabel  string `json:"stateLabel,omitempty"`
 }
 
+type EventPayloadCommentCreatedDto struct {
+	CommentID   string `json:"commentId,omitempty"`
+	Author      string `json:"author,omitempty"`
+	Content     string `json:"content,omitempty"`
+	UpdateID    string `json:"updateId,omitempty"`
+	Application string `json:"application,omitempty"`
+	Provider    string `json:"provider,omitempty"`
+	Host        string `json:"host,omitempty"`
+	Version     string `json:"version,omitempty"`
+	State       string `json:"state,omitempty"`
+	StateLabel  string `json:"stateLabel,omitempty"`
+}
+
 func NewEventWindowResponse(content []*EventResponse, size int, skip int, orderBy string, order string, hasNext bool) *EventWindowResponse {
 	e := new(EventWindowResponse)
 	e.Content = content

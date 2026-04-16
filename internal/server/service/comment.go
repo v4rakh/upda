@@ -8,12 +8,14 @@ import (
 )
 
 type CommentService struct {
-	repo repository.CommentRepository
+	repo         repository.CommentRepository
+	eventService *EventService
 }
 
-func NewCommentService(r repository.CommentRepository) *CommentService {
+func NewCommentService(r repository.CommentRepository, eventService *EventService) *CommentService {
 	return &CommentService{
-		repo: r,
+		repo:         r,
+		eventService: eventService,
 	}
 }
 
@@ -77,10 +79,12 @@ func (s *CommentService) Create(author string, content string, update *model.Upd
 	var e *model.Comment
 	if e, err = s.repo.Create(author, content, update.ID.String()); err != nil {
 		return nil, err
-	} else {
-		log.Info().Msg("Created comment")
-		return e, nil
 	}
+
+	log.Info().Msg("Created comment")
+	s.eventService.CreateCommentCreated(e, update)
+
+	return e, nil
 }
 
 func (s *CommentService) UpdateContent(id string, content string) (*model.Comment, error) {

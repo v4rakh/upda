@@ -111,6 +111,7 @@
   },
   "action_select_event": {
     "all": "all",
+    "comment_created": "Comment created",
     "update_created": "Update created",
     "update_deleted": "Update deleted",
     "update_updated": "Update changed",
@@ -335,6 +336,7 @@
     "name": "Name"
   },
   "event_text": {
+    "comment_created": "<b><a href=\"/#/updates/{{updateId}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> received a new comment by <b>{{author}}</b>.",
     "update_created": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> with version <b>{{version}}</b> has been created.",
     "update_deleted": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> with version <b>{{version}}</b> has been deleted.",
     "update_updated": "<b><a href=\"/#/updates/{{id}}\">{{application}}</a></b> on host <b>{{host}}</b> for provider <b>{{provider}}</b> has been changed (version or metadata). Version: <b>{{version}}</b> (was <b>{{versionPrior}}</b>).",
