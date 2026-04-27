@@ -26,7 +26,8 @@ LABEL maintainer="Varakh <varakh@varakh.de>" \
     org.opencontainers.image.vendor="Varakh" \
     org.opencontainers.image.title="upda" \
     org.opencontainers.image.description="upda" \
-    org.opencontainers.image.base.name="alpine:3.23"
+    org.opencontainers.image.base.name="alpine:3.23" \
+    org.opencontainers.image.source="https://git.myservermanager.com/varakh/upda"
 
 ENV USER=appuser
 ENV GROUP=appuser
