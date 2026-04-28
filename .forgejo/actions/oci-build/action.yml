@@ -4,4 +4,4 @@ runs:
     - name: OCI - build
       shell: bash
       run: |
-        docker buildx build --no-cache --build-arg VERSION=${{ github.sha }} -t git.myservermanager.com/varakh/upda:${{ github.sha }} -f Dockerfile .
+        docker buildx build --no-cache -t git.myservermanager.com/varakh/upda:${{ github.sha }} -f Dockerfile .

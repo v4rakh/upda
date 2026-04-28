@@ -1,49 +1,56 @@
 #
 # Build image
 #
-FROM alpine:3.23 AS builder
-LABEL maintainer="Varakh <varakh@varakh.de>"
-ARG VERSION="rolling-oci"
+FROM node:24-alpine AS builder-frontend
 
 RUN apk --update upgrade && \
-    apk add git && \
-    apk add go gcc make && \
-    apk add nodejs npm && \
+    apk add pnpm && \
     rm -rf /var/cache/apk/*
 
-WORKDIR /app
+WORKDIR /src/web
+COPY internal/server/web/package*.json ./
+RUN pnpm install
+COPY internal/server/web/ ./
+RUN pnpm build
+
+FROM golang:1.25-alpine AS builder-server
+
+# Enable automatic toolchain download for Go 1.25+
+ENV GOTOOLCHAIN=auto
+
+WORKDIR /src
+
+# Download dependencies first (better layer caching)
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source and frontend build
 COPY . .
-RUN npm install --global pnpm@^10 && \
-    VERSION=${VERSION} CC=gcc make clean dependencies build-web build-server-linux-amd64
+COPY --from=builder-frontend /src/web/build ./internal/server/web/build
+RUN CGO_ENABLED=0 GOOS=linux go build -tags prod -ldflags="-s -w" -o /upda ./cmd/upda
 
 #
 # Actual image
 #
-FROM alpine:3.23
+FROM gcr.io/distroless/static-debian13:nonroot
+
+# Copy binary
+COPY --from=builder-server /upda /usr/local/bin/upda
+
+# Labels
 LABEL maintainer="Varakh <varakh@varakh.de>" \
     description="upda" \
     org.opencontainers.image.authors="Varakh" \
     org.opencontainers.image.vendor="Varakh" \
     org.opencontainers.image.title="upda" \
     org.opencontainers.image.description="upda" \
-    org.opencontainers.image.base.name="alpine:3.23" \
+    org.opencontainers.image.base.name="gcr.io/distroless/static-debian13:nonroot" \
     org.opencontainers.image.source="https://git.myservermanager.com/varakh/upda"
 
-ENV USER=appuser
-ENV GROUP=appuser
-ENV UID=2033
-ENV GID=2033
-
-RUN apk --update upgrade && \
-    apk add tzdata && \
-    rm -rf /var/cache/apk/* && \
-    addgroup -S ${GROUP} -g ${GID} && \
-    adduser -S ${USER} -G ${GROUP} -u ${UID}
-
-COPY --from=builder /app/bin/upda-linux-amd64 /usr/bin/upda
-
-USER ${USER}
-
+# Expose HTTP port
 ENV SERVER_PORT=8080
 EXPOSE ${SERVER_PORT}
-CMD ["/usr/bin/upda", "server", "serve"]
+
+# Default command
+ENTRYPOINT ["/usr/local/bin/upda"]
+CMD ["server", "serve"]

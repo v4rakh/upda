@@ -4,4 +4,4 @@ runs:
     - name: Native - test
       shell: bash
       run: |
-        VERSION=${{ github.sha }} make test-coverage
+        make test-coverage

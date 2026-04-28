@@ -227,3 +227,14 @@ ExecStart=/usr/local/bin/upda server serve
 
 For a full set of available configuration, look into the [Configuration](./Configuration.md) section. Furthermore,
 it's recommended to set up proper [Monitoring](./Monitoring.md).
+
+### Nix
+
+Add upda as **Nix flakes** input:
+
+```nix
+# flake.nix
+{
+    inputs.upda.url = "git+https://git.myservermanager.com/varakh/upda?ref=refs/tags/latest";
+}
+```

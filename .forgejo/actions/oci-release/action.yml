@@ -29,4 +29,4 @@ runs:
     - name: OCI - build and push
       shell: bash
       run: |
-        docker buildx build --push --no-cache --build-arg VERSION=${{ github.sha }} -t git.myservermanager.com/varakh/upda:latest -t git.myservermanager.com/varakh/upda:${{ inputs.version }} -f Dockerfile .
+        docker buildx build --push --no-cache -t git.myservermanager.com/varakh/upda:latest -t git.myservermanager.com/varakh/upda:${{ inputs.version }} -f Dockerfile .

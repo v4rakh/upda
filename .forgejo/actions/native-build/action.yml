@@ -4,4 +4,4 @@ runs:
     - name: Native - checkstyle, audit, build
       shell: bash
       run: |
-        VERSION=${{ github.sha }} make clean dependencies audit checkstyle build
+        make clean dependencies audit checkstyle build

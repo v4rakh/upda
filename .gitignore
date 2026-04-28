@@ -1,9 +1,6 @@
 ### dotenv ###
 .env
 
-### direnv ###
-.direnv
-
 ### Go ###
 bin/
 coverage/
@@ -13,6 +10,9 @@ go.work
 
 ### Nix ###
 result
+
+### Release ###
+CHANGELOG.md
 
 ### GoLand/Intellij ###
 .idea/

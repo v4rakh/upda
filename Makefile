@@ -1,6 +1,3 @@
-VERSION ?= rolling
-LDFLAGS := -X 'git.myservermanager.com/varakh/upda/internal/meta.Version=$(VERSION)'
-
 GO ?= GO111MODULE=on CGO_ENABLED=0 go
 GO_TEST ?= CGO_ENABLED=1 go
 GOOS ?= $(shell $(GO) version | cut -d' ' -f4 | cut -d'/' -f1)
@@ -73,7 +70,7 @@ test-web-coverage:
 	cd ${WEB_DIR}; $(PNPM) run test:coverage
 
 run-server:
-	$(GO) run -ldflags="$(LDFLAGS)" ${CMD_GO_FILES} server serve
+	$(GO) run ${CMD_GO_FILES} server serve
 run-web:
 	cd ${WEB_DIR}; $(PNPM) start
 
@@ -92,26 +89,26 @@ scan:
 build: build-web build-server-all
 
 build-server:
-	$(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-${GOOS}-${GOARCH} ${CMD_GO_FILES}
+	$(GO) build -tags prod -o ${BIN_DIR}/upda-${GOOS}-${GOARCH} ${CMD_GO_FILES}
 
 build-server-all: build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-darwin-amd64 build-server-darwin-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64
 
 build-server-freebsd-amd64:
-	GOOS=freebsd GOARCH=amd64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-freebsd-amd64 ${CMD_GO_FILES}
+	GOOS=freebsd GOARCH=amd64 $(GO) build -tags prod -o ${BIN_DIR}/upda-freebsd-amd64 ${CMD_GO_FILES}
 build-server-freebsd-arm64:
-	GOOS=freebsd GOARCH=arm64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-freebsd-arm64 ${CMD_GO_FILES}
+	GOOS=freebsd GOARCH=arm64 $(GO) build -tags prod -o ${BIN_DIR}/upda-freebsd-arm64 ${CMD_GO_FILES}
 build-server-darwin-amd64:
-	GOOS=darwin GOARCH=amd64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-darwin-amd64 ${CMD_GO_FILES}
+	GOOS=darwin GOARCH=amd64 $(GO) build -tags prod -o ${BIN_DIR}/upda-darwin-amd64 ${CMD_GO_FILES}
 build-server-darwin-arm64:
-	GOOS=darwin GOARCH=arm64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-darwin-arm64 ${CMD_GO_FILES}
+	GOOS=darwin GOARCH=arm64 $(GO) build -tags prod -o ${BIN_DIR}/upda-darwin-arm64 ${CMD_GO_FILES}
 build-server-linux-amd64:
-	GOOS=linux GOARCH=amd64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-linux-amd64 ${CMD_GO_FILES}
+	GOOS=linux GOARCH=amd64 $(GO) build -tags prod -o ${BIN_DIR}/upda-linux-amd64 ${CMD_GO_FILES}
 build-server-linux-arm64:
-	GOOS=linux GOARCH=arm64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-linux-arm64 ${CMD_GO_FILES}
+	GOOS=linux GOARCH=arm64 $(GO) build -tags prod -o ${BIN_DIR}/upda-linux-arm64 ${CMD_GO_FILES}
 build-server-windows-amd64:
-	GOOS=windows GOARCH=amd64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-windows-amd64 ${CMD_GO_FILES}
+	GOOS=windows GOARCH=amd64 $(GO) build -tags prod -o ${BIN_DIR}/upda-windows-amd64 ${CMD_GO_FILES}
 build-server-windows-arm64:
-	GOOS=windows GOARCH=arm64 $(GO) build -tags prod -ldflags="$(LDFLAGS)" -o ${BIN_DIR}/upda-windows-arm64 ${CMD_GO_FILES}
+	GOOS=windows GOARCH=arm64 $(GO) build -tags prod -o ${BIN_DIR}/upda-windows-arm64 ${CMD_GO_FILES}
 
 # remove built build/conf directory to be served live from the running binary
 build-web:

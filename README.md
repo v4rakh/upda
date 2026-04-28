@@ -15,35 +15,6 @@ Please head over to the documentation for setup, usage, and operation. This sect
 
 ## Development & contribution
 
-Head over to the [getting started](#getting-started) for setting up the development environment first.
-
-### Guidelines
-
-* Pay attention to `make checkstyle` (uses `go vet ./...`); pipeline fails if issues are detected.
-* Each entity has its own repository
-* Each entity is only used in repository and service (otherwise, mapping happens, latest at controller level)
-* Presenter layer is constructed from the entity, e.g., in REST responses and mapped
-* No entity is directly returned in any REST response
-* All log calls should be handled by `log`
-* Configuration is bootstrapped via separated `struct` types which are given to the service which need them
-* Error handling
-    * Always throw an error with `NewServiceError` for repositories, services and handlers
-    * Always throw an error wrapping the cause with `fmt.Errorf`
-    * Forward/bubble up the error directly, when original error is already a `NewServiceError` (most likely internal
-      calls)
-    * Always abort handler chain with `AbortWithError`
-    * Utils can throw any error
-    * Repositories, handlers and services should always properly return `error` including any `init`-like function (
-      best to avoid them and call in `newXXX`). **Do not abort with `Fatalf` or similar**
-    * `log.Fatalf` or `log.Fatal()` is allowed in `config.go` or `server.go`
-* Look into the `_doc/` folder for [OpenAPI specification](./_doc/api.yaml).
-* Consider reading [Effective Go](https://go.dev/doc/effective_go)
-* Consider reading [100 Go Mistakes and How to Avoid Them](https://100go.co/)
-
-Be aware that some are false positives and actually required.
-
-### Getting started
-
 The most straight forward way to get started is by looking into available commands inside the `Makefile`.
 
 For the full setup, you need the following tools:
@@ -52,35 +23,10 @@ For the full setup, you need the following tools:
 - pnpm and node (see version constraints in `package.json`)
 - make to execute commands of the `Makefile`
 
-Though, when you're familiar with [direnv](https://github.com/direnv/direnv) or even the package
-manager [nix](https://nixos.org/), you can achieve a full and easy setup when you go into the project's directory.
-
-#### `direnv` / `nix-direnv`
-
-This project can optionally use [direnv](https://github.com/direnv/direnv) (
-or [nix-direnv](https://github.com/nix-community/nix-direnv) with `nix`) to automatically load environment variables
-from an `.env` file. Copy `.env.development` to `.env` and adjust the values accordingly.
-
-When you change directory into the project, the environment variables are automatically loaded after you've allowed
-`direnv` with `direnv allow`.
-
-#### Nix Flakes
-
-_In addition_, the project hosts a `flake.nix` and a `flake.lock` file. You can safely ignore them if you don't like to
-use this method of bootstrapping your environment to work with this application. This setup though allows to easily have
-an environment set up for this application by installing necessary required binaries without modifying your OS
-installation. This is done through the package manager [nix](https://nixos.org/) which automatically installs everything
-necessary under a _devShell_ (development shell). From shell which you can enter via `nix develop` inside the project's
-root directory, all the above tools are available.
-To automate it even further, [nix-direnv](https://github.com/nix-community/nix-direnv) recognises when you change
-directory (or open an IDE terminal) within this project (similar to `direnv` itself).
-
-**Keep in mind that the project itself is not available as flake.**
-
-### Pre-requisites
+Quick start is to run:
 
 1. Copy `.env.development` to `.env`.
-2. Start with `make run-server`
+2. Start with `make run-server` and make sure the environment variables from `.env` are injected.
 
 If you like to test with Postgres and/or REDIS for task locking, here are some useful docker commands to have containers
 up and running quickly. Set necessary environment variables properly.
@@ -113,41 +59,6 @@ If you like to have a look on the _production_ experience, the frontend needs to
 the Golang binary with `-tags prod`. How to properly build the frontend, please look into `build-web` of
 the `Makefile` (additional `rm -rf` cmd!).
 
-### enums
-
-For new enums or when changing existing ones, use the `make generate` task which
-uses [go-enum](https://github.com/abice/go-enum) to generate boilerplate code.
-
-See example `enum.go`. Make sure to use the same `//go:generate` directives.
-
-### Using the `lockService` correctly
-
-The `lockService` can be used to lock resources. This works in-memory and also in a distributed fashion with REDIS.
-
-Ensure to provide proper locking options when using, although in-memory ignores those.
-
-Example:
-
-```shell
-# invoked from an endpoint
-context := c.Request.Context()
-
-var err error
-var lock Lock
-
-if lock, err = h.lockService.lockWithOptions(context, "TEST-LOCK", withLockOptionExpiry(5*time.Minute), withLockOptionInfiniteRetries(), withLockOptionRetryDelay(5*time.Second)); err != nil {
-    _ = c.AbortWithError(errToHttpStatus(err), err)
-    return
-}
-# defer to avoid leakage
-defer func(lock Lock) {
-    _ = lock.unlock(context)
-}(lock)
-
-# simulate long running task
-time.Sleep(20 * time.Second)
-```
-
 ### Tests
 
 There are multiple test targets defined in the `Makefile`
@@ -162,25 +73,13 @@ your user and/or docker).
 ### Git workflow
 
 The main branch is `master`. It's protected and only eligible users can push to it. Merge requests to protected branches
-are safe-guarded: they need review or at least a successful pipeline run to be merged.
+are safeguarded: they need review or at least a successful pipeline run to be merged.
 
-- Merge request branches should start with `feat/`, `fix/`, `refactor/`, `chore/`, or `ci/`
-- Merge requests should be squashed and the source branch should be deleted
-- Merge request commits should have a meaningful commit message
-- Merge request titles should have a meaningful title which is taken as commit message once merged
-    - should be prefixed with `feat: ...`, `fix(...): ...`, where the contents inside the bracket should be _one word_
-      which topic/component is touched (conventional commits)
-    - should reflect a breaking change by adding a `!` before the colon, e.g., `fix(deps)!: ...`
-    - should include more verbose information in the body of the git commit message (merge request description)
-
-```
-feat(security)!: add OpenID Connect authentication
-
-- This adds a new authentication mode called oidc
-- This new mode is the default, which might break existing installations
-```
-
-- Merge requests should contain documentation changes, so that code and documentation stays in sync
+- Use conventional commits as commit style and branch naming strategy, e.g., `feat/`, `fix/`, `refactor/`, `chore/`, or
+  `ci/`
+- **All** merge request commits should have a meaningful commit **title** and **message** stating the **why**
+- Use atomic git commits, separate **preparatory** from **functional** commits to speed up review
+- Avoid merging trunk back, use `git-rebase`
 
 ### Pipeline workflow
 
@@ -192,27 +91,29 @@ Pipeline runs
 This means you need to create a merge request to trigger a pipeline run. Without merge request, no build is triggered,
 thus your code cannot be merged.
 
-### Release preparation & workflow
-
-Follow these steps to release the application
-
-* Trigger the pipeline for a commit on the `master`
-    * When asked, enter a version number which should align with semantic versioning
-    * The pipeline creates a git tag and a release in the VCS management system
-    * Wait until the release pipeline succeeded
-* (_optional_) Generate the changelog
-    * Got into the git repository, make sure to fetch (including just created tag)
-    * Requires [git-cliff](https://git-cliff.org/) being installed
-    * Invoke from last but one release git tag to the most recent release tag (just created) with
-      `git-cliff OLDTAG..NEWTAG`, e.g., `git-cliff 6.0.0..6.1.0`
-    * This prints markdown to your terminal.
-    * Copy the markdown and edit the release in the VCS management system
-
-There's no additional preparation needed before invoking the release pipeline on `master` as it should always represent
-a working state at any time.
-
 ### Dependency updates
 
 Dependency updates are handled by Renovate using the `renovate.json5` file. The base branch is `master`.
 
 Major updates undergo manual review.
+
+### Releases
+
+1. Prepare a new MR to trunk with the following changes
+    * Adjust and align versions
+        * `flake.nix`: `version`
+        * `internal/meta/pkg.go`: `Version`
+        * `package.json`: `version`
+    * Make sure `make clean dependencies checkstyle audit build test test-coverage` is fine
+    * Make sure `nix build` is fine (you need `nix` for it, update checksums in `flake.nix` if it fails)
+    * Use `release/` as branch prefix and `release: prepare XYZ` as commit message
+2. Merge to trunk
+3. Trigger the release job the semantic version which is inside the main trunk
+4. Generate changelog and attach it to the release (use `git-cliff`)
+5. Pull changes from trunk, prepare a new MR to trunk to prepare next version
+    *  Adjust and align versions to the next semantic _patch_ version
+    * `flake.nix`: `version`
+    * `internal/meta/pkg.go`: `Version`
+    * `package.json`: `version`
+    * Use `release/` as branch prefix and `release: prepare next cycle...` as commit message
+6. Merge to trunk

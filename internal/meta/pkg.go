@@ -1,7 +1,6 @@
 package meta
 
-const Name = "upda"
-
-var (
-	Version string
+const (
+	Name    = "upda"
+	Version = "8.3.0"
 )
