@@ -93,6 +93,9 @@ importers:
       '@types/lodash':
         specifier: 4.17.24
         version: 4.17.24
+      '@types/node':
+        specifier: 24.1.0
+        version: 24.1.0
       '@types/react':
         specifier: 19.2.14
         version: 19.2.14
@@ -107,7 +110,7 @@ importers:
         version: 8.58.2(eslint@10.2.1)(typescript@6.0.3)
       '@vitejs/plugin-react':
         specifier: 6.0.1
-        version: 6.0.1(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+        version: 6.0.1(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
       '@vitest/coverage-v8':
         specifier: 4.1.5
         version: 4.1.5(vitest@4.1.5)
@@ -182,19 +185,19 @@ importers:
         version: 5.0.3(prettier@3.8.3)(stylelint@17.8.0(typescript@6.0.3))
       vite:
         specifier: 8.0.10
-        version: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+        version: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
       vite-plugin-eslint2:
         specifier: 5.1.0
-        version: 5.1.0(eslint@10.2.1)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+        version: 5.1.0(eslint@10.2.1)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
       vite-plugin-stylelint:
         specifier: 6.1.0
-        version: 6.1.0(postcss@8.5.10)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(stylelint@17.8.0(typescript@6.0.3))(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+        version: 6.1.0(postcss@8.5.10)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(stylelint@17.8.0(typescript@6.0.3))(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
       vite-plugin-svgr:
         specifier: 5.2.0
-        version: 5.2.0(rollup@4.53.3)(typescript@6.0.3)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+        version: 5.2.0(rollup@4.53.3)(typescript@6.0.3)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
       vitest:
         specifier: 4.1.5
-        version: 4.1.5(@types/node@22.14.1)(@vitest/coverage-v8@4.1.5)(jsdom@29.0.2)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+        version: 4.1.5(@types/node@24.1.0)(@vitest/coverage-v8@4.1.5)(jsdom@29.0.2)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
 
 packages:
 
@@ -1477,8 +1480,8 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
-  '@types/node@22.14.1':
-    resolution: {integrity: sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==}
+  '@types/node@24.1.0':
+    resolution: {integrity: sha512-ut5FthK5moxFKH2T1CUOC6ctR67rQRvvHdFLCD2Ql6KXmMuCrjsSsRI9UsLCm9M18BMwClv4pn327UvB7eeO1w==}
 
   '@types/prismjs@1.26.6':
     resolution: {integrity: sha512-vqlvI7qlMvcCBbVe0AKAb4f97//Hy0EBTaiW8AalRnG/xAN5zOiWWyrNqNXeq8+KAuvRewjCVY1+IPxk4RdNYw==}
@@ -4180,8 +4183,8 @@ packages:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
 
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+  undici-types@7.8.0:
+    resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
 
   undici@7.24.6:
     resolution: {integrity: sha512-Xi4agocCbRzt0yYMZGMA6ApD7gvtUFaxm4ZmeacWI4cZxaF6C+8I8QfofC20NAePiB/IcvZmzkJ7XPa471AEtA==}
@@ -5803,10 +5806,9 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
-  '@types/node@22.14.1':
+  '@types/node@24.1.0':
     dependencies:
-      undici-types: 6.21.0
-    optional: true
+      undici-types: 7.8.0
 
   '@types/prismjs@1.26.6': {}
 
@@ -6068,10 +6070,10 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.7.11':
     optional: true
 
-  '@vitejs/plugin-react@6.0.1(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))':
+  '@vitejs/plugin-react@6.0.1(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))':
     dependencies:
       '@rolldown/pluginutils': 1.0.0-rc.7
-      vite: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+      vite: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
 
   '@vitest/coverage-v8@4.1.5(vitest@4.1.5)':
     dependencies:
@@ -6085,7 +6087,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@types/node@22.14.1)(@vitest/coverage-v8@4.1.5)(jsdom@29.0.2)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+      vitest: 4.1.5(@types/node@24.1.0)(@vitest/coverage-v8@4.1.5)(jsdom@29.0.2)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
 
   '@vitest/expect@4.1.5':
     dependencies:
@@ -6096,13 +6098,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))':
+  '@vitest/mocker@4.1.5(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))':
     dependencies:
       '@vitest/spy': 4.1.5
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+      vite: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
 
   '@vitest/pretty-format@4.1.5':
     dependencies:
@@ -9271,8 +9273,7 @@ snapshots:
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
 
-  undici-types@6.21.0:
-    optional: true
+  undici-types@7.8.0: {}
 
   undici@7.24.6: {}
 
@@ -9400,24 +9401,24 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  vite-plugin-eslint2@5.1.0(eslint@10.2.1)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
+  vite-plugin-eslint2@5.1.0(eslint@10.2.1)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       debug: 4.4.3
       eslint: 10.2.1
-      vite: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+      vite: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
     optionalDependencies:
       rolldown: 1.0.0-rc.17
       rollup: 4.53.3
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-stylelint@6.1.0(postcss@8.5.10)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(stylelint@17.8.0(typescript@6.0.3))(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
+  vite-plugin-stylelint@6.1.0(postcss@8.5.10)(rolldown@1.0.0-rc.17)(rollup@4.53.3)(stylelint@17.8.0(typescript@6.0.3))(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       debug: 4.4.3
       stylelint: 17.8.0(typescript@6.0.3)
-      vite: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+      vite: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
     optionalDependencies:
       postcss: 8.5.10
       rolldown: 1.0.0-rc.17
@@ -9425,18 +9426,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-svgr@5.2.0(rollup@4.53.3)(typescript@6.0.3)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
+  vite-plugin-svgr@5.2.0(rollup@4.53.3)(typescript@6.0.3)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.53.3)
       '@svgr/core': 8.1.0(typescript@6.0.3)
       '@svgr/plugin-jsx': 8.1.0(@svgr/core@8.1.0(typescript@6.0.3))
-      vite: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+      vite: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
     transitivePeerDependencies:
       - rollup
       - supports-color
       - typescript
 
-  vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2):
+  vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -9444,16 +9445,16 @@ snapshots:
       rolldown: 1.0.0-rc.17
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 22.14.1
+      '@types/node': 24.1.0
       esbuild: 0.27.2
       fsevents: 2.3.3
       less: 4.6.4
       terser: 5.38.2
 
-  vitest@4.1.5(@types/node@22.14.1)(@vitest/coverage-v8@4.1.5)(jsdom@29.0.2)(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
+  vitest@4.1.5(@types/node@24.1.0)(@vitest/coverage-v8@4.1.5)(jsdom@29.0.2)(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)):
     dependencies:
       '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
+      '@vitest/mocker': 4.1.5(vite@8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2))
       '@vitest/pretty-format': 4.1.5
       '@vitest/runner': 4.1.5
       '@vitest/snapshot': 4.1.5
@@ -9470,10 +9471,10 @@ snapshots:
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 8.0.10(@types/node@22.14.1)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
+      vite: 8.0.10(@types/node@24.1.0)(esbuild@0.27.2)(less@4.6.4)(terser@5.38.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.14.1
+      '@types/node': 24.1.0
       '@vitest/coverage-v8': 4.1.5(vitest@4.1.5)
       jsdom: 29.0.2
     transitivePeerDependencies:
