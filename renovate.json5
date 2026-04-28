@@ -10,7 +10,7 @@
   separateMultipleMajor: false,
   separateMultipleMinor: false,
   separateMinorPatch: true,
-  baseBranchPatterns: ["master"],
+  baseBranchPatterns: ["main"],
   extends: [
     ":ignoreUnstable",
     ":rebaseStalePrs",

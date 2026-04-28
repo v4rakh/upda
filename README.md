@@ -72,7 +72,7 @@ your user and/or docker).
 
 ### Git workflow
 
-The main branch is `master`. It's protected and only eligible users can push to it. Merge requests to protected branches
+The main branch is `main`. It's protected and only eligible users can push to it. Merge requests to protected branches
 are safeguarded: they need review or at least a successful pipeline run to be merged.
 
 - Use conventional commits as commit style and branch naming strategy, e.g., `feat/`, `fix/`, `refactor/`, `chore/`, or
@@ -93,7 +93,7 @@ thus your code cannot be merged.
 
 ### Dependency updates
 
-Dependency updates are handled by Renovate using the `renovate.json5` file. The base branch is `master`.
+Dependency updates are handled by Renovate using the `renovate.json5` file. The base branch is `main`.
 
 Major updates undergo manual review.
 
