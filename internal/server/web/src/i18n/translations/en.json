@@ -356,6 +356,10 @@
     "title": "Events"
   },
   "filter_presets": {
+    "delete_confirm_cancel": "Cancel",
+    "delete_confirm_description": "Are you sure you want to delete this preset?",
+    "delete_confirm_ok": "Delete",
+    "delete_confirm_title": "Delete filter preset?",
     "error_bad_request_get": "Invalid input. Unable to retrieve filter presets.",
     "error_default_delete": "Unable to delete filter preset. Please make sure your device has network connection.",
     "error_default_get": "Unable to retrieve filter presets. Please make sure your device has network connection.",
