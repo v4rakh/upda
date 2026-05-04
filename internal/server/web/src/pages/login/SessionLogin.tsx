@@ -38,7 +38,7 @@ const SessionLogin = () => {
 
 	const onFinish = useCallback(
 		(values: { username: string; password: string }) => {
-			sendLogin({ username: values.username, password: values.password } as AuthTypeSessionLoginRequest);
+			sendLogin({ username: values.username, password: values.password });
 		},
 		[sendLogin]
 	);

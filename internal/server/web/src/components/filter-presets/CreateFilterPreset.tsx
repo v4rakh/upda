@@ -1,5 +1,5 @@
 import { useCreateFilterPresetMutation } from '../../api/filterPresetsApi';
-import { CreateFilterPresetRequest, FilterPresetType } from '../../types/filterPreset';
+import { FilterPresetType } from '../../types/filterPreset';
 import { useNotification } from '../../use/useNotification';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, ColorPicker, Form, Input } from 'antd';
@@ -31,7 +31,7 @@ const CreateFilterPreset = ({ type }: CreateFilterPresetProps) => {
 				label: values.label,
 				color: values.color ? values.color.toHexString() : undefined,
 				parameters: searchParams.toString()
-			} as CreateFilterPresetRequest);
+			});
 		});
 	}, [form, save, type, searchParams]);
 

@@ -90,7 +90,7 @@ const ActionsPage = () => {
 					ActionFilterQueryParamNames.ORDER,
 					(sort as SorterResult<ActionResponse>).order === 'descend'
 						? ActionOrder.DESC
-						: (ActionOrder.ASC as string)
+						: (ActionOrder.ASC)
 				);
 			}
 			setSearchQueryParams(queryParams);

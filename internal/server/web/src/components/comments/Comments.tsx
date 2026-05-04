@@ -5,7 +5,7 @@ import { useLazyGetCommentsQuery } from '../../api/commentsApi';
 import DateTimeStyle from '../../constants/dateTimeStyle';
 import { LIST_PAGE_DEFAULT, LIST_PAGE_SIZE_DEFAULT } from '../../constants/pagination';
 import { useLocaleProviderContext } from '../../providers/LocaleContextProvider';
-import { CommentResponse, CommentSingleResponse, CommentsRequestParams } from '../../types';
+import { CommentResponse, CommentSingleResponse } from '../../types';
 import { useNotification } from '../../use/useNotification';
 import { formatDateTimeWithTimeZone } from '../../utils/datetimeHelper';
 import { DownOutlined, ReloadOutlined } from '@ant-design/icons';
@@ -31,10 +31,7 @@ const Comments = ({ updateId }: CommentProps): ReactNode => {
 
 	const fetchData = useCallback(
 		async (updateId: string, page: number) => {
-			const res = await trigger(
-				{ page: page, pageSize: LIST_PAGE_SIZE_DEFAULT, updateId: updateId } as CommentsRequestParams,
-				false
-			);
+			const res = await trigger({ page: page, pageSize: LIST_PAGE_SIZE_DEFAULT, updateId: updateId }, false);
 			if (res.isSuccess && res.data && res.data.data.content) {
 				const merged = unionBy(comments, res.data.data.content, 'id');
 				setComments(merged);

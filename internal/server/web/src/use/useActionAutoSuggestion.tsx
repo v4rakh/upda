@@ -19,7 +19,7 @@ const createVarOptions = (vars: string[]): MentionsOptionProps[] =>
 				{e}
 			</Space>
 		)
-	})) as MentionsOptionProps[];
+	}));
 
 export interface AutoSuggestionHook {
 	mentionOptions: MentionsOptionProps[];

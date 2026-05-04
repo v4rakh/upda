@@ -96,7 +96,7 @@ const ActionInvocationsPage = () => {
 					ActionInvocationFilterQueryParamNames.ORDER,
 					(sort as SorterResult<ActionInvocationResponse>).order === 'descend'
 						? ActionInvocationOrder.DESC
-						: (ActionInvocationOrder.ASC as string)
+						: (ActionInvocationOrder.ASC)
 				);
 			}
 			setSearchQueryParams(queryParams);
