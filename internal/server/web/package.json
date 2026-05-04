@@ -19,6 +19,7 @@
 		"format": "prettier --write ./src/**/*.{ts,tsx,less}",
 		"format:check": "prettier --check ./src/**/*.{ts,tsx,less}",
 		"lint": "eslint \"./src/**/*.{tsx,ts}\"",
+		"lint:errors": "eslint --quiet \"./src/**/*.{tsx,ts}\"",
 		"lint:fix": "eslint --fix \"./src/**/*.{tsx,ts}\"",
 		"lint:style": "stylelint \"./src/**/*.less\"",
 		"lint:style:fix": "stylelint \"./src/**/*.less\" --fix",
