@@ -10,7 +10,6 @@ interface Configuration {
 	VITE_API_URL: string;
 	VITE_BASE_PATH: string;
 	VITE_TITLE: string;
-	VITE_ENABLE_DARK_THEME: number;
 	VITE_ENABLE_FOOTER: number;
 	VITE_AUTH_TYPE: AuthType;
 }

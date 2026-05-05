@@ -1,7 +1,7 @@
 import { useModifyCommentContentMutation } from '../../api/commentsApi';
+import { useTheme } from '../../providers/ThemeProvider';
 import { CommentResponse, CommentSingleResponse } from '../../types';
 import { useNotification } from '../../use/useNotification';
-import { darkThemeEnabled } from '../../utils/featureHelper';
 import { EditOutlined } from '@ant-design/icons';
 import MDEditor from '@uiw/react-md-editor';
 import { Button, Form, Space, Typography } from 'antd';
@@ -21,13 +21,14 @@ const { Text } = Typography;
 const EditableComment: FC<EditableCommentProps> = ({ comment, onEditSuccess }): ReactNode => {
 	const [t] = useTranslation('comment_edit');
 	const { apiError } = useNotification();
+	const { isDarkTheme } = useTheme();
 	const [form] = Form.useForm();
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [modify, { data, isLoading, isError, isSuccess, error }] = useModifyCommentContentMutation();
 
 	const editorTheme = useMemo(() => {
-		return darkThemeEnabled() ? 'dark' : 'light';
-	}, []);
+		return isDarkTheme ? 'dark' : 'light';
+	}, [isDarkTheme]);
 
 	useEffect(() => {
 		if (isError) {

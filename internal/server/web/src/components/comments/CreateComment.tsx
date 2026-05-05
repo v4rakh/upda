@@ -1,7 +1,7 @@
 import { useCreateCommentMutation } from '../../api/commentsApi';
+import { useTheme } from '../../providers/ThemeProvider';
 import { CommentSingleResponse, CreateCommentRequest } from '../../types';
 import { useNotification } from '../../use/useNotification';
-import { darkThemeEnabled } from '../../utils/featureHelper';
 import { PlusOutlined } from '@ant-design/icons';
 import MDEditor from '@uiw/react-md-editor';
 import { Button, Collapse, Divider, Form } from 'antd';
@@ -19,13 +19,14 @@ interface CreateCommentProps {
 const CreateComment = ({ updateId, onCreateSuccess }: CreateCommentProps): ReactNode => {
 	const [t] = useTranslation('comment_create');
 	const { apiError } = useNotification();
+	const { isDarkTheme } = useTheme();
 	const [form] = Form.useForm();
 	const [save, { data, isSuccess, isError, reset, error, isLoading }] = useCreateCommentMutation();
 	const [collapseActiveKeys, setCollapseActiveKeys] = useState<string[] | string>([]);
 
 	const editorTheme = useMemo(() => {
-		return darkThemeEnabled() ? 'dark' : 'light';
-	}, []);
+		return isDarkTheme ? 'dark' : 'light';
+	}, [isDarkTheme]);
 
 	const onSubmit = useCallback(() => {
 		form.validateFields().then((values: CreateCommentRequest) => {

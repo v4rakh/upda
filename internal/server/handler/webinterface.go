@@ -22,9 +22,8 @@ const runtime_config = Object.freeze({
   VITE_BASE_PATH: '/',
   VITE_API_URL: '%s',
   VITE_TITLE: '%s',
-  VITE_ENABLE_DARK_THEME: %d,
-  VITE_ENABLE_FOOTER: %d,
-  VITE_AUTH_TYPE: '%s'
+  VITE_AUTH_TYPE: '%s',
+  VITE_ENABLE_FOOTER: %d
 });
 
 Object.defineProperty(window, 'runtime_config', {
@@ -32,15 +31,11 @@ Object.defineProperty(window, 'runtime_config', {
     writable: false
 });
 	`
-	darkThemeEnabled := 0
-	if h.webInterfaceConfig.DarkThemeEnabled {
-		darkThemeEnabled = 1
-	}
 	enableFooter := 0
 	if h.webInterfaceConfig.FooterEnabled {
 		enableFooter = 1
 	}
 
-	webinterfaceConfig := fmt.Sprintf(runtimeConfig, h.webInterfaceConfig.ApiUrl, h.webInterfaceConfig.Title, darkThemeEnabled, enableFooter, h.authConfig.Type)
+	webinterfaceConfig := fmt.Sprintf(runtimeConfig, h.webInterfaceConfig.ApiUrl, h.webInterfaceConfig.Title, h.authConfig.Type, enableFooter)
 	c.Data(http.StatusOK, "text/javascript; charset=utf-8", []byte(webinterfaceConfig))
 }

@@ -5,6 +5,7 @@ import UpdateFilterQueryParamNames from '../../constants/api/updateFilterQueryPa
 import UpdateOrder from '../../constants/api/updateOrder';
 import UpdateOrderBy from '../../constants/api/updateOrderBy';
 import UpdateSearchIn from '../../constants/api/updateSearchIn';
+import LocalStorageKeys from '../../constants/localStorageKeys';
 import { UpdateStateValue } from '../../types';
 import { FilterPresetType } from '../../types/filterPreset';
 import { useLocalStorage } from '../../use/useLocalStorage';
@@ -18,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 const COLLAPSE_KEY = 'updatesFilterExpanded';
-const STORAGE_KEY = 'updatesFilterExpanded';
 
 const { Search } = Input;
 
@@ -29,7 +29,7 @@ export interface UpdatePageFilterProps {
 const UpdatePageFilter: FC<UpdatePageFilterProps> = ({ loading }) => {
 	const [t] = useTranslation('updates_filters');
 	const [form] = Form.useForm();
-	const [expanded, setExpanded] = useLocalStorage<boolean>(STORAGE_KEY, false);
+	const [expanded, setExpanded] = useLocalStorage<boolean>(LocalStorageKeys.UPDATES_FILTER_EXPANDED, false);
 
 	const [queryParams, setSearchQueryParams] = useSearchParams();
 	const { searchTerm, searchIn, orderBy, order, state } = useUpdatesFilterQueryParams();

@@ -267,6 +267,8 @@
     "secrets": "Secrets",
     "state_definitions": "States",
     "state_transitions": "Transitions",
+    "toggle_dark_theme": "Enable dark theme",
+    "toggle_light_theme": "Enable light theme",
     "updates": "Updates",
     "webhooks": "Webhooks"
   },

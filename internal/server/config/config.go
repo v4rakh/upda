@@ -86,11 +86,10 @@ type Database struct {
 }
 
 type Webinterface struct {
-	Enabled          bool   `env:"WEB_INTERFACE_ENABLED,default=true"`
-	ApiUrl           string `env:"WEB_INTERFACE_API_URL,default=http://localhost:8080/api/" validate:"required_if=Enabled true"`
-	Title            string `env:"WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
-	DarkThemeEnabled bool   `env:"WEB_INTERFACE_DARK_THEME_ENABLED,default=false"`
-	FooterEnabled    bool   `env:"WEB_INTERFACE_FOOTER_ENABLED,default=true"`
+	Enabled       bool   `env:"WEB_INTERFACE_ENABLED,default=true"`
+	ApiUrl        string `env:"WEB_INTERFACE_API_URL,default=http://localhost:8080/api/" validate:"required_if=Enabled true"`
+	Title         string `env:"WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
+	FooterEnabled bool   `env:"WEB_INTERFACE_FOOTER_ENABLED,default=true"`
 }
 
 type WebinterfaceCacheControl struct {

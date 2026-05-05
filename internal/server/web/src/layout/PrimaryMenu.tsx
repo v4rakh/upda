@@ -132,7 +132,13 @@ const PrimaryMenu: FC<PrimaryMenuProps> = ({ t }): ReactNode => {
 		return items;
 	}, [isAuthenticated, t, navigate, isLoggingOut, profile?.preferredUsername, onLogoutClicked]);
 	return (
-		<Menu theme="dark" selectable={false} mode="horizontal" items={primaryNavs} style={{ flex: 1, minWidth: 0 }} />
+		<Menu
+			theme="dark"
+			selectable={false}
+			mode="horizontal"
+			items={primaryNavs}
+			style={{ flex: 1, minWidth: 0, borderBottom: 'none' }}
+		/>
 	);
 };
 

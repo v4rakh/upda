@@ -74,7 +74,6 @@ The following tables describe available configuration values.
 | WEB_INTERFACE_ENABLED            | true                       | Enables web UI.             |
 | WEB_INTERFACE_API_URL            | http://localhost:8080/api/ | API URL used by the web UI. |
 | WEB_INTERFACE_TITLE              | upda                       | Web UI title.               |
-| WEB_INTERFACE_DARK_THEME_ENABLED | false                      | Enables dark theme.         |
 | WEB_INTERFACE_FOOTER_ENABLED     | true                       | Shows or hides the footer.  |
 
 ### Webinterface Cache Control
