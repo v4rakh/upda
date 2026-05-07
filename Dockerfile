@@ -35,7 +35,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -tags prod -ldflags="-s -w" -o /upda ./cmd
 FROM gcr.io/distroless/static-debian13:nonroot
 
 # Copy binary
-COPY --from=builder-server /upda /usr/local/bin/upda
+COPY --chown=65532:0 --from=builder-server /upda /usr/local/bin/upda
 
 # Labels
 LABEL maintainer="Varakh <varakh@varakh.de>" \
@@ -50,6 +50,9 @@ LABEL maintainer="Varakh <varakh@varakh.de>" \
 # Expose HTTP port
 ENV SERVER_PORT=8080
 EXPOSE ${SERVER_PORT}
+
+# Run as non-root user (required for OpenShift restricted SCC)
+USER 65532:65532
 
 # Default command
 ENTRYPOINT ["/usr/local/bin/upda"]
