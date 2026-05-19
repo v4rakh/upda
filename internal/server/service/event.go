@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/json"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
@@ -10,7 +12,6 @@ import (
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/rs/zerolog/log"
-	"time"
 )
 
 type EventService struct {

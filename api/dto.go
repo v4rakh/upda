@@ -9,11 +9,11 @@ import (
 // json/body
 
 type ModifyUpdateStateRequest struct {
-	State string `json:"state" binding:"required,min=1,max=50"`
+	State string `binding:"required,min=1,max=50" json:"state"`
 }
 
 type ModifyWebhookLabelRequest struct {
-	Label string `json:"label" binding:"required,min=1,max=255"`
+	Label string `binding:"required,min=1,max=255" json:"label"`
 }
 
 type ModifyWebhookIgnoreHostRequest struct {
@@ -21,29 +21,29 @@ type ModifyWebhookIgnoreHostRequest struct {
 }
 
 type ModifyWebhookIgnoreHostReplacementRequest struct {
-	IgnoreHostReplacement string `json:"ignoreHostReplacement" binding:"required,min=1,max=255"`
+	IgnoreHostReplacement string `binding:"required,min=1,max=255" json:"ignoreHostReplacement"`
 }
 
 type CreateWebhookRequest struct {
-	Label                 string `json:"label" binding:"required,min=1,max=255"`
-	Type                  string `json:"type" binding:"required,oneof=generic diun"`
+	Label                 string `binding:"required,min=1,max=255"      json:"label"`
+	Type                  string `binding:"required,oneof=generic diun" json:"type"`
 	IgnoreHost            bool   `json:"ignoreHost"`
-	IgnoreHostReplacement string `json:"ignoreHostReplacement" binding:"required,min=1,max=255"`
+	IgnoreHostReplacement string `binding:"required,min=1,max=255"      json:"ignoreHostReplacement"`
 }
 
 type CreateSecretRequest struct {
-	Key   string `json:"key" binding:"required,min=1"`
-	Value string `json:"value" binding:"required,min=1"`
+	Key   string `binding:"required,min=1" json:"key"`
+	Value string `binding:"required,min=1" json:"value"`
 }
 
 type CreateConstantRequest struct {
-	Key   string `json:"key" binding:"required,min=1"`
-	Value string `json:"value" binding:"required,min=1"`
+	Key   string `binding:"required,min=1" json:"key"`
+	Value string `binding:"required,min=1" json:"value"`
 }
 
 type CreateActionRequest struct {
-	Label            string      `json:"label" binding:"required,min=1,max=255"`
-	Type             string      `json:"type" binding:"required,oneof=shoutrrr"`
+	Label            string      `binding:"required,min=1,max=255"  json:"label"`
+	Type             string      `binding:"required,oneof=shoutrrr" json:"type"`
 	MatchEvent       *string     `json:"matchEvent"`
 	MatchHost        *string     `json:"matchHost"`
 	MatchApplication *string     `json:"matchApplication"`
@@ -52,26 +52,26 @@ type CreateActionRequest struct {
 	Enabled          bool        `json:"enabled"`
 }
 type CreateFilterPresetRequest struct {
-	Type       string  `json:"type" binding:"required,oneof=update"`
-	Label      string  `json:"label" binding:"required,min=1,max=255"`
-	Parameters string  `json:"parameters" binding:"required"`
+	Type       string  `binding:"required,oneof=update"  json:"type"`
+	Label      string  `binding:"required,min=1,max=255" json:"label"`
+	Parameters string  `binding:"required"               json:"parameters"`
 	Color      *string `json:"color"`
 }
 
 type CreateCommentRequest struct {
-	Content string `json:"content" binding:"required,min=1"`
+	Content string `binding:"required,min=1" json:"content"`
 }
 
 type ModifySecretValueRequest struct {
-	Value string `json:"value" binding:"required,min=1"`
+	Value string `binding:"required,min=1" json:"value"`
 }
 
 type ModifyConstantValueRequest struct {
-	Value string `json:"value" binding:"required,min=1"`
+	Value string `binding:"required,min=1" json:"value"`
 }
 
 type ModifyActionLabelRequest struct {
-	Label string `json:"label" binding:"required,min=1,max=255"`
+	Label string `binding:"required,min=1,max=255" json:"label"`
 }
 
 type ModifyActionMatchEventRequest struct {
@@ -91,8 +91,8 @@ type ModifyActionMatchProviderRequest struct {
 }
 
 type ModifyActionTypeAndPayloadRequest struct {
-	Type    string      `json:"type" binding:"required,oneof=shoutrrr"`
-	Payload interface{} `json:"payload" binding:"required"`
+	Type    string      `binding:"required,oneof=shoutrrr" json:"type"`
+	Payload interface{} `binding:"required"                json:"payload"`
 }
 
 type ModifyActionEnabledRequest struct {
@@ -100,22 +100,22 @@ type ModifyActionEnabledRequest struct {
 }
 
 type ModifyCommentContentRequest struct {
-	Content string `json:"content" binding:"required,min=1"`
+	Content string `binding:"required,min=1" json:"content"`
 }
 
 type TestActionRequest struct {
-	Application string `json:"application" binding:"required,min=1"`
-	Provider    string `json:"provider" binding:"required,min=1"`
-	Host        string `json:"host" binding:"required,min=1"`
-	Version     string `json:"version" binding:"required,min=1"`
-	State       string `json:"state" binding:"required,min=1"`
+	Application string `binding:"required,min=1" json:"application"`
+	Provider    string `binding:"required,min=1" json:"provider"`
+	Host        string `binding:"required,min=1" json:"host"`
+	Version     string `binding:"required,min=1" json:"version"`
+	State       string `binding:"required,min=1" json:"state"`
 }
 
 type WebhookGenericRequest struct {
-	Application string      `json:"application" binding:"required,min=1"`
+	Application string      `binding:"required,min=1" json:"application"`
 	Provider    string      `json:"provider"`
-	Host        string      `json:"host" binding:"required,min=1"`
-	Version     string      `json:"version" binding:"required,min=1"`
+	Host        string      `binding:"required,min=1" json:"host"`
+	Version     string      `binding:"required,min=1" json:"version"`
 	Metadata    interface{} `json:"metadata"`
 }
 
@@ -130,76 +130,76 @@ type WebhookDiunMetadataRequest struct {
 }
 
 type WebhookDiunRequest struct {
-	DiunVersion string                     `json:"diun_version" binding:"required,min=1"`
-	Hostname    string                     `json:"hostname" binding:"required,min=1"`
-	Status      string                     `json:"status" binding:"required,min=1"`
-	Provider    string                     `json:"provider" binding:"required,min=1"`
-	Image       string                     `json:"image" binding:"required,min=1"`
+	DiunVersion string                     `binding:"required,min=1" json:"diun_version"`
+	Hostname    string                     `binding:"required,min=1" json:"hostname"`
+	Status      string                     `binding:"required,min=1" json:"status"`
+	Provider    string                     `binding:"required,min=1" json:"provider"`
+	Image       string                     `binding:"required,min=1" json:"image"`
 	HubLink     string                     `json:"hub_link"`
-	MimeType    string                     `json:"mime_type" binding:"required,min=1"`
-	Digest      string                     `json:"digest" binding:"required,min=1"`
-	Created     string                     `json:"created" binding:"required,min=1"`
-	Platform    string                     `json:"platform" binding:"required,min=1"`
+	MimeType    string                     `binding:"required,min=1" json:"mime_type"`
+	Digest      string                     `binding:"required,min=1" json:"digest"`
+	Created     string                     `binding:"required,min=1" json:"created"`
+	Platform    string                     `binding:"required,min=1" json:"platform"`
 	Metadata    WebhookDiunMetadataRequest `json:"metadata"`
 }
 
 // query parameters
 
 type PaginateUpdateRequest struct {
-	PageSize   int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page       int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order      string `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy    string `form:"orderBy,default=updated_at" binding:"oneof=id application provider host version created_at updated_at"`
+	PageSize   int    `binding:"numeric,gte=1"                                                    form:"pageSize,default=5"`
+	Page       int    `binding:"numeric,gte=1"                                                    form:"page,default=1"`
+	Order      string `binding:"oneof=asc desc"                                                   form:"order,default=desc"`
+	OrderBy    string `binding:"oneof=id application provider host version created_at updated_at" form:"orderBy,default=updated_at"`
 	SearchTerm string `form:"searchTerm"`
-	SearchIn   string `form:"searchIn,default=application" binding:"oneof=application provider host version"`
+	SearchIn   string `binding:"oneof=application provider host version"                          form:"searchIn,default=application"`
 }
 
 type PaginateWebhookRequest struct {
-	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
+	PageSize int    `binding:"numeric,gte=1"                             form:"pageSize,default=5"`
+	Page     int    `binding:"numeric,gte=1"                             form:"page,default=1"`
+	Order    string `binding:"oneof=asc desc"                            form:"order,default=asc"`
+	OrderBy  string `binding:"oneof=id label type created_at updated_at" form:"orderBy,default=label"`
 }
 
 type PaginateActionRequest struct {
-	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order    string `form:"order,default=asc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=label" binding:"oneof=id label type created_at updated_at"`
+	PageSize int    `binding:"numeric,gte=1"                             form:"pageSize,default=5"`
+	Page     int    `binding:"numeric,gte=1"                             form:"page,default=1"`
+	Order    string `binding:"oneof=asc desc"                            form:"order,default=asc"`
+	OrderBy  string `binding:"oneof=id label type created_at updated_at" form:"orderBy,default=label"`
 }
 
 type PaginateActionInvocationRequest struct {
-	PageSize int    `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int    `form:"page,default=1" binding:"numeric,gte=1"`
-	Order    string `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy  string `form:"orderBy,default=created_at" binding:"oneof=id state retry_count created_at updated_at"`
+	PageSize int    `binding:"numeric,gte=1"                                    form:"pageSize,default=5"`
+	Page     int    `binding:"numeric,gte=1"                                    form:"page,default=1"`
+	Order    string `binding:"oneof=asc desc"                                   form:"order,default=desc"`
+	OrderBy  string `binding:"oneof=id state retry_count created_at updated_at" form:"orderBy,default=created_at"`
 }
 
 type EventWindowRequest struct {
-	Size     int     `form:"size,default=10" binding:"numeric,gte=1"`
-	Skip     int     `form:"skip,default=0" binding:"numeric"`
-	Order    string  `form:"order,default=desc" binding:"oneof=asc desc"`
-	OrderBy  string  `form:"orderBy,default=created_at" binding:"oneof=id name created_at updated_at"`
+	Size     int     `binding:"numeric,gte=1"                       form:"size,default=10"`
+	Skip     int     `binding:"numeric"                             form:"skip,default=0"`
+	Order    string  `binding:"oneof=asc desc"                      form:"order,default=desc"`
+	OrderBy  string  `binding:"oneof=id name created_at updated_at" form:"orderBy,default=created_at"`
 	UpdateID *string `form:"updateId"`
 }
 
 type PaginateCommentRequest struct {
-	PageSize int `form:"pageSize,default=5" binding:"numeric,gte=1"`
-	Page     int `form:"page,default=1" binding:"numeric,gte=1"`
+	PageSize int `binding:"numeric,gte=1" form:"pageSize,default=5"`
+	Page     int `binding:"numeric,gte=1" form:"page,default=1"`
 }
 
 // uri parameters
 
 type FilterPresetUriRequest struct {
-	Type string `uri:"type" binding:"required,oneof=update"`
+	Type string `binding:"required,oneof=update" uri:"type"`
 }
 
 type IDUriRequest struct {
-	ID string `uri:"id" binding:"required,uuid4"`
+	ID string `binding:"required,uuid4" uri:"id"`
 }
 
 type UpdateIDUriRequest struct {
-	ID string `uri:"updateId" binding:"required,uuid4"`
+	ID string `binding:"required,uuid4" uri:"updateId"`
 }
 
 // Responses
@@ -731,20 +731,20 @@ func NewCommentPageResponse(content []*CommentResponse, page int, pageSize int, 
 // Update State Definition DTOs
 
 type CreateUpdateStateDefinitionRequest struct {
-	Name             string  `json:"name" binding:"required,min=1,max=50,alphanum"`
-	Label            string  `json:"label" binding:"required,min=1,max=100"`
-	Color            string  `json:"color" binding:"required,min=1,max=50"`
-	Icon             string  `json:"icon" binding:"required,min=1,max=100"`
+	Name             string  `binding:"required,min=1,max=50,alphanum" json:"name"`
+	Label            string  `binding:"required,min=1,max=100"         json:"label"`
+	Color            string  `binding:"required,min=1,max=50"          json:"color"`
+	Icon             string  `binding:"required,min=1,max=100"         json:"icon"`
 	Description      *string `json:"description"`
 	IsInitial        bool    `json:"isInitial"`
 	SkipOnNewVersion bool    `json:"skipOnNewVersion"`
 }
 
 type ModifyUpdateStateDefinitionRequest struct {
-	Name             string  `json:"name" binding:"required,min=1,max=50,alphanum"`
-	Label            string  `json:"label" binding:"required,min=1,max=100"`
-	Color            string  `json:"color" binding:"required,min=1,max=50"`
-	Icon             string  `json:"icon" binding:"required,min=1,max=100"`
+	Name             string  `binding:"required,min=1,max=50,alphanum" json:"name"`
+	Label            string  `binding:"required,min=1,max=100"         json:"label"`
+	Color            string  `binding:"required,min=1,max=50"          json:"color"`
+	Icon             string  `binding:"required,min=1,max=100"         json:"icon"`
 	Description      *string `json:"description"`
 	IsInitial        bool    `json:"isInitial"`
 	SkipOnNewVersion bool    `json:"skipOnNewVersion"`
@@ -752,12 +752,12 @@ type ModifyUpdateStateDefinitionRequest struct {
 }
 
 type ReorderUpdateStateDefinitionItem struct {
-	ID        string `json:"id" binding:"required,uuid4"`
-	SortOrder int    `json:"sortOrder" binding:"min=0"`
+	ID        string `binding:"required,uuid4" json:"id"`
+	SortOrder int    `binding:"min=0"          json:"sortOrder"`
 }
 
 type ReorderUpdateStateDefinitionsRequest struct {
-	Items []ReorderUpdateStateDefinitionItem `json:"items" binding:"required,min=1,dive"`
+	Items []ReorderUpdateStateDefinitionItem `binding:"required,min=1,dive" json:"items"`
 }
 
 type UpdateStateDefinitionResponse struct {
@@ -811,12 +811,12 @@ func NewUpdateStateDefinitionPageResponse(content []*UpdateStateDefinitionRespon
 // Update State Transition DTOs
 
 type CreateUpdateStateTransitionRequest struct {
-	FromStateId string `json:"fromStateId" binding:"required,uuid4"`
-	ToStateId   string `json:"toStateId" binding:"required,uuid4"`
+	FromStateId string `binding:"required,uuid4" json:"fromStateId"`
+	ToStateId   string `binding:"required,uuid4" json:"toStateId"`
 }
 
 type StateIdUriRequest struct {
-	StateID string `uri:"stateId" binding:"required,uuid4"`
+	StateID string `binding:"required,uuid4" uri:"stateId"`
 }
 
 type UpdateStateTransitionResponse struct {

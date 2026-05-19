@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"github.com/go-resty/resty/v2"
 	"github.com/urfave/cli/v3"
-	"time"
 )
 
 const (
@@ -199,7 +200,7 @@ func failIfFlagsNotPresent(cmd *cli.Command, flagKeys []string) error {
 
 	for _, key := range flagKeys {
 		if cmd.String(key) == "" {
-			return errors.New(fmt.Sprintf("'%v' is required but blank", key))
+			return fmt.Errorf("'%v' is required but blank", key)
 		}
 	}
 

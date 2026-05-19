@@ -2,15 +2,16 @@ package service
 
 import (
 	"fmt"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"github.com/go-co-op/gocron-redis-lock/v2"
+	redislock "github.com/go-co-op/gocron-redis-lock/v2"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"time"
 )
 
 type TaskService struct {
@@ -48,7 +49,7 @@ func NewTaskService(l LockService, ac *config.App, lc *config.Lock) (*TaskServic
 		log.Info().Msg("Initializing REDIS task service")
 
 		var c *redis.Client
-		if c, err = config.NewRedisClient(fmt.Sprintf("%s-task", meta.Name), lc.RedisUrl); err != nil {
+		if c, err = config.NewRedisClient(meta.Name+"-task", lc.RedisUrl); err != nil {
 			return nil, fmt.Errorf("task service: cannot initialize REDIS client: %w", err)
 		}
 

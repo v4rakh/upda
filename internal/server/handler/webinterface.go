@@ -2,9 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"net/http"
+
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type WebinterfaceHandler struct {

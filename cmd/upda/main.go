@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	golog "log"
+	"os"
+
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server"
 	"git.myservermanager.com/varakh/upda/internal/terminal"
 	"github.com/urfave/cli/v3"
-	golog "log"
-	"os"
 )
 
 func main() {

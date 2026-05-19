@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/locker"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"time"
 )
 
 type LockMemService struct {

@@ -3,12 +3,13 @@ package service
 import (
 	"errors"
 	"fmt"
+	"sync"
+
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"git.myservermanager.com/varakh/upda/internal/str"
 	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
-	"sync"
 )
 
 type customGauges struct {

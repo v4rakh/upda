@@ -2,8 +2,8 @@ package dto
 
 // ActionPayloadShoutrrrDto payload for shoutrrr
 type ActionPayloadShoutrrrDto struct {
-	Body string   `json:"body" binding:"required" validate:"required"`
-	Urls []string `json:"urls" binding:"required" validate:"required,min=1"`
+	Body string   `binding:"required" json:"body" validate:"required"`
+	Urls []string `binding:"required" json:"urls" validate:"required,min=1"`
 }
 
 // EventPayloadInformationDto general event payload

@@ -1,11 +1,12 @@
 package handler
 
 import (
+	"net/http"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type EventHandler struct {

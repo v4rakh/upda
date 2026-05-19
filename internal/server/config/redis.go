@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/redis/go-redis/v9"
 )

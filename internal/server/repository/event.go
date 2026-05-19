@@ -3,11 +3,12 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
-	"time"
 )
 
 type EventRepository interface {
@@ -56,8 +57,7 @@ func (r *EventDbRepo) Create(name string, state string, payload interface{}) (*m
 	}
 
 	var err error
-	var e *model.Event
-	e = &model.Event{
+	var e = &model.Event{
 		Name:  name,
 		State: state,
 	}

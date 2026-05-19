@@ -2,6 +2,7 @@ package repository
 
 import (
 	"encoding/json"
+
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
@@ -72,7 +73,6 @@ func (r *UpdateDbRepo) FindBy(application string, provider string, host string) 
 
 	if res.RowsAffected == 0 || e == nil {
 		return nil, service_error.ErrResourceNotFound
-
 	}
 
 	return e, nil

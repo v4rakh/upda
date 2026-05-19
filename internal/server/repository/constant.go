@@ -1,3 +1,4 @@
+//nolint:dupl
 package repository
 
 import (
@@ -77,9 +78,7 @@ func (r *ConstantDbRepo) Create(key string, value string) (*model.Constant, erro
 		return nil, service_error.ErrValidationNotBlank
 	}
 
-	var e *model.Constant
-
-	e = &model.Constant{
+	var e = &model.Constant{
 		Key:   key,
 		Value: value,
 	}

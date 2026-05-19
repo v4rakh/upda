@@ -6,6 +6,11 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	golog "log"
+	"net/http"
+	"os"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/validate"
 	"github.com/golang-migrate/migrate/v4"
@@ -16,13 +21,9 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/sethvargo/go-envconfig"
-	"github.com/skynet2/zerolog-gorm"
+	zerologgorm "github.com/skynet2/zerolog-gorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	golog "log"
-	"net/http"
-	"os"
-	"time"
 )
 
 const (
@@ -33,22 +34,22 @@ const (
 var migrationPostgresFS embed.FS
 
 type Logging struct {
-	Encoding              constant.ConfigLogEncoding    `env:"LOGGING_ENCODING,default=console" validate:"required,oneof=json console"`
+	Encoding              constant.ConfigLogEncoding    `env:"LOGGING_ENCODING,default=console"                   validate:"required,oneof=json console"`
 	EncodingColorize      bool                          `env:"LOGGING_ENCODING_COLORIZE,default=false"`
-	EncodingErrorKey      string                        `env:"LOGGING_ENCODING_ERROR_KEY,default=error" validate:"required"`
-	EncodingFileKey       string                        `env:"LOGGING_ENCODING_FILE_KEY,default=file" validate:"required"`
-	EncodingFuncKey       string                        `env:"LOGGING_ENCODING_FUNC_KEY,default=func" validate:"required"`
-	EncodingLevelKey      string                        `env:"LOGGING_ENCODING_LEVEL_KEY,default=level" validate:"required"`
-	EncodingMessageKey    string                        `env:"LOGGING_ENCODING_MESSAGE_KEY,default=msg" validate:"required"`
+	EncodingErrorKey      string                        `env:"LOGGING_ENCODING_ERROR_KEY,default=error"           validate:"required"`
+	EncodingFileKey       string                        `env:"LOGGING_ENCODING_FILE_KEY,default=file"             validate:"required"`
+	EncodingFuncKey       string                        `env:"LOGGING_ENCODING_FUNC_KEY,default=func"             validate:"required"`
+	EncodingLevelKey      string                        `env:"LOGGING_ENCODING_LEVEL_KEY,default=level"           validate:"required"`
+	EncodingMessageKey    string                        `env:"LOGGING_ENCODING_MESSAGE_KEY,default=msg"           validate:"required"`
 	EncodingStacktraceKey string                        `env:"LOGGING_ENCODING_STACKTRACE_KEY,default=stacktrace" validate:"required"`
-	EncodingTimeEncoder   constant.ConfigLogTimeEncoder `env:"LOGGING_ENCODING_TIME_ENCODER,default=rfc3339" validate:"required,oneof=epoch epochmillis epochnanos iso8601 rfc3339 rfc3339nano"`
-	EncodingTimeKey       string                        `env:"LOGGING_ENCODING_TIME_KEY,default=ts" validate:"required"`
-	Level                 string                        `env:"LOGGING_LEVEL,default=info" validate:"required,oneof=trace debug info warn error fatal panic disabled"`
-	LevelRequests         string                        `env:"LOGGING_LEVEL_REQUESTS,default=disabled" validate:"required,oneof=trace debug info warn error fatal panic disabled"`
+	EncodingTimeEncoder   constant.ConfigLogTimeEncoder `env:"LOGGING_ENCODING_TIME_ENCODER,default=rfc3339"      validate:"required,oneof=epoch epochmillis epochnanos iso8601 rfc3339 rfc3339nano"`
+	EncodingTimeKey       string                        `env:"LOGGING_ENCODING_TIME_KEY,default=ts"               validate:"required"`
+	Level                 string                        `env:"LOGGING_LEVEL,default=info"                         validate:"required,oneof=trace debug info warn error fatal panic disabled"`
+	LevelRequests         string                        `env:"LOGGING_LEVEL_REQUESTS,default=disabled"            validate:"required,oneof=trace debug info warn error fatal panic disabled"`
 }
 
 type App struct {
-	TimeZone    string `env:"TZ,default=Etc/UTC" validate:"required"`
+	TimeZone    string `env:"TZ,default=Etc/UTC"        validate:"required"`
 	Development bool   `env:"DEVELOPMENT,default=false"`
 }
 
@@ -57,13 +58,13 @@ type Secret struct {
 }
 
 type Server struct {
-	Port        int           `env:"SERVER_PORT,default=8080" validate:"gte=1"`
+	Port        int           `env:"SERVER_PORT,default=8080"         validate:"gte=1"`
 	Listen      string        `env:"SERVER_LISTEN"`
-	BasePath    string        `env:"SERVER_BASE_PATH,default=/" validate:"required"`
+	BasePath    string        `env:"SERVER_BASE_PATH,default=/"       validate:"required"`
 	TlsEnabled  bool          `env:"SERVER_TLS_ENABLED,default=false"`
 	TlsCertPath string        `env:"SERVER_TLS_CERT_PATH"`
 	TlsKeyPath  string        `env:"SERVER_TLS_KEY_PATH"`
-	Timeout     time.Duration `env:"SERVER_TIMEOUT,default=10s" validate:"gte=0"`
+	Timeout     time.Duration `env:"SERVER_TIMEOUT,default=10s"       validate:"gte=0"`
 }
 
 type Cors struct {
@@ -75,20 +76,20 @@ type Cors struct {
 }
 
 type Database struct {
-	Type             constant.ConfigDatabaseType `env:"DB_TYPE,default=postgres" validate:"required,oneof=postgres"`
+	Type             constant.ConfigDatabaseType `env:"DB_TYPE,default=postgres"           validate:"required,oneof=postgres"`
 	MigrationEnabled bool                        `env:"DB_MIGRATION_ENABLED,default=true"`
 	PostgresHost     string                      `env:"DB_POSTGRES_HOST,default=localhost" validate:"required_if=Type postgres"`
-	PostgresPort     int                         `env:"DB_POSTGRES_PORT,default=5432" validate:"required_if=Type postgres"`
-	PostgresName     string                      `env:"DB_POSTGRES_NAME" validate:"required_if=Type postgres"`
-	PostgresTimeZone string                      `env:"DB_POSTGRES_TZ,default=Etc/UTC" validate:"required_if=Type postgres"`
-	PostgresUser     string                      `env:"DB_POSTGRES_USER" validate:"required_if=Type postgres"`
-	PostgresPassword string                      `env:"DB_POSTGRES_PASSWORD" validate:"required_if=Type postgres"`
+	PostgresPort     int                         `env:"DB_POSTGRES_PORT,default=5432"      validate:"required_if=Type postgres"`
+	PostgresName     string                      `env:"DB_POSTGRES_NAME"                   validate:"required_if=Type postgres"`
+	PostgresTimeZone string                      `env:"DB_POSTGRES_TZ,default=Etc/UTC"     validate:"required_if=Type postgres"`
+	PostgresUser     string                      `env:"DB_POSTGRES_USER"                   validate:"required_if=Type postgres"`
+	PostgresPassword string                      `env:"DB_POSTGRES_PASSWORD"               validate:"required_if=Type postgres"`
 }
 
 type Webinterface struct {
 	Enabled       bool   `env:"WEB_INTERFACE_ENABLED,default=true"`
 	ApiUrl        string `env:"WEB_INTERFACE_API_URL,default=http://localhost:8080/api/" validate:"required_if=Enabled true"`
-	Title         string `env:"WEB_INTERFACE_TITLE,default=upda" validate:"required_if=Enabled true"`
+	Title         string `env:"WEB_INTERFACE_TITLE,default=upda"                         validate:"required_if=Enabled true"`
 	FooterEnabled bool   `env:"WEB_INTERFACE_FOOTER_ENABLED,default=true"`
 }
 
@@ -109,16 +110,16 @@ type WebinterfaceCacheControl struct {
 }
 
 type Auth struct {
-	Type                   constant.ConfigAuthType            `env:"AUTH_TYPE,default=session" validate:"required,oneof=session"`
-	SessionSecret          string                             `env:"AUTH_SESSION_SECRET,required" validate:"required_if=Type session"`
-	SessionProvider        constant.ConfigAuthSessionProvider `env:"AUTH_SESSION_PROVIDER,default=single" validate:"required_if=Type session,oneof=single credentials"`
-	SessionUser            string                             `env:"AUTH_SESSION_USER" validate:"required_if=SessionProvider single"`
-	SessionPassword        string                             `env:"AUTH_SESSION_PASSWORD" validate:"required_if=SessionProvider single"`
+	Type                   constant.ConfigAuthType            `env:"AUTH_TYPE,default=session"                        validate:"required,oneof=session"`
+	SessionSecret          string                             `env:"AUTH_SESSION_SECRET,required"                     validate:"required_if=Type session"`
+	SessionProvider        constant.ConfigAuthSessionProvider `env:"AUTH_SESSION_PROVIDER,default=single"             validate:"required_if=Type session,oneof=single credentials"`
+	SessionUser            string                             `env:"AUTH_SESSION_USER"                                validate:"required_if=SessionProvider single"`
+	SessionPassword        string                             `env:"AUTH_SESSION_PASSWORD"                            validate:"required_if=SessionProvider single"`
 	SessionCredentials     map[string]string                  `env:"AUTH_SESSION_CREDENTIALS,separator=|,delimiter=;" validate:"required_if=SessionProvider credentials"`
 	SessionCleanupEnabled  bool                               `env:"AUTH_SESSION_CLEANUP_ENABLED,default=true"`
-	SessionCleanupInterval time.Duration                      `env:"AUTH_SESSION_CLEANUP_INTERVAL,default=1h" validate:"required_if=Type session,gte=0"`
-	SessionCookieMaxAge    time.Duration                      `env:"AUTH_SESSION_COOKIE_MAX_AGE,default=8h" validate:"required_if=Type session"`
-	SessionCookieName      string                             `env:"AUTH_SESSION_COOKIE_NAME,default=UPDA_SESSION" validate:"required_if=Type session"`
+	SessionCleanupInterval time.Duration                      `env:"AUTH_SESSION_CLEANUP_INTERVAL,default=1h"         validate:"required_if=Type session,gte=0"`
+	SessionCookieMaxAge    time.Duration                      `env:"AUTH_SESSION_COOKIE_MAX_AGE,default=8h"           validate:"required_if=Type session"`
+	SessionCookieName      string                             `env:"AUTH_SESSION_COOKIE_NAME,default=UPDA_SESSION"    validate:"required_if=Type session"`
 	// if set to non-blank, subdomains send it
 	SessionCookieDomain *string `env:"AUTH_SESSION_COOKIE_DOMAIN"`
 	// cookie's scope (/ meaning when browser adds it automatically)
@@ -134,7 +135,7 @@ type Auth struct {
 
 type Task struct {
 	EventCleanStaleEnabled  bool          `env:"TASK_EVENT_CLEAN_STALE_ENABLED,default=false"`
-	EventCleanStaleInterval time.Duration `env:"TASK_EVENT_CLEAN_STALE_INTERVAL,default=8h" validate:"required_if=EventCleanStaleEnabled true,gt=0"`
+	EventCleanStaleInterval time.Duration `env:"TASK_EVENT_CLEAN_STALE_INTERVAL,default=8h"   validate:"required_if=EventCleanStaleEnabled true,gt=0"`
 	EventCleanStaleMaxAge   time.Duration `env:"TASK_EVENT_CLEAN_STALE_MAX_AGE,default=2190h" validate:"required_if=EventCleanStaleEnabled true,gt=0"`
 
 	ActionsEnqueueEnabled   bool          `env:"TASK_ACTIONS_ENQUEUE_ENABLED,default=true"`
@@ -142,8 +143,8 @@ type Task struct {
 	ActionsEnqueueBatchSize int           `env:"TASK_ACTIONS_ENQUEUE_BATCH_SIZE,default=1" validate:"required_if=ActionsEnqueueEnabled true,numeric,gte=1"`
 
 	ActionsInvokeEnabled    bool          `env:"TASK_ACTIONS_INVOKE_ENABLED,default=true"`
-	ActionsInvokeInterval   time.Duration `env:"TASK_ACTIONS_INVOKE_INTERVAL,default=10s" validate:"required_if=ActionsInvokeEnabled true,gt=0"`
-	ActionsInvokeBatchSize  int           `env:"TASK_ACTIONS_INVOKE_BATCH_SIZE,default=1" validate:"required_if=ActionsInvokeEnabled true,numeric,gte=1"`
+	ActionsInvokeInterval   time.Duration `env:"TASK_ACTIONS_INVOKE_INTERVAL,default=10s"  validate:"required_if=ActionsInvokeEnabled true,gt=0"`
+	ActionsInvokeBatchSize  int           `env:"TASK_ACTIONS_INVOKE_BATCH_SIZE,default=1"  validate:"required_if=ActionsInvokeEnabled true,numeric,gte=1"`
 	ActionsInvokeMaxRetries int           `env:"TASK_ACTIONS_INVOKE_MAX_RETRIES,default=3" validate:"required_if=ActionsInvokeEnabled true,numeric,gte=1"`
 
 	ActionsCleanStaleEnabled  bool          `env:"TASK_ACTIONS_CLEAN_STALE_ENABLED,default=true"`
@@ -153,14 +154,14 @@ type Task struct {
 
 type Lock struct {
 	RedisEnabled        bool          `env:"LOCK_REDIS_ENABLED,default=false"`
-	RedisHost           string        `env:"LOCK_REDIS_HOST,default=localhost" validate:"required_if=RedisEnabled true"`
-	RedisPort           int           `env:"LOCK_REDIS_PORT,default=6379" validate:"required_if=RedisEnabled true,numeric,gte=1"`
-	RedisDbName         int           `env:"LOCK_REDIS_DB_NAME,default=0" validate:"numeric,gte=0"`
+	RedisHost           string        `env:"LOCK_REDIS_HOST,default=localhost"        validate:"required_if=RedisEnabled true"`
+	RedisPort           int           `env:"LOCK_REDIS_PORT,default=6379"             validate:"required_if=RedisEnabled true,numeric,gte=1"`
+	RedisDbName         int           `env:"LOCK_REDIS_DB_NAME,default=0"             validate:"numeric,gte=0"`
 	RedisUsername       string        `env:"LOCK_REDIS_USERNAME"`
 	RedisPassword       string        `env:"LOCK_REDIS_PASSWORD"`
-	RedisTaskTries      int           `env:"LOCK_REDIS_TASK_LOCK_TRIES,default=1" validate:"required_if=RedisEnabled true,numeric,gte=1"`
+	RedisTaskTries      int           `env:"LOCK_REDIS_TASK_LOCK_TRIES,default=1"     validate:"required_if=RedisEnabled true,numeric,gte=1"`
 	RedisTaskLockAtMost time.Duration `env:"LOCK_REDIS_TASK_LOCK_AT_MOST,default=30s" validate:"required_if=RedisEnabled true,gte=0"`
-	RedisTaskRetryDelay time.Duration `env:"LOCK_REDIS_TASK_RETRY_DELAY,default=5s" validate:"required_if=RedisEnabled true,gte=0"`
+	RedisTaskRetryDelay time.Duration `env:"LOCK_REDIS_TASK_RETRY_DELAY,default=5s"   validate:"required_if=RedisEnabled true,gte=0"`
 	RedisUrl            string
 }
 
@@ -170,13 +171,13 @@ type Webhook struct {
 
 type Prometheus struct {
 	Enabled            bool          `env:"PROMETHEUS_ENABLED,default=false"`
-	Port               int           `env:"PROMETHEUS_PORT,default=8080" validate:"required_if=Enabled true,gte=1"`
+	Port               int           `env:"PROMETHEUS_PORT,default=8080"                 validate:"required_if=Enabled true,gte=1"`
 	Listen             string        `env:"PROMETHEUS_LISTEN"`
-	BasePath           string        `env:"PROMETHEUS_BASE_PATH,default=/" validate:"required_if=Enabled true"`
-	Path               string        `env:"PROMETHEUS_METRICS_PATH,default=/metrics" validate:"required_if=Enabled true"`
+	BasePath           string        `env:"PROMETHEUS_BASE_PATH,default=/"               validate:"required_if=Enabled true"`
+	Path               string        `env:"PROMETHEUS_METRICS_PATH,default=/metrics"     validate:"required_if=Enabled true"`
 	SecureTokenEnabled bool          `env:"PROMETHEUS_SECURE_TOKEN_ENABLED,default=true"`
-	SecureToken        string        `env:"PROMETHEUS_SECURE_TOKEN" validate:"required_if=Enabled true SecureTokenEnabled true"`
-	RefreshInterval    time.Duration `env:"PROMETHEUS_REFRESH_INTERVAL,default=60s" validate:"required_if=Enabled true,gte=0"`
+	SecureToken        string        `env:"PROMETHEUS_SECURE_TOKEN"                      validate:"required_if=Enabled true SecureTokenEnabled true"`
+	RefreshInterval    time.Duration `env:"PROMETHEUS_REFRESH_INTERVAL,default=60s"      validate:"required_if=Enabled true,gte=0"`
 }
 
 type Configuration struct {
@@ -358,7 +359,6 @@ func configureLogger(cfg *Logging) {
 
 	if constant.ConfigLogEncodingJson == cfg.Encoding {
 		log.Logger = zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
-
 	} else {
 		log.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: zerolog.TimeFieldFormat, NoColor: !cfg.EncodingColorize}).With().Timestamp().Caller().Logger()
 	}

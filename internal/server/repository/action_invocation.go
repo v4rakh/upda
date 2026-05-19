@@ -1,10 +1,11 @@
 package repository
 
 import (
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"gorm.io/gorm"
-	"time"
 )
 
 type ActionInvocationRepository interface {

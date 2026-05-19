@@ -4,6 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"runtime"
+	"slices"
+	"syscall"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/auth"
@@ -20,12 +27,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/wader/gormstore/v2"
 	"go.uber.org/automaxprocs/maxprocs"
-	"net/http"
-	"os"
-	"os/signal"
-	"runtime"
-	"slices"
-	"syscall"
 )
 
 type Server struct {
@@ -171,7 +172,7 @@ func (s *Server) Start() {
 	if cfg.Webinterface.Enabled && !cfg.App.Development {
 		cacheControl := middlewareCacheControl(cfg.WebinterfaceCacheControl)
 		webinterfaceHandler := handler.NewWebinterfaceHandler(cfg.Webinterface, cfg.Auth)
-		appRouter.GET(fmt.Sprintf("%sui/conf/runtime-config.js", cfg.Server.BasePath), cacheControl, webinterfaceHandler.GetConfig)
+		appRouter.GET(cfg.Server.BasePath+"ui/conf/runtime-config.js", cacheControl, webinterfaceHandler.GetConfig)
 
 		targetFSPath := "web/build"
 		var webinterfaceFolderFS ginstatic.ServeFileSystem
@@ -180,19 +181,19 @@ func (s *Server) Start() {
 		}
 
 		appRouter.GET(cfg.Server.BasePath, middlewareRedirect("ui/"))
-		if "/" != cfg.Server.BasePath {
-			appRouter.GET("", middlewareRedirect(fmt.Sprintf("%sui/", cfg.Server.BasePath)))
+		if cfg.Server.BasePath != "/" {
+			appRouter.GET("", middlewareRedirect(cfg.Server.BasePath+"ui/"))
 		}
-		appRouter.Use(middlewareFSRewrite(fmt.Sprintf("%sui", cfg.Server.BasePath), webinterfaceFolderFS, &cacheControl))
+		appRouter.Use(middlewareFSRewrite(cfg.Server.BasePath+"ui", webinterfaceFolderFS, &cacheControl))
 	}
 
-	apiPublicGroup := appRouter.Group(fmt.Sprintf("%s/api/v1", cfg.Server.BasePath))
+	apiPublicGroup := appRouter.Group(cfg.Server.BasePath + "/api/v1")
 	apiPublicGroup.GET("/health", healthHandler.Show)
 	apiPublicGroup.GET("/info", infoHandler.Show)
 
 	apiPublicGroup.POST("/webhooks/:id", middlewareEnforceJsonContentType(), webhookInvocationHandler.Execute)
 
-	apiProtectedGroup := appRouter.Group(fmt.Sprintf("%sapi/v1", cfg.Server.BasePath))
+	apiProtectedGroup := appRouter.Group(cfg.Server.BasePath + "api/v1")
 
 	// authentication provider
 	if !slices.Contains(constant.ConfigAuthTypeValues(), cfg.Auth.Type) {

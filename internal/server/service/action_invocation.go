@@ -2,6 +2,9 @@ package service
 
 import (
 	"errors"
+	"strings"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/json"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/dto"
@@ -11,8 +14,6 @@ import (
 	strutil "git.myservermanager.com/varakh/upda/internal/str"
 	"github.com/containrrr/shoutrrr"
 	"github.com/rs/zerolog/log"
-	"strings"
-	"time"
 )
 
 type ActionInvocationService struct {
@@ -154,8 +155,7 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 		}
 
 		if err = s.Execute(action, eventPayload); err != nil {
-			var cause error
-			cause = err
+			var cause = err
 
 			log.Error().Msgf("Could not invoke action '%s' (%v) for action invocation '%v'. Reason: %s", action.Label, action.ID, actionInvocation.ID, err.Error())
 
@@ -240,9 +240,7 @@ func (s *ActionInvocationService) replaceSecrets(str string) string {
 		return str
 	}
 
-	var matches [][]string
-
-	matches = strutil.ExtractBetween(str, "<SECRET>", "</SECRET>")
+	var matches = strutil.ExtractBetween(str, "<SECRET>", "</SECRET>")
 	var err error
 
 	for _, match := range matches {
@@ -262,9 +260,7 @@ func (s *ActionInvocationService) replaceConstants(str string) string {
 		return str
 	}
 
-	var matches [][]string
-
-	matches = strutil.ExtractBetween(str, "<CONST>", "</CONST>")
+	var matches = strutil.ExtractBetween(str, "<CONST>", "</CONST>")
 	var err error
 
 	for _, match := range matches {

@@ -2,13 +2,14 @@ package handler
 
 import (
 	"errors"
+	"net/http"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type WebhookInvocationHandler struct {

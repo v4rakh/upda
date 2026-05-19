@@ -61,9 +61,7 @@ func (r *FilterPresetDbRepo) Create(t string, label string, parameters string, c
 		return nil, service_error.ErrValidationNotBlank
 	}
 
-	var e *model.FilterPreset
-
-	e = &model.FilterPreset{
+	var e = &model.FilterPreset{
 		Type:       t,
 		Label:      label,
 		Parameters: parameters,

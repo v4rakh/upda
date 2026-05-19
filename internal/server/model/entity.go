@@ -1,13 +1,14 @@
 package model
 
 import (
+	"os"
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/encryption"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
-	"os"
-	"time"
 )
 
 // BeforeCreate creates a new UUID

@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"net/http"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type HealthHandler struct {

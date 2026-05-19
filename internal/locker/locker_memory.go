@@ -1,18 +1,15 @@
 package locker
 
 import (
-	"sync"
-	"time"
-)
-
-import (
 	"errors"
+	"sync"
 	"sync/atomic"
+	"time"
 )
 
 const (
 	DefaultExpiration time.Duration = 0
-	NoExpiration                    = -1
+	NoExpiration      time.Duration = -1
 )
 
 // ErrorNoSuchLock is returned when the requested lock does not exist
@@ -63,7 +60,7 @@ func (l *lockCtr) Unlock() {
 // NewInMemoryLockRegistry creates a new InMemoryLockRegistry
 func NewInMemoryLockRegistry() *InMemoryLockRegistry {
 	return &InMemoryLockRegistry{
-		defaultExpiry: NoExpiration,
+		defaultExpiry: NoExpiration.Milliseconds(),
 		locks:         make(map[string]*lockCtr),
 	}
 }

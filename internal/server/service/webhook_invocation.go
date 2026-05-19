@@ -1,11 +1,12 @@
 package service
 
 import (
+	"strings"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
-	"strings"
 )
 
 type WebhookInvocationService struct {

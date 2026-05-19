@@ -2,6 +2,13 @@ package server
 
 import (
 	"fmt"
+	"io"
+	"mime"
+	"net/http"
+	"path/filepath"
+	"runtime/debug"
+	"strings"
+
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
@@ -12,13 +19,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"go.eigsys.de/gin-cachecontrol/v2"
-	"io"
-	"mime"
-	"net/http"
-	"path/filepath"
-	"runtime/debug"
-	"strings"
+	cachecontrol "go.eigsys.de/gin-cachecontrol/v2"
 )
 
 // middlewareCors applies CORS configuration
@@ -149,7 +150,7 @@ func middlewareFSRewrite(basePath string, fs ginstatic.ServeFileSystem, handlerF
 		p := c.Request.URL.Path
 		if strings.HasPrefix(p, basePath) {
 			relPath := strings.TrimPrefix(p, basePath)
-			if "" == relPath || "/" == relPath {
+			if relPath == "" || relPath == "/" {
 				relPath = "/index.html"
 			}
 			relPath = strings.TrimPrefix(relPath, "/")
@@ -192,7 +193,7 @@ func middlewareRedirect(targetPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		p := c.Request.URL.Path
 		var t string
-		if "" == p || "/" == p {
+		if p == "" || p == "/" {
 			t = targetPath
 		} else {
 			t = fmt.Sprintf("%s/%s", p, targetPath)

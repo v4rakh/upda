@@ -1,7 +1,9 @@
+//nolint:dupl
 package service
 
 import (
 	"errors"
+
 	"git.myservermanager.com/varakh/upda/internal/server/model"
 	"git.myservermanager.com/varakh/upda/internal/server/repository"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"

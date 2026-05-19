@@ -1,3 +1,4 @@
+//nolint:dupl
 package repository
 
 import (
@@ -77,9 +78,7 @@ func (r *SecretDbRepo) Create(key string, value string) (*model.Secret, error) {
 		return nil, service_error.ErrValidationNotBlank
 	}
 
-	var e *model.Secret
-
-	e = &model.Secret{
+	var e = &model.Secret{
 		Key:   key,
 		Value: value,
 	}

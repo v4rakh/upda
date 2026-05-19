@@ -1,11 +1,12 @@
 package service
 
 import (
+	"time"
+
 	"git.myservermanager.com/varakh/upda/internal/server/config"
 	"git.myservermanager.com/varakh/upda/internal/server/constant"
 	"github.com/go-co-op/gocron/v2"
 	"github.com/rs/zerolog/log"
-	"time"
 )
 
 type EventsCleanTask struct {
