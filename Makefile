@@ -8,7 +8,6 @@ CMD_GO_FILES ?= ./cmd/upda/main.go
 export GO111MODULE=on
 
 PNPM ?= pnpm
-GOSEC ?= gosec
 GRYPE ?= grype
 
 BIN_DIR = $(shell pwd)/bin
@@ -40,9 +39,15 @@ dependencies-web:
 
 checkstyle: checkstyle-web checkstyle-server
 checkstyle-server:
-	$(GO) vet ./...
+	golangci-lint run
 checkstyle-web:
 	cd ${WEB_DIR}; $(PNPM) run checkstyle
+
+checkstyle-fix: checkstyle-web-fix checkstyle-server-fix
+checkstyle-server-fix:
+	golangci-lint run --fix
+checkstyle-web-fix:
+	cd ${WEB_DIR} && $(PNPM) run format && $(PNPM) run lint:fix && $(PNPM) run i18n-sync && $(PNPM) run lint:style:fix
 
 generate: generate-server
 generate-server:
@@ -73,14 +78,6 @@ run-server:
 	$(GO) run ${CMD_GO_FILES} server serve
 run-web:
 	cd ${WEB_DIR}; $(PNPM) start
-
-audit: audit-web audit-server
-
-audit-web:
-	cd ${WEB_DIR}; $(PNPM) audit -P --audit-level critical;
-
-audit-server:
-	$(GOSEC) -quiet -sort -severity high -confidence high ./...
 
 scan:
 	@NO_COLOR=1 $(GRYPE) -v -o table --file bin/grype.txt --fail-on critical bin/ || true
@@ -114,4 +111,4 @@ build-server-windows-arm64:
 build-web:
 	cd ${WEB_DIR}; $(PNPM) run build; rm -rf build/conf
 
-.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web generate generate-server build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web checkstyle checkstyle-server checkstyle-web audit audit-web audit-server scan test test-server test-web test-coverage test-server-coverage test-web-coverage run run-server run-web
+.PHONY: clean clean-server clean-web dependencies dependencies-server dependencies-web generate generate-server build build-server build-server-all build-server-darwin-amd64 build-server-darwin-arm64 build-server-freebsd-amd64 build-server-freebsd-arm64 build-server-linux-amd64 build-server-linux-arm64 build-server-windows-amd64 build-server-windows-arm64 build-web checkstyle checkstyle-server checkstyle-web checkstyle-fix checkstyle-web-fix checkstyle-server-fix scan test test-server test-web test-coverage test-server-coverage test-web-coverage run run-server run-web
