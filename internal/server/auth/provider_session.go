@@ -69,14 +69,14 @@ func (p *SessionProvider) IsAuthenticated(c *gin.Context, passThroughFunc ...Pro
 	return true
 }
 
-func (p *SessionProvider) Login(c *gin.Context) (error, int) {
+func (p *SessionProvider) Login(c *gin.Context) (int, error) {
 	var req *UserCredentials
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		return errCredentialsBind, http.StatusBadRequest
+		return http.StatusBadRequest, errCredentialsBind
 	}
 	if ok := p.validator.Validate(req); !ok {
-		return errForbidden, http.StatusForbidden
+		return http.StatusForbidden, errForbidden
 	}
 
 	session := sessions.Default(c)
@@ -84,13 +84,13 @@ func (p *SessionProvider) Login(c *gin.Context) (error, int) {
 	session.Set(sessionKeyPreferredUsername, req.Username)
 
 	if err := session.Save(); err != nil {
-		return fmt.Errorf("could not create session for '%s': %w", session, err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("could not create session for '%s': %w", session, err)
 	}
 
-	return nil, http.StatusNoContent
+	return http.StatusNoContent, nil
 }
 
-func (p *SessionProvider) Logout(c *gin.Context) (error, int) {
+func (p *SessionProvider) Logout(c *gin.Context) (int, error) {
 	session := sessions.Default(c)
 	// marks the session as "written"
 	session.Set(sessionKeyAuthenticated, false)
@@ -98,22 +98,22 @@ func (p *SessionProvider) Logout(c *gin.Context) (error, int) {
 	session.Options(sessions.Options{Path: p.cookiePath, MaxAge: -1})
 
 	if err := session.Save(); err != nil {
-		return fmt.Errorf("could not logout session %w", err), http.StatusInternalServerError
+		return http.StatusInternalServerError, fmt.Errorf("could not logout session %w", err)
 	}
 	session.Clear()
 
-	return nil, http.StatusNoContent
+	return http.StatusNoContent, nil
 }
 
-func (p *SessionProvider) Profile(c *gin.Context) (*Profile, error, int) {
+func (p *SessionProvider) Profile(c *gin.Context) (*Profile, int, error) {
 	session := sessions.Default(c)
 	sessionPreferredUsername := session.Get(sessionKeyPreferredUsername)
 
 	if sessionPreferredUsername == nil {
-		return nil, errProfileEmpty, http.StatusInternalServerError
+		return nil, http.StatusInternalServerError, errProfileEmpty
 	}
 
-	return &Profile{PreferredUsername: sessionPreferredUsername.(string)}, nil, http.StatusOK
+	return &Profile{PreferredUsername: sessionPreferredUsername.(string)}, http.StatusOK, nil
 }
 
 func (p *SessionProvider) RouteContext(c *gin.Context) (*Profile, error) {

@@ -58,13 +58,14 @@ type Secret struct {
 }
 
 type Server struct {
-	Port        int           `env:"SERVER_PORT,default=8080"         validate:"gte=1"`
-	Listen      string        `env:"SERVER_LISTEN"`
-	BasePath    string        `env:"SERVER_BASE_PATH,default=/"       validate:"required"`
-	TlsEnabled  bool          `env:"SERVER_TLS_ENABLED,default=false"`
-	TlsCertPath string        `env:"SERVER_TLS_CERT_PATH"`
-	TlsKeyPath  string        `env:"SERVER_TLS_KEY_PATH"`
-	Timeout     time.Duration `env:"SERVER_TIMEOUT,default=10s"       validate:"gte=0"`
+	Port              int           `env:"SERVER_PORT,default=8080"               validate:"gte=1"`
+	Listen            string        `env:"SERVER_LISTEN"`
+	BasePath          string        `env:"SERVER_BASE_PATH,default=/"             validate:"required"`
+	TlsEnabled        bool          `env:"SERVER_TLS_ENABLED,default=false"`
+	TlsCertPath       string        `env:"SERVER_TLS_CERT_PATH"`
+	TlsKeyPath        string        `env:"SERVER_TLS_KEY_PATH"`
+	Timeout           time.Duration `env:"SERVER_TIMEOUT,default=10s"             validate:"gte=0"`
+	ReadHeaderTimeout time.Duration `env:"SERVER_READ_HEADER_TIMEOUT,default=30s" validate:"gte=0"`
 }
 
 type Cors struct {
@@ -253,7 +254,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 			log.Fatal().Msgf("Could not retrieve database: %v", err)
 		}
 
-		if err = sqlDb.Ping(); err != nil {
+		if err = sqlDb.PingContext(ctx); err != nil {
 			log.Fatal().Msgf("Could not connect to database: %v", err)
 		}
 

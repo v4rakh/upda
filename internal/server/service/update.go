@@ -69,7 +69,7 @@ func (s *UpdateService) Upsert(application string, provider string, host string,
 			log.Warn().Msgf("Could not find state definition for '%s', proceeding with update", e.State)
 		} else if currentStateDef.SkipOnNewVersion {
 			log.Info().Msgf("Skipping update '%v' in state '%s' (skipOnNewVersion=true)", e.ID, e.State)
-			return nil, nil
+			return e, nil
 		}
 
 		if e, err = s.repo.Update(e.ID.String(), version, metadata); err != nil {

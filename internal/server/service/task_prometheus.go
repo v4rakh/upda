@@ -63,6 +63,9 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 
 	runnable := func() {
 		updates, updatesError := s.updateService.GetAll()
+		if updatesError != nil {
+			log.Error().Msgf("Could not fetch updates for prometheus metric. Reason: %s", updatesError.Error())
+		}
 
 		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesTotal, float64(len(updates))); updatesError != nil {
 			log.Error().Msgf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
@@ -89,21 +92,27 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 
 		var webhooksTotal int64
 		var webhooksError error
-		webhooksTotal, webhooksError = s.webhookService.Count()
+		if webhooksTotal, webhooksError = s.webhookService.Count(); webhooksError != nil {
+			log.Error().Msgf("Could not fetch webhooks count for prometheus metric. Reason: %s", webhooksError.Error())
+		}
 		if webhooksError = s.prometheusService.SetGaugeNoLabels(constant.MetricWebhooks, float64(webhooksTotal)); webhooksError != nil {
 			log.Error().Msgf("Could not refresh webhooks prometheus metric. Reason: %s", webhooksError.Error())
 		}
 
 		var eventsTotal int64
 		var eventsError error
-		eventsTotal, eventsError = s.eventService.Count()
+		if eventsTotal, eventsError = s.eventService.Count(); eventsError != nil {
+			log.Error().Msgf("Could not fetch events count for prometheus metric. Reason: %s", eventsError.Error())
+		}
 		if eventsError = s.prometheusService.SetGaugeNoLabels(constant.MetricEvents, float64(eventsTotal)); eventsError != nil {
 			log.Error().Msgf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
 		}
 
 		var actionsTotal int64
 		var actionsError error
-		actionsTotal, actionsError = s.actionService.Count()
+		if actionsTotal, actionsError = s.actionService.Count(); actionsError != nil {
+			log.Error().Msgf("Could not fetch actions count for prometheus metric. Reason: %s", actionsError.Error())
+		}
 		if actionsError = s.prometheusService.SetGaugeNoLabels(constant.MetricActions, float64(actionsTotal)); actionsError != nil {
 			log.Error().Msgf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
 		}

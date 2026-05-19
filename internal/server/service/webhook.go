@@ -67,7 +67,7 @@ func (s *WebhookService) UpdateLabel(id string, label string) (*model.Webhook, e
 	var e *model.Webhook
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -87,7 +87,7 @@ func (s *WebhookService) UpdateIgnoreHostReplacement(id string, ignoreHostReplac
 	var e *model.Webhook
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -107,7 +107,7 @@ func (s *WebhookService) UpdateIgnoreHost(id string, ignoreHost bool) (*model.We
 	var e *model.Webhook
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 

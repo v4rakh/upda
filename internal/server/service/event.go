@@ -59,32 +59,32 @@ func (s *EventService) CreateUpdateCreated(e *model.Update) *model.Event {
 	return nil
 }
 
-func (s *EventService) CreateUpdateUpdated(old *model.Update, new *model.Update) *model.Event {
-	if old == nil || new == nil {
+func (s *EventService) CreateUpdateUpdated(old *model.Update, updated *model.Update) *model.Event {
+	if old == nil || updated == nil {
 		return nil
 	}
 
 	eventName := constant.EventNameUpdateUpdated
 
-	if old.State != new.State {
+	if old.State != updated.State {
 		eventName = constant.EventNameUpdateUpdatedState
 	}
 
-	if old.Version != new.Version {
+	if old.Version != updated.Version {
 		eventName = constant.EventNameUpdateUpdatedVersion
 	}
 
 	s.CreateWithWarnOnly(eventName, &api.EventPayloadUpdateUpdatedDto{
-		ID:              new.ID.String(),
-		Application:     new.Application,
-		Provider:        new.Provider,
-		Host:            new.Host,
+		ID:              updated.ID.String(),
+		Application:     updated.Application,
+		Provider:        updated.Provider,
+		Host:            updated.Host,
 		VersionPrior:    old.Version,
-		Version:         new.Version,
+		Version:         updated.Version,
 		StatePrior:      old.State,
 		StatePriorLabel: s.resolveStateLabel(old.State),
-		State:           new.State,
-		StateLabel:      s.resolveStateLabel(new.State),
+		State:           updated.State,
+		StateLabel:      s.resolveStateLabel(updated.State),
 	})
 
 	return nil
@@ -221,7 +221,7 @@ func (s *EventService) UpdateState(id string, state constant.EventState) (*model
 	var e *model.Event
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 

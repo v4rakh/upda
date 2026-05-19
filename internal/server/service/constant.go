@@ -55,7 +55,7 @@ func (s *ConstantService) Insert(key string, value string) (*model.Constant, err
 	var e *model.Constant
 	var err error
 
-	e, err = s.repo.FindByKey(key)
+	_, err = s.repo.FindByKey(key)
 
 	if err != nil && !errors.Is(err, service_error.ErrResourceNotFound) {
 		return nil, err
@@ -79,7 +79,7 @@ func (s *ConstantService) UpdateValue(id string, value string) (*model.Constant,
 	var e *model.Constant
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 

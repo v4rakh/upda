@@ -235,7 +235,7 @@ func criterionActonInvocationMaxRetries(maxRetries int) func(db *gorm.DB) *gorm.
 }
 
 func criterionActionInvocationState(states []string) func(db *gorm.DB) *gorm.DB {
-	if states != nil && len(states) > 0 {
+	if len(states) > 0 {
 		return func(db *gorm.DB) *gorm.DB {
 			return db.Where("state IN (?)", states)
 		}

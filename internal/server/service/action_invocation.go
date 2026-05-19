@@ -227,7 +227,6 @@ func (s *ActionInvocationService) Execute(action *model.Action, eventPayloadInfo
 				return err
 			}
 		}
-		break
 	default:
 		return service_error.NewServiceError(service_error.ErrCodeGeneral, errors.New("no matching action type found for invocation"))
 	}
@@ -354,7 +353,7 @@ func (s *ActionInvocationService) UpdateState(id string, state constant.ActionIn
 	var e *model.ActionInvocation
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -374,7 +373,7 @@ func (s *ActionInvocationService) UpdateMessage(id string, message *string) (*mo
 	var e *model.ActionInvocation
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -394,7 +393,7 @@ func (s *ActionInvocationService) UpdateRetryCount(id string, retryCount int) (*
 	var e *model.ActionInvocation
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 

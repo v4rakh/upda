@@ -55,7 +55,7 @@ func (s *SecretService) Insert(key string, value string) (*model.Secret, error) 
 	var e *model.Secret
 	var err error
 
-	e, err = s.repo.FindByKey(key)
+	_, err = s.repo.FindByKey(key)
 
 	if err != nil && !errors.Is(err, service_error.ErrResourceNotFound) {
 		return nil, err
@@ -79,7 +79,7 @@ func (s *SecretService) UpdateValue(id string, value string) (*model.Secret, err
 	var e *model.Secret
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 

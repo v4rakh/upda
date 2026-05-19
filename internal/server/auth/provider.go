@@ -32,13 +32,13 @@ type Provider interface {
 	IsAuthenticated(c *gin.Context, passThroughFunc ...ProviderPassThroughFunc) bool
 
 	// Login defines a function to log in and returns the HTTP status code
-	Login(c *gin.Context) (error, int)
+	Login(c *gin.Context) (int, error)
 
 	// Logout defines a function to log out and returns the HTTP status code
-	Logout(c *gin.Context) (error, int)
+	Logout(c *gin.Context) (int, error)
 
 	// Profile defines a function to fetch profile and returns the HTTP status code
-	Profile(c *gin.Context) (*Profile, error, int)
+	Profile(c *gin.Context) (*Profile, int, error)
 
 	// RouteContext defines a function to get profile to pass to subsequent handlers which is added for this Provider for protected paths
 	RouteContext(c *gin.Context) (*Profile, error)

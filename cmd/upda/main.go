@@ -45,8 +45,8 @@ var serverServeCmd = &cli.Command{
 	Name:  "serve",
 	Usage: "Starts the server and keeps it running",
 	Action: func(ctx context.Context, _ *cli.Command) error {
-		server := server.New(&ctx)
-		server.Start()
+		server := server.New()
+		server.Start(ctx)
 		return nil
 	},
 }

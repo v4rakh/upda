@@ -94,7 +94,7 @@ func (s *ActionService) UpdateLabel(id string, label string) (*model.Action, err
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -114,7 +114,7 @@ func (s *ActionService) UpdateMatchEvent(id string, matchEvent *string) (*model.
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -134,7 +134,7 @@ func (s *ActionService) UpdateMatchApplication(id string, matchApplication *stri
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -154,7 +154,7 @@ func (s *ActionService) UpdateMatchProvider(id string, matchProvider *string) (*
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -174,7 +174,7 @@ func (s *ActionService) UpdateMatchHost(id string, matchHost *string) (*model.Ac
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -197,7 +197,7 @@ func (s *ActionService) UpdateTypeAndPayload(id string, t constant.ActionType, p
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 
@@ -221,7 +221,7 @@ func (s *ActionService) UpdateEnabled(id string, enabled bool) (*model.Action, e
 	var e *model.Action
 	var err error
 
-	if e, err = s.Get(id); err != nil {
+	if _, err = s.Get(id); err != nil {
 		return nil, err
 	}
 

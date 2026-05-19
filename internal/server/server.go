@@ -29,26 +29,17 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 )
 
-type Server struct {
-	ctx context.Context
+type Server struct{}
+
+func New() *Server {
+	return &Server{}
 }
 
-func New(ctx *context.Context) *Server {
-	s := &Server{}
-	if ctx == nil {
-		s.ctx = context.Background()
-	} else {
-		s.ctx = *ctx
-	}
-
-	return s
-}
-
-func (s *Server) Start() {
+func (s *Server) Start(ctx context.Context) {
 	var err error
 
 	// configuration init
-	cfg, db := config.LoadFromEnvironment(s.ctx)
+	cfg, db := config.LoadFromEnvironment(ctx)
 
 	log.Info().Msgf("Starting %s %s", meta.Name, meta.Version)
 
@@ -308,8 +299,8 @@ func (s *Server) Start() {
 	apiProtectedGroup.DELETE("/update-state-transitions/:id", updateStateTransitionHandler.Delete)
 
 	// start servers (run in separate goroutines)
-	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port))
-	prometheusSrv := s.newServer(promRouter, fmt.Sprintf("%s:%d", cfg.Prometheus.Listen, cfg.Prometheus.Port))
+	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port), cfg.Server)
+	prometheusSrv := s.newServer(promRouter, fmt.Sprintf("%s:%d", cfg.Prometheus.Listen, cfg.Prometheus.Port), cfg.Server)
 
 	s.startServer(appSrv, cfg.Server)
 
@@ -329,14 +320,14 @@ func (s *Server) Start() {
 
 	log.Info().Msg("Shutting down...")
 
-	timeoutCtx, timeoutCancel := context.WithTimeout(s.ctx, cfg.Server.Timeout)
+	timeoutCtx, timeoutCancel := context.WithTimeout(ctx, cfg.Server.Timeout)
 	defer timeoutCancel()
 
 	shutdownDone := make(chan struct{})
 	go func() {
 		taskService.Stop()
-		s.stopServer(s.ctx, appSrv)
-		s.stopServer(s.ctx, prometheusSrv)
+		s.stopServer(ctx, appSrv)
+		s.stopServer(ctx, prometheusSrv)
 		close(shutdownDone)
 	}()
 
@@ -349,15 +340,16 @@ func (s *Server) Start() {
 	}
 }
 
-func (s *Server) newServer(r *gin.Engine, address string) *http.Server {
+func (s *Server) newServer(r *gin.Engine, address string, cfg *config.Server) *http.Server {
 	if r == nil || address == "" {
 		log.Fatal().Msg("Failed to create server, engine or address is nil")
 		return nil
 	}
 
 	return &http.Server{
-		Addr:    address,
-		Handler: r,
+		Addr:              address,
+		Handler:           r,
+		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
 	}
 }
 
@@ -424,7 +416,7 @@ func (s *Server) applyAuthProvider(p auth.Provider, public *gin.RouterGroup, pro
 			var loginErr error
 			var loginHttpStatus int
 
-			if loginErr, loginHttpStatus = p.Login(c); loginErr != nil {
+			if loginHttpStatus, loginErr = p.Login(c); loginErr != nil {
 				httpErr := service_error.NewServiceErrorHttp(loginHttpStatus, loginErr)
 				c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 				_ = c.AbortWithError(handler.ToHttpStatus(httpErr), httpErr)
@@ -440,7 +432,7 @@ func (s *Server) applyAuthProvider(p auth.Provider, public *gin.RouterGroup, pro
 			var logoutErr error
 			var logoutHttpStatus int
 
-			if logoutErr, logoutHttpStatus = p.Logout(c); logoutErr != nil {
+			if logoutHttpStatus, logoutErr = p.Logout(c); logoutErr != nil {
 				httpErr := service_error.NewServiceErrorHttp(logoutHttpStatus, logoutErr)
 				c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 				_ = c.AbortWithError(handler.ToHttpStatus(httpErr), httpErr)
@@ -456,7 +448,7 @@ func (s *Server) applyAuthProvider(p auth.Provider, public *gin.RouterGroup, pro
 			var profile *auth.Profile
 			var profileError error
 			var profileHttpStatus int
-			if profile, profileError, profileHttpStatus = p.Profile(c); profileError != nil {
+			if profile, profileHttpStatus, profileError = p.Profile(c); profileError != nil {
 				httpErr := service_error.NewServiceErrorHttp(profileHttpStatus, profileError)
 				_ = c.AbortWithError(handler.ToHttpStatus(httpErr), httpErr)
 				return

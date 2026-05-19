@@ -91,7 +91,8 @@ func (s *TaskService) Stop() {
 
 // EnqueueOnce enqueues a new job once for execution, convenience method for gocron.WithLimitedRuns, see https://github.com/go-co-op/gocron/issues/709
 func (s *TaskService) EnqueueOnce(job gocron.JobDefinition, task gocron.Task, name string, options ...gocron.JobOption) (gocron.Job, error) {
-	jobOptions := []gocron.JobOption{gocron.WithLimitedRuns(1)}
+	jobOptions := make([]gocron.JobOption, 1, 1+len(options))
+	jobOptions[0] = gocron.WithLimitedRuns(1)
 	jobOptions = append(jobOptions, options...)
 	return s.Enqueue(job, task, name, jobOptions...)
 }
@@ -101,7 +102,8 @@ func (s *TaskService) Enqueue(job gocron.JobDefinition, task gocron.Task, name s
 	if name == "" {
 		return nil, service_error.ErrValidationNotBlank
 	}
-	jobOptions := []gocron.JobOption{gocron.WithName(name)}
+	jobOptions := make([]gocron.JobOption, 1, 1+len(options))
+	jobOptions[0] = gocron.WithName(name)
 	jobOptions = append(jobOptions, options...)
 	return s.scheduler.NewJob(job, task, jobOptions...)
 }

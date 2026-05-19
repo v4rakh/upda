@@ -34,10 +34,8 @@ func New(db *gorm.DB, options ...Option) GormStore {
 		cleanupEnabled: false,
 	}
 
-	if options != nil {
-		for _, o := range options {
-			o.Apply(opts)
-		}
+	for _, o := range options {
+		o.Apply(opts)
 	}
 
 	store := gormstore.NewOptions(db, opts.gormStoreOptions, opts.KeyPairs...)

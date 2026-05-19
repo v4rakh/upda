@@ -121,7 +121,6 @@ func middlewareAppVersion() gin.HandlerFunc {
 func middlewareGlobalNotFound() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeNotFound), "page not found"))
-		return
 	}
 }
 
@@ -129,7 +128,6 @@ func middlewareGlobalNotFound() gin.HandlerFunc {
 func middlewareGlobalMethodNotAllowed() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeMethodNotAllowed), "method not allowed"))
-		return
 	}
 }
 
@@ -200,6 +198,5 @@ func middlewareRedirect(targetPath string) gin.HandlerFunc {
 		}
 		c.Redirect(http.StatusMovedPermanently, t)
 		c.Abort()
-		return
 	}
 }

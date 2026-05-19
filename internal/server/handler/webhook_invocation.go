@@ -51,7 +51,6 @@ func (h *WebhookInvocationHandler) Execute(c *gin.Context) {
 			_ = c.AbortWithError(ToHttpStatus(err), err)
 			return
 		}
-		break
 	case constant.WebhookTypeDiun.String():
 		var req api.WebhookDiunRequest
 		if err = c.ShouldBindJSON(&req); err != nil {
@@ -62,7 +61,6 @@ func (h *WebhookInvocationHandler) Execute(c *gin.Context) {
 			_ = c.AbortWithError(ToHttpStatus(err), err)
 			return
 		}
-		break
 	default:
 		err = service_error.NewServiceError(service_error.ErrCodeIllegalArgument, errors.New("no default handler for webhook type found"))
 		_ = c.AbortWithError(ToHttpStatus(err), err)

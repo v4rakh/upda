@@ -201,7 +201,7 @@ func (r *EventDbRepo) Count(state ...string) (int64, error) {
 }
 
 func CriterionEventState(states []string) func(db *gorm.DB) *gorm.DB {
-	if states != nil && len(states) > 0 {
+	if len(states) > 0 {
 		return func(db *gorm.DB) *gorm.DB {
 			return db.Where("state IN (?)", states)
 		}

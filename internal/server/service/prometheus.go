@@ -26,7 +26,6 @@ var (
 )
 
 type PrometheusService struct {
-	router           *gin.Engine
 	prometheus       *ginprom.Prometheus
 	prometheusConfig *config.Prometheus
 	customGauges     customGauges

@@ -48,8 +48,8 @@ func NewServiceErrorHttp(status int, err error) error {
 }
 
 // NewServiceDatabaseError returns an error that formats as the given text and aligns with builtin error
-func NewServiceDatabaseError(error error) error {
-	return NewServiceError(ErrCodeGeneral, fmt.Errorf("database error: %w", error))
+func NewServiceDatabaseError(err error) error {
+	return NewServiceError(ErrCodeGeneral, fmt.Errorf("database error: %w", err))
 }
 
 type ServiceError struct {

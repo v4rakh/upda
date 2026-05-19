@@ -26,7 +26,6 @@ func AbortWithValidatorPayload(c *gin.Context, err error) {
 	resErr := service_error.NewServiceError(service_error.ErrCodeIllegalArgument, fmt.Errorf("validation error: %v (%w)", str.ValuesString(errorMap), err))
 	c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
 	_ = c.AbortWithError(http.StatusBadRequest, resErr)
-	return
 }
 
 func ToHttpStatus(err error) int {

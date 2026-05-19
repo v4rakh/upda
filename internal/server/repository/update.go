@@ -239,7 +239,7 @@ func criterionUpdateSearch(searchTerm string, searchIn string) func(db *gorm.DB)
 }
 
 func criterionUpdateState(states []string) func(db *gorm.DB) *gorm.DB {
-	if states != nil && len(states) > 0 {
+	if len(states) > 0 {
 		return func(db *gorm.DB) *gorm.DB {
 			return db.Where("state IN (?)", states)
 		}

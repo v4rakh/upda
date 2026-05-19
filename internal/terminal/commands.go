@@ -16,7 +16,7 @@ import (
 const (
 	envServerUrl    = "UPDA_SERVER_URL"
 	envWebhookId    = "UPDA_WEBHOOK_ID"
-	envWebhookToken = "UPDA_WEBHOOK_TOKEN"
+	envWebhookToken = "UPDA_WEBHOOK_TOKEN" //nolint:gosec // env var name, not a credential
 
 	flagUrl                = "url"
 	flagUser               = "user"
@@ -150,7 +150,7 @@ func webhookSend(_ context.Context, cmd *cli.Command) error {
 			structuredPayload.Provider = provider
 		}
 
-		if metaData != nil && len(metaData) > 0 {
+		if len(metaData) > 0 {
 			structuredPayload.Metadata = metaData
 		}
 

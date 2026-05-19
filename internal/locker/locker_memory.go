@@ -12,8 +12,8 @@ const (
 	NoExpiration      time.Duration = -1
 )
 
-// ErrorNoSuchLock is returned when the requested lock does not exist
-var ErrorNoSuchLock = errors.New("no such lock")
+// ErrNoSuchLock is returned when the requested lock does not exist
+var ErrNoSuchLock = errors.New("no such lock")
 
 // InMemoryLockRegistry provides a locking mechanism based on the passed in reference name
 type InMemoryLockRegistry struct {
@@ -125,7 +125,7 @@ func (r *InMemoryLockRegistry) Unlock(name string) error {
 	nameLock, exists := r.locks[name]
 	if !exists {
 		r.mu.Unlock()
-		return ErrorNoSuchLock
+		return ErrNoSuchLock
 	}
 
 	if nameLock.count() == 0 {

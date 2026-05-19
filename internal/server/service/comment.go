@@ -95,7 +95,7 @@ func (s *CommentService) UpdateContent(id string, content string) (*model.Commen
 	var e *model.Comment
 	var err error
 
-	if e, err = s.GetById(id); err != nil {
+	if _, err = s.GetById(id); err != nil {
 		return nil, err
 	}
 
