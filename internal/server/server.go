@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"slices"
 	"syscall"
+	"time"
 
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
@@ -299,8 +300,8 @@ func (s *Server) Start(ctx context.Context) {
 	apiProtectedGroup.DELETE("/update-state-transitions/:id", updateStateTransitionHandler.Delete)
 
 	// start servers (run in separate goroutines)
-	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port), cfg.Server)
-	prometheusSrv := s.newServer(promRouter, fmt.Sprintf("%s:%d", cfg.Prometheus.Listen, cfg.Prometheus.Port), cfg.Server)
+	appSrv := s.newServer(appRouter, fmt.Sprintf("%s:%d", cfg.Server.Listen, cfg.Server.Port), cfg.Server.ReadHeaderTimeout)
+	prometheusSrv := s.newServer(promRouter, fmt.Sprintf("%s:%d", cfg.Prometheus.Listen, cfg.Prometheus.Port), cfg.Prometheus.ReadHeaderTimeout)
 
 	s.startServer(appSrv, cfg.Server)
 
@@ -340,7 +341,7 @@ func (s *Server) Start(ctx context.Context) {
 	}
 }
 
-func (s *Server) newServer(r *gin.Engine, address string, cfg *config.Server) *http.Server {
+func (s *Server) newServer(r *gin.Engine, address string, readHeaderTimeout time.Duration) *http.Server {
 	if r == nil || address == "" {
 		log.Fatal().Msg("Failed to create server, engine or address is nil")
 		return nil
@@ -349,7 +350,7 @@ func (s *Server) newServer(r *gin.Engine, address string, cfg *config.Server) *h
 	return &http.Server{
 		Addr:              address,
 		Handler:           r,
-		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
+		ReadHeaderTimeout: readHeaderTimeout,
 	}
 }
 

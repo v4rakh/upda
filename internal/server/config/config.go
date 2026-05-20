@@ -179,6 +179,7 @@ type Prometheus struct {
 	SecureTokenEnabled bool          `env:"PROMETHEUS_SECURE_TOKEN_ENABLED,default=true"`
 	SecureToken        string        `env:"PROMETHEUS_SECURE_TOKEN"                      validate:"required_if=Enabled true SecureTokenEnabled true"`
 	RefreshInterval    time.Duration `env:"PROMETHEUS_REFRESH_INTERVAL,default=60s"      validate:"required_if=Enabled true,gte=0"`
+	ReadHeaderTimeout  time.Duration `env:"PROMETHEUS_READ_HEADER_TIMEOUT,default=30s"   validate:"gte=0"`
 }
 
 type Configuration struct {
