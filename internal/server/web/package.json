@@ -32,7 +32,7 @@
 		"clean": "npx --quiet rimraf build && npx --quiet rimraf ci/*.xml && npx --quiet rimraf coverage && npx --quiet rimraf node_modules"
 	},
 	"dependencies": {
-		"@ant-design/icons": "6.2.3",
+		"@ant-design/icons": "6.2.5",
 		"@ant-design/pro-layout": "7.22.7",
 		"@dnd-kit/core": "6.3.1",
 		"@dnd-kit/modifiers": "9.0.0",
@@ -41,7 +41,7 @@
 		"@reduxjs/toolkit": "2.12.0",
 		"@uiw/react-md-editor": "4.1.1",
 		"antd": "6.4.3",
-		"html-react-parser": "6.1.1",
+		"html-react-parser": "6.1.2",
 		"i18next": "26.2.0",
 		"i18next-browser-languagedetector": "8.2.1",
 		"linkify-html": "4.3.3",
@@ -75,7 +75,7 @@
 		"eslint-import-resolver-typescript": "4.4.4",
 		"eslint-plugin-import": "2.32.0",
 		"eslint-plugin-jsx-a11y": "6.10.2",
-		"eslint-plugin-prettier": "5.5.5",
+		"eslint-plugin-prettier": "5.5.6",
 		"eslint-plugin-react": "7.37.5",
 		"eslint-plugin-react-hooks": "7.1.1",
 		"eslint-plugin-sonarjs": "4.0.3",
