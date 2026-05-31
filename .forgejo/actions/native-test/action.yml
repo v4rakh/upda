@@ -1,7 +1,0 @@
-runs:
-  using: "composite"
-  steps:
-    - name: Native - test
-      shell: bash
-      run: |
-        make test-coverage
