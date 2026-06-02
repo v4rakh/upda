@@ -238,3 +238,17 @@ Add upda as **Nix flakes** input:
     inputs.upda.url = "git+https://git.myservermanager.com/varakh/upda?ref=refs/tags/latest";
 }
 ```
+
+There's a NixOS module which you can use. For available properties, see `nix/module.nix`. Here's a minimal example:
+
+```nix
+services.upda = {
+  enable = true;
+  environment = {
+    # ...
+  };
+  environmentFiles = [
+    # ..., e.g., config.sops.upda-env.path
+  ];
+};
+```

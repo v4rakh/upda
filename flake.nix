@@ -7,7 +7,12 @@
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
+    inputs@{
+      flake-parts,
+      nixpkgs,
+      self,
+      ...
+    }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -15,7 +20,7 @@
       ];
 
       perSystem =
-        { pkgs, self', ... }:
+        { pkgs, config, ... }:
         let
           version = "8.3.0";
           frontend = pkgs.stdenv.mkDerivation (finalAttrs: {
@@ -25,11 +30,13 @@
 
             nativeBuildInputs = with pkgs; [
               nodejs_24
-              pnpm_10
+              pnpm
               pnpmConfigHook
             ];
 
-            pnpmInstallFlags = [ "--frozen-lockfile" ];
+            pnpmInstallFlags = [
+              "--frozen-lockfile"
+            ];
 
             pnpmDeps = pkgs.fetchPnpmDeps {
               inherit (finalAttrs)
@@ -39,7 +46,7 @@
                 pnpmInstallFlags
                 ;
               fetcherVersion = 3;
-              hash = "sha256-DbGib0ayJZirmluQ4D8R7HfcGMKlVLsWBA/grUFIMS8=";
+              hash = "sha256-6XRIp/Wten28PhGs39U+IEykflo3h+I3l7F8iwYf4Yg=";
             };
 
             buildPhase = ''
@@ -61,10 +68,13 @@
           packages.server = pkgs.buildGoModule {
             pname = "upda";
             inherit version;
-            src = ./.;
+            src = pkgs.lib.cleanSourceWith {
+              src = ./.;
+              filter = path: type: !(type == "directory" && builtins.baseNameOf path == "node_modules");
+            };
             tags = [ "prod" ];
             doCheck = false;
-            vendorHash = "sha256-24UzisWDZon6u59Z+Yf2XB3rNRoEEiyd861cKgZ+f4c=";
+            vendorHash = "sha256-QMqqDpr1khNbRBljDUL+UcAzJTEe6rvaXjIVx1Q99oY=";
 
             preBuild = ''
               mkdir -p internal/server/web
@@ -73,7 +83,7 @@
             buildInputs = [ frontend ];
           };
 
-          packages.default = self'.packages.server;
+          packages.default = config.packages.server;
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
@@ -87,5 +97,12 @@
             ];
           };
         };
+
+      flake = {
+        nixosModules.default = import ./nix/module.nix {
+          inherit self;
+          lib = nixpkgs.lib;
+        };
+      };
     };
 }
