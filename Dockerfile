@@ -27,7 +27,7 @@ RUN go mod download
 # Copy source and frontend build
 COPY . .
 COPY --from=builder-frontend /src/web/build ./internal/server/web/build
-RUN CGO_ENABLED=0 GOOS=linux go build -tags prod -ldflags="-s -w" -o /upda ./cmd/upda
+RUN CGO_ENABLED=0 GOOS=linux go build -tags prod -trimpath -ldflags="-s -w" -o /upda ./cmd/upda
 
 #
 # Actual image

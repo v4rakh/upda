@@ -74,6 +74,10 @@
             };
             tags = [ "prod" ];
             doCheck = false;
+            ldflags = [
+              "-s"
+              "-w"
+            ];
             vendorHash = "sha256-QMqqDpr1khNbRBljDUL+UcAzJTEe6rvaXjIVx1Q99oY=";
 
             preBuild = ''
