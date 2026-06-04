@@ -69,12 +69,12 @@ The following tables describe available configuration values.
 
 ### Webinterface
 
-| Env Var                          | Default                    | Description                 |
-|----------------------------------|----------------------------|-----------------------------|
-| WEB_INTERFACE_ENABLED            | true                       | Enables web UI.             |
-| WEB_INTERFACE_API_URL            | http://localhost:8080/api/ | API URL used by the web UI. |
-| WEB_INTERFACE_TITLE              | upda                       | Web UI title.               |
-| WEB_INTERFACE_FOOTER_ENABLED     | true                       | Shows or hides the footer.  |
+| Env Var                      | Default                    | Description                 |
+|------------------------------|----------------------------|-----------------------------|
+| WEB_INTERFACE_ENABLED        | true                       | Enables web UI.             |
+| WEB_INTERFACE_API_URL        | http://localhost:8080/api/ | API URL used by the web UI. |
+| WEB_INTERFACE_TITLE          | upda                       | Web UI title.               |
+| WEB_INTERFACE_FOOTER_ENABLED | true                       | Shows or hides the footer.  |
 
 ### Webinterface Cache Control
 
@@ -93,6 +93,17 @@ The following tables describe available configuration values.
 | WEB_INTERFACE_CC_IMMUTABLE              | false   | Marks responses as immutable.           |
 | WEB_INTERFACE_CC_STALE_WHILE_REVALIDATE | -       | Allows stale cache while revalidating.  |
 | WEB_INTERFACE_CC_STALE_IF_ERROR         | -       | Allows stale cache if server errors.    |
+
+### Webinterface Security Headers
+
+| Env Var                                   | Default     | Description                                                                                                                       |
+|-------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| WEB_INTERFACE_SH_CSP_ENABLED              | false       | Enables `Content-Security-Policy` header for all web interface responses.                                                         |
+| WEB_INTERFACE_SH_CSP_VALUE                | (see below) | Full CSP directive string. Defaults to a strict single-origin SPA policy. Adjust `connect-src` when API is on a different origin. |
+| WEB_INTERFACE_SH_HSTS_ENABLED             | false       | Enables `Strict-Transport-Security` header. Enable only when the end-user connection is HTTPS.                                    |
+| WEB_INTERFACE_SH_HSTS_MAX_AGE             | 8760h       | How long browsers cache the HSTS policy.                                                                                          |
+| WEB_INTERFACE_SH_HSTS_INCLUDE_SUB_DOMAINS | false       | Appends `; includeSubDomains` to the HSTS header value.                                                                           |
+| WEB_INTERFACE_SH_HSTS_PRELOAD             | false       | Appends `; preload` to the HSTS header value. Requires `WEB_INTERFACE_SH_HSTS_INCLUDE_SUB_DOMAINS=true`.                          |
 
 ### Auth
 

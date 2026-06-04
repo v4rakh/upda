@@ -163,8 +163,9 @@ func (s *Server) Start(ctx context.Context) {
 	// in production, the web interface is served on SERVER_BASE_PATH, build with go flag -tags prod is required
 	if cfg.Webinterface.Enabled && !cfg.App.Development {
 		cacheControl := middlewareCacheControl(cfg.WebinterfaceCacheControl)
+		securityHeaders := middlewareSecurityHeaders(cfg.WebinterfaceSecurityHeaders)
 		webinterfaceHandler := handler.NewWebinterfaceHandler(cfg.Webinterface, cfg.Auth)
-		appRouter.GET(cfg.Server.BasePath+"ui/conf/runtime-config.js", cacheControl, webinterfaceHandler.GetConfig)
+		appRouter.GET(cfg.Server.BasePath+"ui/conf/runtime-config.js", cacheControl, securityHeaders, webinterfaceHandler.GetConfig)
 
 		targetFSPath := "web/build"
 		var webinterfaceFolderFS ginstatic.ServeFileSystem
@@ -176,7 +177,7 @@ func (s *Server) Start(ctx context.Context) {
 		if cfg.Server.BasePath != "/" {
 			appRouter.GET("", middlewareRedirect(cfg.Server.BasePath+"ui/"))
 		}
-		appRouter.Use(middlewareFSRewrite(cfg.Server.BasePath+"ui", webinterfaceFolderFS, &cacheControl))
+		appRouter.Use(middlewareFSRewrite(cfg.Server.BasePath+"ui", webinterfaceFolderFS, &cacheControl, &securityHeaders))
 	}
 
 	apiPublicGroup := appRouter.Group(cfg.Server.BasePath + "/api/v1")

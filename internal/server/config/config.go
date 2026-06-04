@@ -110,6 +110,19 @@ type WebinterfaceCacheControl struct {
 	StaleIfError         *time.Duration `env:"WEB_INTERFACE_CC_STALE_IF_ERROR,noinit"`
 }
 
+// defaultCspValue is the CSP directive string applied when WEB_INTERFACE_SH_CSP_ENABLED is true
+// and WEB_INTERFACE_SH_CSP_VALUE is not overridden. Suitable for a single-origin Vite/React SPA.
+const defaultCspValue = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'; frame-src 'self'"
+
+type WebinterfaceSecurityHeaders struct {
+	CspEnabled            bool          `env:"WEB_INTERFACE_SH_CSP_ENABLED,default=false"`
+	CspValue              string        `env:"WEB_INTERFACE_SH_CSP_VALUE"`
+	HstsEnabled           bool          `env:"WEB_INTERFACE_SH_HSTS_ENABLED,default=false"`
+	HstsMaxAge            time.Duration `env:"WEB_INTERFACE_SH_HSTS_MAX_AGE,default=8760h"`
+	HstsIncludeSubDomains bool          `env:"WEB_INTERFACE_SH_HSTS_INCLUDE_SUB_DOMAINS,default=false"`
+	HstsPreload           bool          `env:"WEB_INTERFACE_SH_HSTS_PRELOAD,default=false"`
+}
+
 type Auth struct {
 	Type                   constant.ConfigAuthType            `env:"AUTH_TYPE,default=session"                        validate:"required,oneof=session"`
 	SessionSecret          string                             `env:"AUTH_SESSION_SECRET,required"                     validate:"required_if=Type session"`
@@ -183,19 +196,20 @@ type Prometheus struct {
 }
 
 type Configuration struct {
-	App                      *App
-	Auth                     *Auth
-	Cors                     *Cors
-	Database                 *Database
-	Lock                     *Lock
-	Logging                  *Logging
-	Prometheus               *Prometheus
-	Secret                   *Secret
-	Server                   *Server
-	Task                     *Task
-	Webhook                  *Webhook
-	Webinterface             *Webinterface
-	WebinterfaceCacheControl *WebinterfaceCacheControl
+	App                         *App
+	Auth                        *Auth
+	Cors                        *Cors
+	Database                    *Database
+	Lock                        *Lock
+	Logging                     *Logging
+	Prometheus                  *Prometheus
+	Secret                      *Secret
+	Server                      *Server
+	Task                        *Task
+	Webhook                     *Webhook
+	Webinterface                *Webinterface
+	WebinterfaceCacheControl    *WebinterfaceCacheControl
+	WebinterfaceSecurityHeaders *WebinterfaceSecurityHeaders
 }
 
 func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
@@ -315,6 +329,10 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 
 	c.Auth.SessionCookieSameSiteMode = convertSessionCookieSameSite(c.Auth.SessionCookieSameSite)
 
+	if c.WebinterfaceSecurityHeaders.CspValue == "" {
+		c.WebinterfaceSecurityHeaders.CspValue = defaultCspValue
+	}
+
 	log.Info().Msgf("Configuration: App %+v", c.App)
 	log.Info().Msg("Configuration: Auth ***REDACTED***")
 	log.Info().Msgf("Configuration: Cors %+v", c.Cors)
@@ -328,6 +346,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	log.Info().Msgf("Configuration: Webhook %+v", c.Webhook)
 	log.Info().Msgf("Configuration: Webinterface %+v", c.Webinterface)
 	log.Info().Msgf("Configuration: WebinterfaceCacheControl %+v", c.WebinterfaceCacheControl)
+	log.Info().Msgf("Configuration: WebinterfaceSecurityHeaders %+v", c.WebinterfaceSecurityHeaders)
 
 	return &c, db
 }

@@ -8,4 +8,7 @@ const (
 
 	HeaderContentType                = "Content-Type"
 	HeaderContentTypeApplicationJson = "application/json"
+
+	HeaderContentSecurityPolicy   = "Content-Security-Policy"
+	HeaderStrictTransportSecurity = "Strict-Transport-Security"
 )

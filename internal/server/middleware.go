@@ -186,6 +186,27 @@ func middlewareFSRewrite(basePath string, fs ginstatic.ServeFileSystem, handlerF
 	}
 }
 
+// middlewareSecurityHeaders sets Content-Security-Policy and Strict-Transport-Security
+// headers for the web interface when the respective options are enabled.
+func middlewareSecurityHeaders(c *config.WebinterfaceSecurityHeaders) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		header := ctx.Writer.Header()
+		if c.CspEnabled {
+			header.Set(api.HeaderContentSecurityPolicy, c.CspValue)
+		}
+		if c.HstsEnabled {
+			hstsValue := fmt.Sprintf("max-age=%d", int(c.HstsMaxAge.Seconds()))
+			if c.HstsIncludeSubDomains {
+				hstsValue += "; includeSubDomains"
+			}
+			if c.HstsPreload {
+				hstsValue += "; preload"
+			}
+			header.Set(api.HeaderStrictTransportSecurity, hstsValue)
+		}
+	}
+}
+
 // middlewareRedirect redirects when not /
 func middlewareRedirect(targetPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
