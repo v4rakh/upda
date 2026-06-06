@@ -52,7 +52,7 @@ ENV SERVER_PORT=8080
 EXPOSE ${SERVER_PORT}
 
 # Run as non-root user (required for OpenShift restricted SCC)
-USER 65532:65532
+USER 65532:0
 
 # Default command
 ENTRYPOINT ["/usr/local/bin/upda"]
