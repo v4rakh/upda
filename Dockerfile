@@ -13,7 +13,7 @@ RUN pnpm install
 COPY internal/server/web/ ./
 RUN pnpm build
 
-FROM golang:1.25-alpine AS builder-server
+FROM golang:1.26-alpine AS builder-server
 
 # Enable automatic toolchain download for Go 1.25+
 ENV GOTOOLCHAIN=auto
