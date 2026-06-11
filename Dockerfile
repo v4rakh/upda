@@ -9,7 +9,8 @@ RUN apk --update upgrade && \
 
 WORKDIR /src/web
 COPY internal/server/web/package*.json ./
-RUN pnpm install
+COPY internal/server/web/pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY internal/server/web/ ./
 RUN pnpm build
 
