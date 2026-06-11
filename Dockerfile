@@ -8,7 +8,8 @@ RUN apk --update upgrade && \
     rm -rf /var/cache/apk/*
 
 WORKDIR /src/web
-COPY internal/server/web/package*.json ./
+COPY internal/server/web/package.json ./
+COPY internal/server/web/pnpm-lock.yaml ./
 COPY internal/server/web/pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY internal/server/web/ ./
