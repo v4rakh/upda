@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -12,7 +13,6 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/server/config"
-	"git.myservermanager.com/varakh/upda/internal/server/handler"
 	"git.myservermanager.com/varakh/upda/internal/server/service_error"
 	"github.com/gin-contrib/cors"
 	ginstatic "github.com/gin-contrib/static"
@@ -52,9 +52,19 @@ func middlewarePanicRecoveryHandler(lc *config.Logging) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Error().Str(lc.EncodingStacktraceKey, string(debug.Stack())).Msgf("panic recovered: %v", err)
+				stackTrace := debug.Stack()
+				panicErr := fmt.Errorf("%v", err)
+
+				log.Ctx(c.Request.Context()).
+					Error().
+					Err(panicErr).
+					Str(lc.EncodingStacktraceKey, string(stackTrace)).
+					Msg("panic")
+
 				c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
-				c.AbortWithStatusJSON(http.StatusInternalServerError, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeGeneral), fmt.Sprintf("%s", err)))
+
+				// this is a panic, thus treat this carefully as it may contain sensitive information
+				c.AbortWithStatusJSON(http.StatusInternalServerError, api.NewErrorResponseWithStatusAndMessage(service_error.ErrCodeGeneral.String(), "panic"))
 			}
 		}()
 
@@ -71,7 +81,30 @@ func middlewareErrorTransformer() gin.HandlerFunc {
 		if len(c.Errors) > 0 {
 			// status -1 doesn't overwrite existing status code
 			c.Header(api.HeaderContentType, api.HeaderContentTypeApplicationJson)
-			c.JSON(-1, api.NewErrorResponseWithStatusAndMessage(handler.CodeToStr(c.Errors.Last()), c.Errors.Last().Error()))
+
+			// unknown/general errors can contain sensitive information, thus treat carefully
+			if svcErr, ok := errors.AsType[*service_error.ServiceError](c.Errors.Last().Err); ok {
+				errorBody := svcErr.Error()
+				if svcErr.Status == service_error.ErrCodeGeneral {
+					errorBody = svcErr.Status.String()
+
+					log.Ctx(c.Request.Context()).
+						Error().
+						Err(svcErr).
+						Msg("service error")
+				}
+
+				c.JSON(-1, api.NewErrorResponseWithStatusAndMessage(svcErr.Status.String(), errorBody))
+				return
+			}
+
+			// this is an uncaught error, usually everything returns a service_error, thus treat this carefully as it may contain sensitive information
+			log.Ctx(c.Request.Context()).
+				Error().
+				Err(c.Errors.Last().Err).
+				Msg("internal server error")
+
+			c.JSON(-1, api.NewErrorResponseWithStatusAndMessage(service_error.ErrCodeGeneral.String(), "internal server error"))
 			return
 		}
 	}
@@ -120,14 +153,14 @@ func middlewareAppVersion() gin.HandlerFunc {
 // middlewareGlobalNotFound adds a global not found in the same style as the API responds
 func middlewareGlobalNotFound() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusNotFound, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeNotFound), "page not found"))
+		c.AbortWithStatusJSON(http.StatusNotFound, api.NewErrorResponseWithStatusAndMessage(service_error.ErrCodeNotFound.String(), "page not found"))
 	}
 }
 
 // middlewareGlobalMethodNotAllowed adds a global method not allowed in the same style as the API responds
 func middlewareGlobalMethodNotAllowed() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeMethodNotAllowed), "method not allowed"))
+		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, api.NewErrorResponseWithStatusAndMessage(service_error.ErrCodeMethodNotAllowed.String(), "method not allowed"))
 	}
 }
 
@@ -135,7 +168,7 @@ func middlewareGlobalMethodNotAllowed() gin.HandlerFunc {
 func middlewareEnforceJsonContentType() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method != http.MethodOptions && !strings.HasPrefix(c.GetHeader(api.HeaderContentType), api.HeaderContentTypeApplicationJson) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, api.NewErrorResponseWithStatusAndMessage(string(service_error.ErrCodeIllegalArgument), "content-type must be application/json"))
+			c.AbortWithStatusJSON(http.StatusBadRequest, api.NewErrorResponseWithStatusAndMessage(service_error.ErrCodeIllegalArgument.String(), "content-type must be application/json"))
 			return
 		}
 		c.Next()

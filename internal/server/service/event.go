@@ -133,7 +133,7 @@ func (s *EventService) CreateWithWarnOnly(name constant.EventName, payload inter
 	var err error
 
 	if e, err = s.Create(name, payload); err != nil {
-		log.Warn().Msgf("Could not create event '%s': %v", name, err)
+		log.Warn().Err(err).Msgf("Could not create event '%s'", name)
 		return nil
 	}
 

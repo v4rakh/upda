@@ -45,7 +45,7 @@ func (s *EventsCleanTask) configureEventsCleanTask() error {
 		var c int64
 
 		if c, err = s.eventService.CleanStale(t, constant.EventStateCreated, constant.EventStateEnqueued); err != nil {
-			log.Error().Msgf("Could not clean up stale events older than %s (%s). Reason: %s", s.taskConfig.EventCleanStaleMaxAge, t, err.Error())
+			log.Error().Err(err).Msgf("Could not clean up stale events older than %s (%s)", s.taskConfig.EventCleanStaleMaxAge, t)
 			return
 		}
 

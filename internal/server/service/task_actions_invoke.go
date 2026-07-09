@@ -36,7 +36,7 @@ func (s *ActionsInvokeTask) configureActionsInvokeTask() error {
 
 	runnable := func() {
 		if err := s.actionInvocationService.Invoke(s.taskConfig.ActionsInvokeBatchSize, s.taskConfig.ActionsInvokeMaxRetries); err != nil {
-			log.Error().Msgf("Could invoke actions. Reason: %s", err.Error())
+			log.Error().Err(err).Msg("Could not invoke actions")
 		}
 	}
 

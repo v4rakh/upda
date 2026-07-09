@@ -229,10 +229,10 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	// load configuration and validate from environment
 	var c Configuration
 	if err = envconfig.Process(ctx, &c); err != nil {
-		log.Fatal().Msgf("Cannot load configuration from environment. Reason: %v", err)
+		log.Fatal().Err(err).Msg("Cannot load configuration from environment")
 	}
 	if err = validate.ValidOrError(c); err != nil {
-		log.Fatal().Msgf("Cannot validate configuration. Reason: %s", err.Error())
+		log.Fatal().Err(err).Msg("Cannot validate configuration")
 	}
 
 	var db *gorm.DB
@@ -261,29 +261,29 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 		)
 
 		if db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: gormLog}); err != nil {
-			log.Fatal().Msgf("Could not setup database: %v", err)
+			log.Fatal().Err(err).Msg("Could not setup database")
 		}
 
 		var sqlDb *sql.DB
 		if sqlDb, err = db.DB(); err != nil {
-			log.Fatal().Msgf("Could not retrieve database: %v", err)
+			log.Fatal().Err(err).Msg("Could not retrieve database")
 		}
 
 		if err = sqlDb.PingContext(ctx); err != nil {
-			log.Fatal().Msgf("Could not connect to database: %v", err)
+			log.Fatal().Err(err).Msg("Could not connect to database")
 		}
 
 		if migrationDriver, err = migratepostgres.WithInstance(sqlDb, &migratepostgres.Config{}); err != nil {
-			log.Fatal().Msgf("Could not create migration driver: %v", err)
+			log.Fatal().Err(err).Msg("Could not create migration driver")
 		}
 
 		if migrationFS, err = iofs.New(migrationPostgresFS, "migrations_postgres"); err != nil {
-			log.Fatal().Msgf("Could not create migration source: %v", err)
+			log.Fatal().Err(err).Msg("Could not create migration source")
 		}
 	}
 
 	if db == nil {
-		log.Fatal().Msgf("Could not setup database")
+		log.Fatal().Msg("Could not setup database")
 	}
 
 	if !c.Database.MigrationEnabled {
@@ -291,7 +291,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 	} else {
 		var migrator *migrate.Migrate
 		if migrator, err = migrate.NewWithInstance("iofs", migrationFS, migrationDatabaseName, migrationDriver); err != nil {
-			log.Fatal().Msgf("Could not create database migration instance: %v", err)
+			log.Fatal().Err(err).Msg("Could not create database migration instance")
 		}
 
 		var migrationVersion uint
@@ -300,7 +300,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 			if errors.Is(err, migrate.ErrNilVersion) {
 				log.Info().Msg("Database migration schema is uninitialized")
 			} else {
-				log.Fatal().Msgf("Could not retrieve database migration version: %v", err)
+				log.Fatal().Err(err).Msg("Could not retrieve database migration version")
 			}
 		} else {
 			log.Info().Msgf("Previous database migration version is '%d' (dirty '%v')", migrationVersion, migrationVersionDirty)
@@ -311,7 +311,7 @@ func LoadFromEnvironment(ctx context.Context) (*Configuration, *gorm.DB) {
 			if errors.Is(err, migrate.ErrNoChange) {
 				log.Info().Msg("No database schema changes detected")
 			} else {
-				log.Fatal().Msgf("Could not migrate database schema: %v", err)
+				log.Fatal().Err(err).Msg("Could not migrate database schema")
 			}
 		}
 

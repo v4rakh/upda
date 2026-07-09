@@ -97,13 +97,13 @@ func (s *Server) Start(ctx context.Context) {
 	if cfg.Lock.RedisEnabled {
 		var e error
 		if lockService, e = service.NewLockRedisService(cfg.Lock); e != nil {
-			log.Fatal().Msgf("Failed to create lock service: %+v", e)
+			log.Fatal().Err(e).Msg("Failed to create lock service")
 		}
 	}
 
 	var taskService *service.TaskService
 	if taskService, err = service.NewTaskService(lockService, cfg.App, cfg.Lock); err != nil {
-		log.Fatal().Msgf("Task service creation failed: %v", err)
+		log.Fatal().Err(err).Msg("Task service creation failed")
 	}
 
 	updateStateDefinitionService := service.NewUpdateStateDefinitionService(updateStateDefinitionRepo, updateRepo)
@@ -122,23 +122,23 @@ func (s *Server) Start(ctx context.Context) {
 	// tasks init
 	eventsCleanTask := service.NewEventsCleanTask(eventService, taskService, cfg.Task)
 	if err = eventsCleanTask.Init(); err != nil {
-		log.Fatal().Msgf("Task events clean initialization failed: %v", err)
+		log.Fatal().Err(err).Msg("Task events clean initialization failed")
 	}
 	actionsCleanTask := service.NewActionsCleanTask(actionInvocationService, taskService, cfg.Task)
 	if err = actionsCleanTask.Init(); err != nil {
-		log.Fatal().Msgf("Task actions clean initialization failed: %v", err)
+		log.Fatal().Err(err).Msg("Task actions clean initialization failed")
 	}
 	actionsEnqueueTask := service.NewActionsEnqueueTask(actionInvocationService, taskService, cfg.Task)
 	if err = actionsEnqueueTask.Init(); err != nil {
-		log.Fatal().Msgf("Task actions enqueue initialization failed: %v", err)
+		log.Fatal().Err(err).Msg("Task actions enqueue initialization failed")
 	}
 	actionsInvokeTask := service.NewActionsInvokeTask(actionInvocationService, taskService, cfg.Task)
 	if err = actionsInvokeTask.Init(); err != nil {
-		log.Fatal().Msgf("Task actions invoke initialization failed: %v", err)
+		log.Fatal().Err(err).Msg("Task actions invoke initialization failed")
 	}
 	prometheusTask := service.NewPrometheusTask(updateService, updateStateDefinitionService, eventService, webhookService, actionService, prometheusService, taskService, cfg.Prometheus)
 	if err = prometheusTask.Init(); err != nil {
-		log.Fatal().Msgf("Task prometheus task initialization failed: %v", err)
+		log.Fatal().Err(err).Msg("Task prometheus task initialization failed")
 	}
 
 	taskService.Start()
@@ -170,7 +170,7 @@ func (s *Server) Start(ctx context.Context) {
 		targetFSPath := "web/build"
 		var webinterfaceFolderFS ginstatic.ServeFileSystem
 		if webinterfaceFolderFS, err = ginstatic.EmbedFolder(webinterfaceFS, targetFSPath); err != nil {
-			log.Fatal().Msgf("Cannot serve webinterface folder: %s", err.Error())
+			log.Fatal().Err(err).Msg("Cannot serve webinterface folder")
 		}
 
 		appRouter.GET(cfg.Server.BasePath, middlewareRedirect("ui/"))
@@ -367,7 +367,7 @@ func (s *Server) startServer(h *http.Server, cfg *config.Server) {
 		}
 
 		if e != nil && !errors.Is(e, http.ErrServerClosed) {
-			log.Fatal().Msgf("Server cannot be started: %v", e)
+			log.Fatal().Err(e).Msg("Server cannot be started")
 		}
 	}()
 }
@@ -378,7 +378,7 @@ func (s *Server) stopServer(ctx context.Context, h *http.Server) {
 	}
 
 	if err := h.Shutdown(ctx); err != nil {
-		log.Fatal().Msgf("Shutdown failed, exited directly: %v", err)
+		log.Fatal().Err(err).Msg("Shutdown failed, exited directly")
 	}
 
 	log.Info().Msgf("Shutdown for '%s' complete", h.Addr)

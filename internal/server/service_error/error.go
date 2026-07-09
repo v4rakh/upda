@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -27,6 +29,10 @@ var (
 
 type ErrorCode string
 
+func (e ErrorCode) String() string {
+	return string(e)
+}
+
 const (
 	ErrCodeIllegalArgument  ErrorCode = "IllegalArgument"
 	ErrCodeUnauthorized     ErrorCode = "Unauthorized"
@@ -49,7 +55,8 @@ func NewServiceErrorHttp(status int, err error) error {
 
 // NewServiceDatabaseError returns an error that formats as the given text and aligns with builtin error
 func NewServiceDatabaseError(err error) error {
-	return NewServiceError(ErrCodeGeneral, fmt.Errorf("database error: %w", err))
+	log.Error().Err(err).Msg("database error")
+	return NewServiceError(ErrCodeGeneral, errors.New("a database error occurred"))
 }
 
 type ServiceError struct {

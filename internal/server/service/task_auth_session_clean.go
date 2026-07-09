@@ -36,7 +36,7 @@ func (t *AuthSessionCleanTask) GetCleanupFn() sessiongormstore.GormCleanupFunc {
 		}
 
 		if _, err := t.taskService.Enqueue(gocron.DurationJob(t.config.SessionCleanupInterval), gocron.NewTask(runnable), jobNameAuthSessionClean); err != nil {
-			log.Error().Msgf("Could not enqueue auth session cleanup. Reason: %s", err.Error())
+			log.Error().Err(err).Msg("Could not enqueue auth session cleanup")
 		}
 	}
 

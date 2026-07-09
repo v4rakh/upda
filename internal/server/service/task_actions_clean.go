@@ -45,13 +45,13 @@ func (s *ActionsCleanTask) configureActionsCleanTask() error {
 		var err error
 
 		if cError, err = s.actionInvocationService.CleanStale(t, s.taskConfig.ActionsInvokeMaxRetries, constant.ActionInvocationStateError); err != nil {
-			log.Error().Msgf("Could not clean up error stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
+			log.Error().Err(err).Msgf("Could not clean up error stale actions older than %s (%s)", s.taskConfig.ActionsCleanStaleMaxAge, t)
 			return
 		}
 
 		var cSuccess int64
 		if cSuccess, err = s.actionInvocationService.CleanStale(t, 0, constant.ActionInvocationStateSuccess); err != nil {
-			log.Error().Msgf("Could not clean up success stale actions older than %s (%s). Reason: %s", s.taskConfig.ActionsCleanStaleMaxAge, t, err.Error())
+			log.Error().Err(err).Msgf("Could not clean up success stale actions older than %s (%s)", s.taskConfig.ActionsCleanStaleMaxAge, t)
 			return
 		}
 

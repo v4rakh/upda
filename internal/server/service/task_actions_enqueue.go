@@ -36,7 +36,7 @@ func (s *ActionsEnqueueTask) configureActionsEnqueueTask() error {
 
 	runnable := func() {
 		if err := s.actionInvocationService.Enqueue(s.taskConfig.ActionsEnqueueBatchSize); err != nil {
-			log.Error().Msgf("Could enqueue actions. Reason: %s", err.Error())
+			log.Error().Err(err).Msg("Could not enqueue actions")
 		}
 	}
 

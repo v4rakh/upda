@@ -64,11 +64,11 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 	runnable := func() {
 		updates, updatesError := s.updateService.GetAll()
 		if updatesError != nil {
-			log.Error().Msgf("Could not fetch updates for prometheus metric. Reason: %s", updatesError.Error())
+			log.Error().Err(updatesError).Msg("Could not fetch updates for prometheus metric")
 		}
 
 		if updatesError = s.prometheusService.SetGaugeNoLabels(constant.MetricUpdatesTotal, float64(len(updates))); updatesError != nil {
-			log.Error().Msgf("Could not refresh updates all prometheus metric. Reason: %s", updatesError.Error())
+			log.Error().Err(updatesError).Msg("Could not refresh updates all prometheus metric")
 		}
 
 		// Count updates by state dynamically
@@ -80,12 +80,12 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 		// Get all state definitions to ensure we report 0 for states with no updates
 		stateDefs, stateErr := s.stateDefinitionService.GetAll()
 		if stateErr != nil {
-			log.Error().Msgf("Could not get state definitions for prometheus metrics. Reason: %s", stateErr.Error())
+			log.Error().Err(stateErr).Msg("Could not get state definitions for prometheus metrics")
 		} else {
 			for _, stateDef := range stateDefs {
 				count := stateCounters[stateDef.Name]
 				if err := s.prometheusService.SetGauge(constant.MetricUpdatesByState, []string{stateDef.Name}, float64(count)); err != nil {
-					log.Error().Msgf("Could not refresh updates by state prometheus metric for state '%s'. Reason: %s", stateDef.Name, err.Error())
+					log.Error().Err(err).Msgf("Could not refresh updates by state prometheus metric for state '%s'", stateDef.Name)
 				}
 			}
 		}
@@ -93,28 +93,28 @@ func (s *PrometheusTask) configurePrometheusRefreshTask() error {
 		var webhooksTotal int64
 		var webhooksError error
 		if webhooksTotal, webhooksError = s.webhookService.Count(); webhooksError != nil {
-			log.Error().Msgf("Could not fetch webhooks count for prometheus metric. Reason: %s", webhooksError.Error())
+			log.Error().Err(webhooksError).Msg("Could not fetch webhooks count for prometheus metric")
 		}
 		if webhooksError = s.prometheusService.SetGaugeNoLabels(constant.MetricWebhooks, float64(webhooksTotal)); webhooksError != nil {
-			log.Error().Msgf("Could not refresh webhooks prometheus metric. Reason: %s", webhooksError.Error())
+			log.Error().Err(webhooksError).Msg("Could not refresh webhooks prometheus metric")
 		}
 
 		var eventsTotal int64
 		var eventsError error
 		if eventsTotal, eventsError = s.eventService.Count(); eventsError != nil {
-			log.Error().Msgf("Could not fetch events count for prometheus metric. Reason: %s", eventsError.Error())
+			log.Error().Err(eventsError).Msg("Could not fetch events count for prometheus metric")
 		}
 		if eventsError = s.prometheusService.SetGaugeNoLabels(constant.MetricEvents, float64(eventsTotal)); eventsError != nil {
-			log.Error().Msgf("Could not refresh events prometheus metric. Reason: %s", eventsError.Error())
+			log.Error().Err(eventsError).Msg("Could not refresh events prometheus metric")
 		}
 
 		var actionsTotal int64
 		var actionsError error
 		if actionsTotal, actionsError = s.actionService.Count(); actionsError != nil {
-			log.Error().Msgf("Could not fetch actions count for prometheus metric. Reason: %s", actionsError.Error())
+			log.Error().Err(actionsError).Msg("Could not fetch actions count for prometheus metric")
 		}
 		if actionsError = s.prometheusService.SetGaugeNoLabels(constant.MetricActions, float64(actionsTotal)); actionsError != nil {
-			log.Error().Msgf("Could not refresh actions prometheus metric. Reason: %s", actionsError.Error())
+			log.Error().Err(actionsError).Msg("Could not refresh actions prometheus metric")
 		}
 	}
 

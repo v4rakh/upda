@@ -53,7 +53,7 @@ func (s *ActionInvocationService) Enqueue(batchSize int) error {
 
 	for _, event := range events {
 		if err = s.EnqueueFromEvent(event, actions); err != nil {
-			log.Error().Msgf("Could not enqueue action for event '%s' (%s). Reason: %s", event.Name, event.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not enqueue action for event '%s' (%s)", event.Name, event.ID)
 		}
 	}
 
@@ -92,7 +92,7 @@ func (s *ActionInvocationService) EnqueueFromEvent(event *model.Event, actions [
 
 	for _, action := range filteredActions {
 		if _, err = s.Create(event, action, constant.ActionInvocationStateCreated); err != nil {
-			log.Error().Msgf("Could not enqueue action '%s' (%v). Reason: %s", action.Label, action.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not enqueue action '%s' (%v)", action.Label, action.ID)
 			continue
 		}
 	}
@@ -127,7 +127,7 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 
 	for _, actionInvocation := range actionInvocations {
 		if _, err = s.UpdateState(actionInvocation.ID.String(), constant.ActionInvocationStateRunning); err != nil {
-			log.Error().Msgf("Could not mark action invocation '%v' as running. Reason: %s", actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not mark action invocation '%v' as running", actionInvocation.ID)
 			continue
 		}
 
@@ -135,21 +135,21 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 
 		var event *model.Event
 		if event, err = s.eventService.Get(actionInvocation.EventID); err != nil {
-			log.Error().Msgf("Could not find event '%v' for action '%v' and action invocation '%v'. Reason: %s", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not find event '%v' for action '%v' and action invocation '%v'", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID)
 			// with cascade, cannot happen
 			continue
 		}
 
 		var eventPayload *dto.EventPayloadInformationDto
 		if eventPayload, err = s.eventService.ExtractPayloadInfo(event); err != nil {
-			log.Error().Msgf("Could not extract event's '%v' information for action '%v' and action invocation '%v'. Reason: %s", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not extract event's '%v' information for action '%v' and action invocation '%v'", actionInvocation.EventID, actionInvocation.ActionID, actionInvocation.ID)
 			// with layout of attached payload, cannot happen
 			continue
 		}
 
 		var action *model.Action
 		if action, err = s.actionService.Get(actionInvocation.ActionID); err != nil {
-			log.Error().Msgf("Could not find action '%v' for action invocation '%v'. Reason: %s", actionInvocation.ActionID, actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not find action '%v' for action invocation '%v'", actionInvocation.ActionID, actionInvocation.ID)
 			// with cascade, cannot happen
 			continue
 		}
@@ -157,7 +157,7 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 		if err = s.Execute(action, eventPayload); err != nil {
 			var cause = err
 
-			log.Error().Msgf("Could not invoke action '%s' (%v) for action invocation '%v'. Reason: %s", action.Label, action.ID, actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not invoke action '%s' (%v) for action invocation '%v'", action.Label, action.ID, actionInvocation.ID)
 
 			var newState constant.ActionInvocationState
 			newRetryCount := actionInvocation.RetryCount + 1
@@ -169,16 +169,16 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 			}
 
 			if _, err = s.UpdateState(actionInvocation.ID.String(), newState); err != nil {
-				log.Error().Msgf("Could not mark action invocation '%v' as '%v'. Reason: %s", actionInvocation.ID, newState, err.Error())
+				log.Error().Err(err).Msgf("Could not mark action invocation '%v' as '%v'", actionInvocation.ID, newState)
 			}
 
 			if _, err = s.UpdateRetryCount(actionInvocation.ID.String(), newRetryCount); err != nil {
-				log.Error().Msgf("Could not update action invocation '%v' retry count to '%d'. Reason: %s", actionInvocation.ID, newRetryCount, err.Error())
+				log.Error().Err(err).Msgf("Could not update action invocation '%v' retry count to '%d'", actionInvocation.ID, newRetryCount)
 			}
 
 			msg := cause.Error()
 			if _, err = s.UpdateMessage(actionInvocation.ID.String(), &msg); err != nil {
-				log.Error().Msgf("Could not update action invocation '%v' message. Reason: %s", actionInvocation.ID, err.Error())
+				log.Error().Err(err).Msgf("Could not update action invocation '%v' message", actionInvocation.ID)
 			}
 
 			continue
@@ -186,10 +186,10 @@ func (s *ActionInvocationService) Invoke(batchSize int, maxRetries int) error {
 
 		log.Debug().Msgf("Processed action invocation '%v' for event '%s' (%v) and action '%s' (%v)", actionInvocation.ID, event.Name, event.ID, action.Label, action.ID)
 		if _, err = s.UpdateState(actionInvocation.ID.String(), constant.ActionInvocationStateSuccess); err != nil {
-			log.Error().Msgf("Could not mark action invocation '%v' as success. Reason: %s", actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not mark action invocation '%v' as success", actionInvocation.ID)
 		}
 		if _, err = s.UpdateMessage(actionInvocation.ID.String(), nil); err != nil {
-			log.Error().Msgf("Could not update action invocation '%v' message. Reason: %s", actionInvocation.ID, err.Error())
+			log.Error().Err(err).Msgf("Could not update action invocation '%v' message", actionInvocation.ID)
 		}
 	}
 
@@ -245,7 +245,7 @@ func (s *ActionInvocationService) replaceSecrets(str string) string {
 	for _, match := range matches {
 		var val string
 		if val, err = s.secretService.GetValueByKey(match[1]); err != nil {
-			log.Warn().Msgf("Could not inject secret '%s'. Reason: %s", match[1], err.Error())
+			log.Warn().Err(err).Msgf("Could not inject secret '%s'", match[1])
 			continue
 		}
 		str = strings.ReplaceAll(str, match[0], val)
@@ -265,7 +265,7 @@ func (s *ActionInvocationService) replaceConstants(str string) string {
 	for _, match := range matches {
 		var val string
 		if val, err = s.constantService.GetValueByKey(match[1]); err != nil {
-			log.Warn().Msgf("Could not inject constant '%s'. Reason: %s", match[1], err.Error())
+			log.Warn().Err(err).Msgf("Could not inject constant '%s'", match[1])
 			continue
 		}
 		str = strings.ReplaceAll(str, match[0], val)
