@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
 		plugins: [react(), svgrPlugin(), stylelint(stylelintOptions), eslint(eslintOptions)],
 		base: './',
 		server: {
-			open: false,
+			open: env.VITE_DEV_OPEN === 'true',
 			host: env.VITE_DEV_HOST,
 			port: parseInt(env.VITE_DEV_PORT),
 			proxy: {
