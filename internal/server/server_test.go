@@ -7,6 +7,7 @@ import (
 	"git.myservermanager.com/varakh/upda/api"
 	"git.myservermanager.com/varakh/upda/internal/meta"
 	"git.myservermanager.com/varakh/upda/internal/str"
+	"github.com/moby/moby/api/types/network"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -58,8 +59,8 @@ func createDatabaseContainer(ctx context.Context, t *testing.T) testcontainers.C
 		WaitingFor: wait.ForAll(
 			wait.ForLog("database system is ready to accept connections").WithStartupTimeout(containerStartupTimeout),
 			wait.ForSQL("5432/tcp", "postgres",
-				func(host string, port string) string {
-					strippedPort := stripPortSuffix(port)
+				func(host string, port network.Port) string {
+					strippedPort := stripPortSuffix(port.Port())
 					return fmt.Sprintf(
 						"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 						postgresUser, postgresPass, host, strippedPort, postgresDb,
