@@ -19,7 +19,7 @@ require (
 	github.com/moby/moby/api v1.56.1
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/rs/zerolog v1.35.1
-	github.com/sethvargo/go-envconfig v1.4.3
+	github.com/sethvargo/go-envconfig/v2 v2.0.0
 	github.com/skynet2/zerolog-gorm v1.1.0
 	github.com/stretchr/testify v1.12.1
 	github.com/testcontainers/testcontainers-go v0.44.0
