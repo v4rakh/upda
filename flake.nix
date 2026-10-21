@@ -34,19 +34,14 @@
               pnpmConfigHook
             ];
 
-            pnpmInstallFlags = [
-              "--frozen-lockfile"
-            ];
-
             pnpmDeps = pkgs.fetchPnpmDeps {
               inherit (finalAttrs)
                 pname
                 version
                 src
-                pnpmInstallFlags
                 ;
-              fetcherVersion = 3;
-              hash = "sha256-0YbwqqWOapHT13ekyTtc1WNLcbNGRKaFLOfgdKVdViA=";
+              fetcherVersion = 4;
+              hash = "sha256-X4oHsk2NXjpCO4KNIbu1d/tenICVrYW2aogVL68jpDE=";
             };
 
             buildPhase = ''
@@ -78,7 +73,7 @@
               "-s"
               "-w"
             ];
-            vendorHash = "sha256-QMqqDpr1khNbRBljDUL+UcAzJTEe6rvaXjIVx1Q99oY=";
+            vendorHash = "sha256-c7oIKm9Uf8vOb019mdPD50+/2Kw/7F60lV2S/vJ/8W8=";
 
             preBuild = ''
               mkdir -p internal/server/web
