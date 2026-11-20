@@ -1,18 +1,18 @@
 module git.myservermanager.com/varakh/upda
 
-go 1.26.0
+go 1.26.10
 
 require (
 	github.com/Depado/ginprom v1.8.3
 	github.com/containrrr/shoutrrr v0.8.0
-	github.com/gin-contrib/cors v1.7.9
-	github.com/gin-contrib/sessions v1.1.2
-	github.com/gin-contrib/static v1.1.8
+	github.com/gin-contrib/cors v1.7.11
+	github.com/gin-contrib/sessions v1.1.4
+	github.com/gin-contrib/static v1.1.10
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-co-op/gocron-redis-lock/v2 v2.2.1
 	github.com/go-co-op/gocron/v2 v2.22.0
-	github.com/go-playground/validator/v10 v10.30.5
-	github.com/go-redsync/redsync/v4 v4.18.0
+	github.com/go-playground/validator/v10 v10.30.6
+	github.com/go-redsync/redsync/v4 v4.18.1
 	github.com/go-resty/resty/v2 v2.17.2
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/google/uuid v1.6.0
@@ -55,13 +55,13 @@ require (
 	github.com/ebitengine/purego v0.10.1 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.16 // indirect
 	github.com/gin-contrib/sse v1.1.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
-	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/locales v0.14.2 // indirect
+	github.com/go-playground/universal-translator v0.18.2 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/goccy/go-json v0.10.6 // indirect
 	github.com/goccy/go-yaml v1.19.2 // indirect
